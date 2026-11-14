@@ -84,3 +84,4 @@ class AskResult:
     latency_ms: float
     timings_ms: dict[str, float]
     raw_answer: str | None = None
+    image_text: str | None = None  # texto lido do print enviado com a pergunta

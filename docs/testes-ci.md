@@ -31,12 +31,15 @@ Os testes **não precisam de Ollama, Qdrant em rede nem internet**. Eles usam du
 | `test_pipeline_integration.py` | Ingestão das duas estratégias, reindexação sem duplicar, resposta com citação real, filtro de relevância sem chamar o LLM, falhas do LLM |
 | `test_api.py` | Endpoints, validação (422), 409, 503, 403 do `/ingest`, ausência de segredos no `/config`, OpenAPI |
 | `test_eval.py` | Métricas (Recall@k, MRR, Wilson), integridade dos conjuntos de teste e de desenvolvimento, separação entre os dois (sem vazamento), calibração e o script de avaliação ponta a ponta com dublês |
-| `test_ui.py` | Resposta com selos de citação, indicador de recusa, erro de API, botões de exemplo, escape de HTML, aviso do modo demonstração, só fontes livres |
+| `test_ui.py` | Enter no campo de chat envia a pergunta, selos de citação, recusa com "trechos mais próximos", erro de API, botões de exemplo, "só recuperar", escape de HTML, texto lido do print, aviso do modo demonstração, abas Documentos e Validação (Recall@k, respostas fundamentadas, recusas corretas), só fontes livres |
+| `test_vision.py` | Perguntas com print: formatos aceitos (PNG/JPG/WEBP), base64 inválido, limite de tamanho, cliente do modelo de visão (payload, 404, 500, tempo limite), texto do print na busca e no prompt, 422 e 503 na API |
+| `test_validation.py` | Endpoints das abas Documentos e Validação: chunks mostrados = chunks indexados, caminho do arquivo, 404 para arquivos fora da base (inclusive `../../.env`), conjunto de teste e conferência de recuperação com a mesma regra da avaliação |
+| `test_scripts.py` | Verificador de dependências, BOM UTF-8 e funções coladas a argumentos nos `.ps1` |
 | `test_local_mode.py` | Parser do prompt, respondedor extrativo (mock), fábrica por modo, Qdrant em disco ponta a ponta e persistindo, cliente serializado, pasta travada |
 | `test_ingestion_cli.py` | CLI de ingestão: duas estratégias, `--skip-existing`, pasta inexistente, Ollama fora do ar, aquecimento do reranker com sucesso e falha, espera pelos serviços |
 | `test_logging_setup.py` | Logs JSON (ts, level, event, campos extra, exceções), gravação em arquivo, idempotência, truncamento |
 
-Cobertura em 14/11/2026: **94%** de `src/` e `eval/` (132 testes). Para conferir: `pytest --cov --cov-report=term-missing`. A configuração de cobertura fica em `pyproject.toml`.
+Cobertura em 14/11/2026: **94%** de `src/` e `eval/` (185 testes). Para conferir: `pytest --cov --cov-report=term-missing`. A configuração de cobertura fica em `pyproject.toml`.
 
 ## Integração contínua
 

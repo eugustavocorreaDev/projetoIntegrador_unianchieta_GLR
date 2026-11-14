@@ -3,8 +3,9 @@
     Sobe o projeto na máquina local, sem Docker: ingestão, API (em nova janela) e interface.
 
 .DESCRIPTION
-    Modo de DESENVOLVIMENTO. A execução oficial do projeto continua sendo:
-        docker compose up --build
+    Caminho Windows. Na primeira vez, rode antes a instalação assistida:
+        powershell -ExecutionPolicy Bypass -File scripts\instalar.ps1
+    O caminho Docker (oficial para a entrega) é: docker compose up --build
 
     - Qdrant embutido, gravado em disco em .qdrant_local\ (sem servidor).
     - Se o Ollama responder em http://localhost:11434, usa os modelos reais.
@@ -17,6 +18,10 @@
 .PARAMETER Reindex
     Recria o índice do zero (por padrão, só indexa o que ainda não existe).
 
+.PARAMETER Testar
+    Com a API no ar, valida a instalação de ponta a ponta: faz uma pergunta coberta pela
+    documentação (precisa responder com citação) e uma fora dela (precisa recusar).
+
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File scripts\run_local.ps1
 #>
@@ -24,6 +29,7 @@
 param(
     [switch]$Mock,
     [switch]$Reindex,
+    [switch]$Testar,
     [int]$ApiPort = 8000,
     [int]$UiPort = 8501
 )
@@ -38,12 +44,7 @@ function Stop-WithError([string]$Message) { Write-Host "ERRO: $Message" -Foregro
 # --- 1. Ambiente virtual -------------------------------------------------------------
 $Python = Join-Path $Root ".venv\Scripts\python.exe"
 if (-not (Test-Path $Python)) {
-    Write-Step "Criando o .venv e instalando as dependências (só na primeira vez)"
-    python -m venv .venv
-    if ($LASTEXITCODE -ne 0) { Stop-WithError "Não foi possível criar o .venv. Instale o Python 3.11+." }
-    & $Python -m pip install --upgrade pip
-    & $Python -m pip install -e ".[dev,ui]"
-    if ($LASTEXITCODE -ne 0) { Stop-WithError "Falha ao instalar as dependências." }
+    Stop-WithError "Ambiente ainda não instalado. Rode primeiro: powershell -ExecutionPolicy Bypass -File scripts\instalar.ps1"
 }
 . (Join-Path $Root ".venv\Scripts\Activate.ps1")
 Write-Step "Ambiente virtual ativo: $(& $Python --version)"
@@ -101,9 +102,9 @@ if ($llmModel -and $embedOk) {
         Write-Step "Modo de Visualização (Mock) forçado pela opção -Mock"
     } elseif (-not $ollamaTags) {
         Write-Warning "Ollama não encontrado em localhost:11434: usando o Modo de Visualização (Mock)."
-        Write-Warning "Para respostas geradas por IA: instale o Ollama (winget install Ollama.Ollama) e rode 'ollama pull llama3.2:3b' e 'ollama pull nomic-embed-text'."
+        Write-Warning "Para respostas geradas por IA, rode a instalação assistida: powershell -ExecutionPolicy Bypass -File scripts\instalar.ps1"
     } else {
-        if (-not $llmModel) { Write-Warning "Nenhum modelo de geração instalado. Rode: ollama pull llama3.2:3b" }
+        if (-not $llmModel) { Write-Warning "Nenhum modelo de geração instalado. Rode: ollama pull qwen2.5:3b" }
         if (-not $embedOk) { Write-Warning "Modelo de embeddings ausente. Rode: ollama pull nomic-embed-text" }
         Write-Warning "Usando o Modo de Visualização (Mock) até os modelos serem baixados."
     }
@@ -133,6 +134,41 @@ while (-not $health -and (Get-Date) -lt $deadline) {
 }
 if (-not $health) { Stop-WithError "A API não respondeu em 90 s. Veja os erros na janela 'RAG API'." }
 Write-Step "API no ar: status=$($health.status), llm_mode=$($health.llm_mode), docs em http://localhost:$ApiPort/docs"
+
+# --- 4b. Validação de ponta a ponta (opcional) -------------------------------------------------
+if ($Testar) {
+    Write-Step "Validação: uma pergunta coberta pela documentação e uma fora dela (pode levar até 1 min)"
+    $checks = @(
+        [pscustomobject]@{ Question = "Como compartilho fixtures entre vários arquivos de teste?"; Refuse = $false },
+        [pscustomobject]@{ Question = "O que é HTML?"; Refuse = $true }
+    )
+    $failed = 0
+    foreach ($check in $checks) {
+        $body = [Text.Encoding]::UTF8.GetBytes((@{ question = $check.Question } | ConvertTo-Json))
+        try {
+            $r = Invoke-RestMethod "http://localhost:$ApiPort/ask" -Method Post -ContentType "application/json; charset=utf-8" -Body $body -TimeoutSec 300
+        } catch {
+            $failed++
+            Write-Host "  [FALHA] '$($check.Question)': $($_.Exception.Message)" -ForegroundColor Red
+            continue
+        }
+        $sources = ($r.citations | ForEach-Object { $_.source } | Select-Object -Unique) -join ", "
+        if ($check.Refuse -and $r.refused) {
+            Write-Host "  [OK] '$($check.Question)': recusou, como esperado ($($r.refusal_reason))" -ForegroundColor Green
+        } elseif (-not $check.Refuse -and -not $r.refused -and $sources) {
+            Write-Host "  [OK] '$($check.Question)': respondeu citando $sources ($([math]::Round($r.latency_ms / 1000, 1)) s)" -ForegroundColor Green
+        } else {
+            $failed++
+            $expected = if ($check.Refuse) { "recusar" } else { "responder com citação" }
+            Write-Host "  [FALHA] '$($check.Question)': deveria $expected (refused=$($r.refused), motivo=$($r.refusal_reason))" -ForegroundColor Red
+        }
+    }
+    if ($failed -eq 0) {
+        Write-Step "Instalação validada de ponta a ponta (llm_mode=$($health.llm_mode))."
+    } else {
+        Write-Warning "$failed teste(s) falharam. Veja os erros na janela 'RAG API'; a interface abre mesmo assim."
+    }
+}
 
 # --- 5. Interface Streamlit (nesta janela) ---------------------------------------------
 $uiUrl = "http://localhost:$UiPort"

@@ -70,6 +70,7 @@ class OverlapReranker:
 def make_settings(**overrides) -> Settings:
     base = {
         "docs_dir": DOCS_DIR,
+        "eval_dataset": DATASET,
         "chunk_strategy": "recursive",
         "retrieval_mode": "hybrid",
         "top_k": 5,
@@ -81,8 +82,24 @@ def make_settings(**overrides) -> Settings:
     return Settings(_env_file=None, **base)
 
 
+class FakeImageReader:
+    """Modelo de visão falso: devolve um texto fixo e guarda as imagens recebidas."""
+
+    def __init__(self, text: str = "app.dependency_overrides") -> None:
+        self.text = text
+        self.calls: list[str] = []
+
+    def read(self, image_b64: str) -> str:
+        self.calls.append(image_b64)
+        return self.text
+
+
 def make_pipeline(
-    llm: FakeLLM | None = None, reranker=None, ingest: bool = True, **settings_overrides
+    llm: FakeLLM | None = None,
+    reranker=None,
+    ingest: bool = True,
+    image_reader=None,
+    **settings_overrides,
 ) -> RAGPipeline:
     settings = make_settings(**settings_overrides)
     store = QdrantStore(QdrantClient(location=":memory:"), prefix="test")
@@ -91,7 +108,9 @@ def make_pipeline(
         store, embedder, reranker, candidates_k=settings.candidates_k, rrf_k=settings.rrf_k
     )
     indexer = Indexer(store, embedder, settings.chunk_size, settings.chunk_overlap)
-    pipeline = RAGPipeline(retriever, llm or FakeLLM(), indexer, settings)
+    pipeline = RAGPipeline(
+        retriever, llm or FakeLLM(), indexer, settings, image_reader=image_reader
+    )
     if ingest:
         pipeline.ingest()
     return pipeline

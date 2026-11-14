@@ -36,84 +36,146 @@ flowchart LR
 
 Diagramas completos, camadas, contratos e decisões de arquitetura (ADRs) estão em **[docs/arquitetura.md](docs/arquitetura.md)**.
 
-## Como rodar
+## Como instalar e rodar
 
-São dois fluxos independentes. Escolha **um** deles.
+> **Há dois caminhos para rodar o mesmo sistema. Eles não são etapas um do outro: escolha um só.**
 
-| | Fluxo A: oficial | Fluxo B: desenvolvimento local |
+| Você quer... | Caminho | Comando |
 | --- | --- | --- |
-| Para quê | Entrega, vídeo, avaliação e correção pelo professor | Programar e testar no Windows sem Docker |
-| Precisa de | Docker Desktop | Python 3.11+ (Ollama opcional) |
-| Comando | `docker compose up --build` | `scripts\run_local.ps1` |
-| Banco vetorial | Qdrant em container | Qdrant embutido em disco (`.qdrant_local/`) |
-| Modelos | Ollama em container (baixados automaticamente) | Ollama instalado no Windows; sem ele, modo de visualização (mock) |
+| Desenvolver e testar no Windows (dia a dia do grupo) | **Windows** | `scripts\instalar.ps1` uma vez, depois `scripts\run_local.ps1` |
+| Rodar como o professor vai rodar, gravar o vídeo da entrega ou usar Linux/macOS | **Docker** | `docker compose up --build` |
 
-### Fluxo A: execução oficial (Docker + Ollama)
+Os dois usam o mesmo código, a mesma documentação indexada e os mesmos modelos de IA, servidos pelo Ollama. Muda só o lugar onde as peças rodam: direto no Windows ou dentro de containers. Nenhum dos dois usa chave de API ou serviço pago.
 
-1. Instale o [Docker Desktop](https://www.docker.com/products/docker-desktop/) e abra-o.
+### Em que máquina funciona
+
+| Sistema | Caminho | Observação |
+| --- | --- | --- |
+| Windows 11 ou Windows 10 (versão 1809 ou mais nova) | Windows ou Docker | O `winget`, usado pelo instalador, já vem no sistema |
+| Linux ou macOS | Docker | Os scripts `.ps1` são só para Windows |
+
+| Requisito | Mínimo |
+| --- | --- |
+| Memória RAM | 8 GB (o modelo de 3B usa ~2,5 GB) |
+| Disco livre | 6 GB no caminho Windows; ~10 GB no caminho Docker |
+| Internet | Só na primeira instalação, para baixar programas e modelos |
+| Permissão de administrador | Pode ser pedida pelo Windows ao instalar o Python e o Docker. O Ollama e o projeto instalam sem ela |
+| GPU | Opcional. Sem GPU, cada resposta leva de 10 s a 60 s |
+
+### Caminho Windows: instalação assistida
+
+**1. Baixe o projeto** (uma vez):
+
+```powershell
+git clone https://github.com/eugustavocorreaDev/projetoIntegrador_unianchieta_GLR.git
+cd projetoIntegrador_unianchieta_GLR
+```
+
+Sem Git, use **Code → Download ZIP** na página do repositório, extraia e abra o PowerShell na pasta extraída.
+
+**2. Rode a instalação assistida** (uma vez, e de novo sempre que algo parecer errado):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\instalar.ps1
+```
+
+O script confere cada item abaixo e, para o que faltar, **mostra de onde vai instalar e pergunta antes**. Os programas vêm pelo `winget`, a partir do instalador oficial de cada fabricante (python.org, ollama.com, git-scm.com, docker.com). Os pacotes Python vêm do PyPI, e os modelos, da biblioteca oficial do Ollama.
+
+| # | Item | O que é conferido | Se faltar, o script... |
+| --- | --- | --- | --- |
+| 1 | Python 3.11+ | Versão instalada (3.11 é a mesma do Docker e da CI) | oferece instalar pelo `winget` |
+| 2 | Ambiente virtual `.venv` | Existe e usa Python 3.11+ | cria |
+| 3 | Dependências | Todas na versão fixada no `pyproject.toml` | instala ou corrige |
+| 4 | Arquivo `.env` | Existe | copia do `.env.example` |
+| 5 | Ollama | Instalado e aberto em `localhost:11434` | instala e abre |
+| 6 | Modelo de embeddings `nomic-embed-text` (~270 MB) | Baixado e respondendo a um teste | baixa e testa |
+| 7 | Modelo de geração `qwen2.5:3b` (~2 GB) | Baixado e respondendo a um teste | baixa, testa e deixa carregado na memória |
+| 8 | Modelo de visão `qwen2.5vl:3b` (~3,2 GB, opcional) | Baixado | oferece baixar: permite perguntar enviando um print |
+| 9 | Docker Desktop, Engine e Compose | Instalado e em execução | só oferece: é opcional neste caminho |
+| 10 | RAM, disco e portas 8000/8501 | Recursos mínimos e portas livres | avisa |
+
+No final, o script:
+
+1. mostra o checklist e o resultado (`Caminho Windows: PRONTO, com IA real`);
+2. pergunta se você quer iniciar o projeto;
+3. se você confirmar, sobe a API, indexa a documentação e **valida a instalação de ponta a ponta**. Para isso, faz duas perguntas à API:
+   - uma coberta pela documentação, que precisa ser respondida com citação;
+   - uma fora dela ("O que é HTML?"), que precisa ser recusada;
+4. abre a interface no navegador.
+
+| Opção | Efeito |
+| --- | --- |
+| `-Verificar` | Só audita e mostra o checklist, sem instalar nem alterar nada |
+| `-Sim` | Responde "sim" a todas as perguntas |
+| `-ComDocker` | Trata o Docker como obrigatório e oferece instalá-lo |
+| `-Modelo llama3.2:3b` | Usa outro modelo de geração de 3B |
+| `-Iniciar` | No final, sobe e valida o projeto sem perguntar |
+
+**3. No dia a dia**, para subir o sistema:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\run_local.ps1
+```
+
+A API abre numa janela chamada "RAG API" e a interface abre no navegador, em <http://localhost:8501>. A documentação é indexada sozinha, e reindexada quando muda. Para parar, use `Ctrl+C` na janela da interface e feche a janela "RAG API".
+
+A interface tem três abas:
+
+| Aba | Para quê |
+| --- | --- |
+| 💬 **Perguntar** | Digite e tecle **Enter**. Dá para anexar um print, que o modelo de visão lê; a resposta continua vindo só da documentação, com citações |
+| 📚 **Documentos** | Os 20 arquivos de `data/raw_docs/`, que são tudo o que o assistente sabe, com o texto, os chunks de cada estratégia e as perguntas de teste de cada arquivo |
+| ✅ **Validação** | Roda o conjunto de teste ao vivo: Recall@k da recuperação, respostas fundamentadas e recusas corretas, com download em CSV |
+
+> **Sem o Ollama**, o sistema ainda abre, no **Modo de Visualização (Mock)**: a busca, as citações e a recusa funcionam, mas as respostas não são geradas por IA e não valem como resultado. A interface avisa. Para sair dele, rode o `instalar.ps1` de novo.
+
+### Caminho Docker: um comando, qualquer sistema
+
+1. Instale e abra o [Docker Desktop](https://www.docker.com/products/docker-desktop/), gratuito para estudantes. No Windows, também dá para usar `scripts\instalar.ps1 -ComDocker`. Depois de instalar, reinicie o computador e espere o Docker Desktop mostrar "Engine running".
 2. Na pasta do projeto, rode:
 
    ```bash
    docker compose up --build
    ```
 
-3. Aguarde. A primeira execução baixa os modelos (~2,3 GB) e indexa a documentação sozinha. Depois, abra:
+3. Aguarde. Na primeira vez, leva de 5 a 15 minutos: baixa os modelos (~2,3 GB) e indexa a documentação sozinho. Depois, abra:
    - interface: <http://localhost:8501>
    - API (OpenAPI): <http://localhost:8000/docs>
 
-Para parar, use `Ctrl+C` ou `docker compose down`. Mais detalhes, GPU e solução de problemas em [docs/instalacao.md](docs/instalacao.md#fluxo-a-execução-oficial-docker--ollama).
+Neste caminho não é preciso instalar Python nem Ollama: tudo roda em containers. Para parar, use `Ctrl+C` ou `docker compose down`.
 
-### Fluxo B: desenvolvimento local no Windows (sem Docker)
-
-1. **Python 3.11+** instalado ([python.org](https://www.python.org/downloads/)).
-2. **(Recomendado) Ollama para Windows**, para ter respostas geradas por IA de verdade:
-
-   ```powershell
-   winget install Ollama.Ollama          # ou baixe o instalador em https://ollama.com/download
-   ollama pull llama3.2:3b               # modelo de geração (~2 GB)
-   ollama pull nomic-embed-text          # modelo de embeddings (~270 MB)
-   ollama list                           # confira se os dois aparecem
-   ```
-
-   Depois de instalado, o Ollama roda em segundo plano em `http://localhost:11434`.
-
-3. **Suba o projeto:**
-
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File scripts\run_local.ps1
-   ```
-
-   O script cria o `.venv` se faltar, indexa a documentação (e reindexa sozinho quando ela muda), abre a API numa janela chamada "RAG API" e abre a interface no navegador.
-
-4. **Sem o Ollama**, o script entra no **modo de visualização (mock)**: as respostas organizam os trechos recuperados com as citações, mas **não são geradas por IA**. A interface mostra um aviso, e o relatório de `eval/` marca essas execuções como inválidas para resultados. Para sair do mock, faça o passo 2, feche a janela "RAG API" e rode o script de novo.
-
-Detalhes em [docs/instalacao.md](docs/instalacao.md#fluxo-b-desenvolvimento-local-no-windows-sem-docker).
+Detalhes, GPU e solução de problemas: **[docs/instalacao.md](docs/instalacao.md)**.
 
 ### Variáveis de ambiente
 
-Nenhuma é obrigatória: todas têm valor padrão. Para mudar algo, copie `.env.example` para `.env`. O projeto **não usa chaves**. As principais:
+Nenhuma é obrigatória: todas têm valor padrão, e o `instalar.ps1` cria o `.env` a partir do `.env.example`. O projeto **não usa chaves**. As principais:
 
 | Variável | Padrão | Função |
 | --- | --- | --- |
-| `LLM_MODEL` | `qwen2.5:3b` | Modelo de geração (no Fluxo B, o script usa `llama3.2:3b` se for o que estiver instalado) |
+| `LLM_MODEL` | `qwen2.5:3b` | Modelo de geração (o instalador baixa este; `llama3.2:3b` também funciona) |
 | `EMBED_MODEL` | `nomic-embed-text` | Modelo de embeddings |
 | `CHUNK_STRATEGY` | `recursive` | `fixed` ou `recursive` |
 | `CHUNK_SIZE` / `CHUNK_OVERLAP` | `800` / `120` | Tamanho e sobreposição dos chunks (caracteres) |
-| `RETRIEVAL_MODE` | `hybrid_rerank` | `vector`, `bm25`, `hybrid` ou `hybrid_rerank` |
+| `RETRIEVAL_MODE` | `hybrid` | `vector`, `bm25`, `hybrid` ou `hybrid_rerank` (o reranker piorou a recuperação na medição; ver ADR 002) |
 | `TOP_K` | `5` | Trechos enviados ao LLM |
 | `MIN_VECTOR_SCORE` | `0.0` | Limite de relevância para chamar o LLM (0 desativa) |
 | `DOCS_DIR` | `data/raw_docs` | Documentação a indexar |
-| `LLM_MODE` / `EMBED_MODE` / `QDRANT_MODE` | `ollama` / `ollama` / `server` | Modos oficiais; `mock` / `hash` / `local` só para desenvolvimento |
+| `LLM_MODE` / `EMBED_MODE` / `QDRANT_MODE` | `ollama` / `ollama` / `server` | Modos oficiais; `mock` / `hash` / `local` só para desenvolvimento (o `run_local.ps1` ajusta sozinho) |
 
 A lista completa está em [docs/instalacao.md](docs/instalacao.md#variáveis-de-ambiente).
 
 ### Testes e avaliação
 
-```bash
-pip install -e ".[dev,ui]"
-ruff check . && ruff format --check . && pytest --cov            # não precisa de modelos
+```powershell
+.\.venv\Scripts\python.exe -m ruff check .
+.\.venv\Scripts\python.exe -m ruff format --check .
+.\.venv\Scripts\python.exe -m pytest --cov        # não precisa de modelos nem de Docker
+```
 
-docker compose run --rm api python -m eval.run_eval --reindex --generate   # avaliação (Fluxo A no ar)
+A avaliação oficial roda no caminho Docker, com o sistema no ar:
+
+```bash
+docker compose run --rm api python -m eval.run_eval --reindex --generate
 ```
 
 ## Estrutura do repositório
@@ -135,7 +197,8 @@ src/
 tests/                testes unitários e de integração (sem modelos, com dublês)
 eval/                 métricas, script de avaliação, dataset e resultados
 data/                 base de conhecimento (raw_docs) e documentação externa (external, fora do Git)
-scripts/              run_local.ps1 (Fluxo B) e download da documentação oficial do FastAPI
+scripts/              instalar.ps1 (instalação assistida), run_local.ps1 (caminho Windows),
+                      verificar_dependencias.py e download da documentação oficial do FastAPI
 evidencias/           vídeo, CI, avaliação, logs, prints, falhas e índice
 docs/                 documentação técnica e trabalho de pesquisa em PDF
 .claude/agents/       subagentes: arquiteto-revisor e auditor-rag-enunciado
@@ -146,8 +209,8 @@ docs/                 documentação técnica e trabalho de pesquisa em PDF
 | Integrante | Responsabilidades | Papéis do enunciado que lidera |
 | --- | --- | --- |
 | **Integrante 1:** Gustavo Correa Lima (RA: 2530185) | Backend, Arquitetura, Pipeline RAG e Infraestrutura | Backend e Infraestrutura · IA e Avaliação (pipeline e prompts) |
-| **Integrante 2:** `[PREENCHER NOME COMPLETO - RA: XXXXXXX]` | Dados, Dataset de Avaliação (50 perguntas) e Testes Automatizados | Dados e Qualidade · IA e Avaliação (dataset e métricas) |
-| **Integrante 3:** `[PREENCHER NOME COMPLETO - RA: XXXXXXX]` | Interface Web, Documentação Técnica e Pesquisa ABNT | Produto e Interface |
+| **Integrante 2:** Larissa Paula de Almeida Campos (RA: 2506209) | Dados, Dataset de Avaliação (50 perguntas) e Testes Automatizados | Dados e Qualidade · IA e Avaliação (dataset e métricas) |
+| **Integrante 3:** Rafael Dourado Coimbra (RA: 2414807) | Interface Web, Documentação Técnica e Pesquisa ABNT | Produto e Interface |
 
 ### Regras do trabalho em equipe
 
@@ -180,7 +243,7 @@ Os subagentes `arquiteto-revisor` (arquitetura e código) e `auditor-rag-enuncia
 | Plus Jakarta Sans (fonte dos títulos, via Google Fonts) | SIL Open Font License 1.1 |
 | `nomic-embed-text` | Apache 2.0 |
 | `qwen2.5:3b` (padrão no Docker) | Qwen Research License (uso acadêmico/não comercial) |
-| `llama3.2:3b` (alternativa, Fluxo B) | Llama 3.2 Community License |
+| `llama3.2:3b` (alternativa opcional, `-Modelo llama3.2:3b`) | Llama 3.2 Community License |
 | FlashRank `ms-marco-MultiBERT-L-12` | Ver ficha em <https://huggingface.co/prithivida/flashrank> |
 | Documentação oficial do FastAPI (opcional, baixada por script) | MIT |
 
@@ -189,6 +252,7 @@ A base de `data/raw_docs/` é texto original do projeto (MIT). Fichas de dados e
 ## Documentação
 
 - [Documentação técnica](docs/README.md): arquitetura, instalação, API, dados e modelos, avaliação, testes, segurança e manual.
+- [Checklist de conformidade com o enunciado](docs/checklist-enunciado.md): o que está atendido, parcial e pendente, e como conferir cada item.
 - [Índice de evidências](evidencias/README.md)
 - Trabalho de pesquisa (ABNT): `docs/pesquisa-abnt.pdf`
 

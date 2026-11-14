@@ -1,9 +1,11 @@
-"""Normalização e tokenização de texto compartilhadas (BM25, embeddings por hashing e mock)."""
+"""Normalização e tokenização de texto compartilhadas (BM25, embeddings por hashing, mock,
+validação interativa e avaliação)."""
 
 from __future__ import annotations
 
 import re
 import unicodedata
+from collections.abc import Iterable, Sequence
 
 _TOKEN_RE = re.compile(r"\w+")
 
@@ -43,3 +45,22 @@ STEM_CHARS = 6  # "sobrescrever" e "sobrescrevendo" contam como o mesmo termo
 def stems(text: str) -> set[str]:
     """Radicais aproximados (primeiros caracteres de cada token), para comparar termos."""
     return {t[:STEM_CHARS] for t in tokenize(text)}
+
+
+def normalize(text: str) -> str:
+    """Minúsculas, sem acentos, sem crases/asteriscos do Markdown e com espaços colapsados."""
+    stripped = _strip_accents(text.lower()).replace("`", "").replace("*", "")
+    return " ".join(stripped.split())
+
+
+def contains_snippet(text: str, snippets: Iterable[str]) -> bool:
+    haystack = normalize(text)
+    return any(normalize(s) in haystack for s in snippets)
+
+
+def first_relevant_rank(texts: Sequence[str], snippets: Sequence[str]) -> int | None:
+    """Posição (começando em 1) do primeiro texto que contém um trecho esperado."""
+    for rank, text in enumerate(texts, start=1):
+        if contains_snippet(text, snippets):
+            return rank
+    return None

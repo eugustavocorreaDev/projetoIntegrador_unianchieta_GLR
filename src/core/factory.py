@@ -9,6 +9,7 @@ from __future__ import annotations
 from core.config import Settings
 from generation.llm import LLM, OllamaLLM
 from generation.mock_llm import ExtractiveMockLLM
+from generation.vision import ImageReader, OllamaImageReader
 from ingestion.embeddings import Embedder, HashEmbedder, OllamaEmbedder
 from retrieval.reranker import FlashRankReranker
 from retrieval.vector_store import QdrantStore
@@ -55,6 +56,18 @@ def build_llm(settings: Settings) -> LLM:
         num_ctx=settings.llm_num_ctx,
         max_tokens=settings.llm_max_tokens,
         seed=settings.llm_seed,
+        timeout_s=settings.request_timeout_s,
+    )
+
+
+def build_image_reader(settings: Settings) -> ImageReader | None:
+    """None no modo mock: sem Ollama não há modelo de visão, e o pipeline avisa isso."""
+    if settings.llm_mode == "mock":
+        return None
+    return OllamaImageReader(
+        settings.ollama_base_url,
+        settings.vision_model,
+        max_tokens=settings.vision_max_tokens,
         timeout_s=settings.request_timeout_s,
     )
 

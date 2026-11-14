@@ -2,19 +2,38 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from core.config import ChunkStrategy, RetrievalMode
 from core.schemas import AskResult, RetrievedChunk
 
+# ~5 MB de imagem viram ~6,7 milhões de caracteres em base64
+MAX_IMAGE_B64_CHARS = 7_000_000
+
 
 class QueryRequest(BaseModel):
     question: str = Field(
-        min_length=3, max_length=1000, examples=["Como sobrescrever uma dependência em testes?"]
+        default="",
+        max_length=1000,
+        examples=["Como sobrescrever uma dependência em testes?"],
+        description="Obrigatória (3+ caracteres), a não ser que image_base64 seja enviado",
+    )
+    image_base64: str | None = Field(
+        default=None,
+        max_length=MAX_IMAGE_B64_CHARS,
+        description="Print opcional (PNG, JPG ou WEBP em base64); o texto lido entra na pergunta",
     )
     strategy: ChunkStrategy | None = Field(default=None, description="Padrão: CHUNK_STRATEGY")
     mode: RetrievalMode | None = Field(default=None, description="Padrão: RETRIEVAL_MODE")
     top_k: int | None = Field(default=None, ge=1, le=20, description="Padrão: TOP_K")
+
+    @model_validator(mode="after")
+    def _question_or_image(self) -> QueryRequest:
+        if not self.image_base64 and len(self.question.strip()) < 3:
+            raise ValueError(
+                "Escreva uma pergunta com pelo menos 3 caracteres ou envie uma imagem."
+            )
+        return self
 
 
 class RetrievedOut(BaseModel):
@@ -66,6 +85,7 @@ class AskResponse(BaseModel):
     mode_effective: str
     latency_ms: float
     timings_ms: dict[str, float]
+    image_text: str | None = Field(default=None, description="Texto lido do print, se houver")
 
     @classmethod
     def from_domain(cls, result: AskResult) -> AskResponse:
@@ -80,6 +100,7 @@ class AskResponse(BaseModel):
             mode_effective=result.mode_effective,
             latency_ms=result.latency_ms,
             timings_ms=result.timings_ms,
+            image_text=result.image_text,
         )
 
 
@@ -88,6 +109,66 @@ class SearchResponse(BaseModel):
     strategy: str
     mode_effective: str
     latency_ms: float
+    image_text: str | None = None
+
+
+class DocumentSummary(BaseModel):
+    source: str
+    title: str
+    chars: int
+    sections: int
+    chunks: dict[str, int] = Field(description="Quantidade de chunks por estratégia")
+
+
+class DocumentChunk(BaseModel):
+    index: int
+    section: str
+    text: str
+    chars: int
+
+
+class DocumentDetail(BaseModel):
+    source: str
+    title: str
+    path: str = Field(description="Caminho do arquivo no repositório")
+    text: str
+    sections: list[str]
+    strategy: str
+    chunks: list[DocumentChunk]
+
+
+class ValidationQuestion(BaseModel):
+    id: str
+    question: str
+    answerable: bool
+    expected_answer: str | None = None
+    expected_source: str | None = None
+    expected_section: str | None = None
+    expected_snippets: list[str] = Field(default_factory=list)
+    note: str | None = None
+
+
+class RetrievalCheckRequest(BaseModel):
+    ids: list[str] = Field(min_length=1, max_length=100)
+    strategy: ChunkStrategy | None = None
+    mode: RetrievalMode | None = None
+    top_k: int | None = Field(default=None, ge=1, le=20)
+
+
+class RetrievalCheckRow(BaseModel):
+    id: str
+    question: str
+    expected_source: str
+    rank: int | None = Field(description="Posição do trecho esperado (None = não recuperado)")
+    hit: bool
+    retrieved_sources: list[str]
+    strategy: str
+    mode_effective: str
+    latency_ms: float
+
+
+class RetrievalCheckResponse(BaseModel):
+    rows: list[RetrievalCheckRow]
 
 
 class IngestRequest(BaseModel):

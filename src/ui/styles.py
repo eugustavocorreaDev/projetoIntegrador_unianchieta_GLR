@@ -109,5 +109,7 @@ textarea { border-radius: 10px !important; }
 }
 .status-line { font-size: .85rem; margin: .15rem 0; }
 .hist { font-size: .82rem; color: var(--muted); margin: .2rem 0; line-height: 1.35; }
+.rag-asked { font-size: .92rem; color: var(--muted); margin: 1rem 0 .25rem; }
+.rag-asked b { color: var(--text, #0F172A); }
 </style>
 """

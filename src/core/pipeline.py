@@ -7,8 +7,10 @@ import time
 from pathlib import Path
 
 from core.config import CHUNK_STRATEGIES, RETRIEVAL_MODES, Settings
+from core.errors import InvalidInputError, ServiceUnavailableError
 from core.factory import (
     build_embedder,
+    build_image_reader,
     build_llm,
     build_reranker,
     build_store,
@@ -19,6 +21,7 @@ from core.schemas import AskResult, RetrievedChunk
 from generation.grounding import ground_answer
 from generation.llm import LLM
 from generation.prompts import REFUSAL_MESSAGE, SYSTEM_PROMPT, build_user_prompt
+from generation.vision import ImageReader, decode_image
 from ingestion.indexer import Indexer
 from ingestion.loader import load_documents
 from retrieval.retriever import Retriever
@@ -53,14 +56,43 @@ def relevance_signal(chunks: list[RetrievedChunk]) -> float | None:
     return max(scores) if scores else None
 
 
+def compose_query(question: str, image_text: str | None) -> str:
+    """Junta a pergunta digitada e o texto lido do print; o resultado vai para a busca e o LLM."""
+    question = question.strip()
+    if not image_text:
+        return question
+    lead = question or "O que a documentação diz sobre o conteúdo desta imagem?"
+    return f"{lead}\n\nTexto lido da imagem enviada:\n{image_text.strip()}"
+
+
 class RAGPipeline:
     def __init__(
-        self, retriever: Retriever, llm: LLM, indexer: Indexer, settings: Settings
+        self,
+        retriever: Retriever,
+        llm: LLM,
+        indexer: Indexer,
+        settings: Settings,
+        image_reader: ImageReader | None = None,
     ) -> None:
         self.retriever = retriever
         self.llm = llm
         self.indexer = indexer
         self.settings = settings
+        self.image_reader = image_reader
+
+    def read_image(self, image_b64: str) -> str:
+        """Valida o print e devolve o texto que o modelo de visão leu nele."""
+        max_bytes = int(self.settings.max_image_mb * 1024 * 1024)
+        clean_b64, _ = decode_image(image_b64, max_bytes)
+        if self.image_reader is None:
+            raise ServiceUnavailableError(
+                "A leitura de imagens precisa do Ollama com o modelo de visão "
+                f"({self.settings.vision_model}). Ela fica desativada no Modo de Visualização."
+            )
+        text = self.image_reader.read(clean_b64)
+        if not text:
+            raise InvalidInputError("O modelo de visão não conseguiu ler nada na imagem.")
+        return text
 
     def _resolve(self, strategy: str | None, mode: str | None, top_k: int | None):
         strategy = strategy or self.settings.chunk_strategy
@@ -100,14 +132,22 @@ class RAGPipeline:
         strategy: str | None = None,
         mode: str | None = None,
         top_k: int | None = None,
+        image_b64: str | None = None,
     ) -> AskResult:
         question = question.strip()
         strategy, mode, top_k = self._resolve(strategy, mode, top_k)
         timings: dict[str, float] = {}
         start = time.perf_counter()
 
+        image_text: str | None = None
+        if image_b64:
+            t = time.perf_counter()
+            image_text = self.read_image(image_b64)
+            timings["image"] = _ms(t)
+        query = compose_query(question, image_text)
+
         t = time.perf_counter()
-        chunks, effective = self.retriever.retrieve(question, strategy, mode, top_k)
+        chunks, effective = self.retriever.retrieve(query, strategy, mode, top_k)
         timings["retrieval"] = _ms(t)
 
         raw_answer: str | None = None
@@ -117,7 +157,7 @@ class RAGPipeline:
             answer, refused, reason, citations = REFUSAL_MESSAGE, True, gate_reason, []
         else:
             t = time.perf_counter()
-            raw_answer = self.llm.generate(SYSTEM_PROMPT, build_user_prompt(question, chunks))
+            raw_answer = self.llm.generate(SYSTEM_PROMPT, build_user_prompt(query, chunks))
             timings["generation"] = _ms(t)
             grounded = ground_answer(
                 raw_answer,
@@ -150,11 +190,13 @@ class RAGPipeline:
             latency_ms=_ms(start),
             timings_ms=timings,
             raw_answer=raw_answer,
+            image_text=image_text,
         )
         logger.info(
             "ask.completed",
             extra={
                 "question": truncate(question),
+                "image_text": truncate(image_text) if image_text else None,
                 "strategy": strategy,
                 "mode": mode,
                 "mode_effective": effective,
@@ -223,4 +265,6 @@ def build_pipeline(settings: Settings) -> RAGPipeline:
         settings.chunk_overlap,
         embedder_id=embedder_identity(settings),
     )
-    return RAGPipeline(retriever, build_llm(settings), indexer, settings)
+    return RAGPipeline(
+        retriever, build_llm(settings), indexer, settings, image_reader=build_image_reader(settings)
+    )

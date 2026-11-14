@@ -8,9 +8,27 @@ A documentação interativa (OpenAPI/Swagger) é gerada pelo FastAPI em <http://
 | --- | --- | --- | --- |
 | `GET` | `/health` | Estado do Qdrant e do Ollama e número de chunks por coleção. `status` = `ok` ou `degraded` | — |
 | `GET` | `/config` | Configuração em uso, sem segredos | — |
-| `POST` | `/ask` | Pergunta → resposta com citações ou recusa | 422, 409, 503 |
-| `POST` | `/search` | Só a recuperação, sem chamar o LLM | 422, 409, 503 |
+| `POST` | `/ask` | Pergunta → resposta com citações ou recusa. Aceita um print opcional em `image_base64` | 422, 409, 503 |
+| `POST` | `/search` | Só a recuperação, sem chamar o LLM (também aceita `image_base64`) | 422, 409, 503 |
 | `POST` | `/ingest` | Reindexa `DOCS_DIR` (recria as coleções) | 403 se `ENABLE_INGEST_ENDPOINT=false` |
+| `GET` | `/documents` | Arquivos da base, com título, tamanho, seções e chunks por estratégia | — |
+| `GET` | `/documents/{arquivo}?strategy=` | Texto, caminho, seções e chunks de um arquivo da base | 404 fora da base, 422 |
+| `GET` | `/validation/questions` | Perguntas do conjunto de teste, com fonte e trechos esperados | 404 |
+| `POST` | `/validation/retrieval` | Confere, pergunta a pergunta, se o trecho esperado veio entre os top-k (mesma regra de `eval/run_eval.py`) | 422 |
+
+### Perguntas com print
+
+Envie a imagem em base64 (PNG, JPG ou WEBP, até `MAX_IMAGE_MB`, padrão 5 MB) no campo `image_base64`. A pergunta pode ficar vazia quando houver imagem.
+
+1. O modelo de visão (`VISION_MODEL`, padrão `qwen2.5vl:3b`) transcreve o texto e o código do print.
+2. A transcrição volta no campo `image_text` e é anexada à pergunta, tanto na busca quanto no prompt.
+3. A imagem **nunca é fonte**: a resposta precisa citar trechos da documentação e passa pela mesma verificação de citações.
+
+Os erros possíveis são:
+- **422:** imagem inválida, grande demais ou em formato não aceito;
+- **503:** modelo de visão ausente (`ollama pull qwen2.5vl:3b`) ou Modo de Visualização ativo.
+
+A imagem não é gravada; o log registra só o começo do texto lido.
 
 ### Exemplos
 
@@ -51,4 +69,10 @@ Invoke-RestMethod -Uri http://localhost:8000/ask -Method Post -ContentType "appl
 
 ## Interface web
 
-Em <http://localhost:8501>. Passo a passo com capturas em [manual-usuario.md](manual-usuario.md).
+Em <http://localhost:8501>, com três abas:
+
+- **Perguntar:** o Enter envia, e é possível anexar um print;
+- **Documentos:** a base indexada, arquivo por arquivo;
+- **Validação:** o conjunto de teste rodado ao vivo.
+
+Passo a passo em [manual-usuario.md](manual-usuario.md).

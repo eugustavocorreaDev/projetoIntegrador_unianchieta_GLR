@@ -41,6 +41,10 @@ class Settings(BaseSettings):
     llm_max_tokens: int = 512
     llm_seed: int = 42
     request_timeout_s: float = 180.0
+    # Leitura de prints enviados com a pergunta (opcional; desativada no modo mock)
+    vision_model: str = "qwen2.5vl:3b"
+    vision_max_tokens: int = 600
+    max_image_mb: float = 5.0
 
     # Qdrant
     qdrant_url: str = "http://localhost:6333"
@@ -48,12 +52,16 @@ class Settings(BaseSettings):
 
     # Ingestão
     docs_dir: Path = Path("data/raw_docs")
+    # Conjunto de teste usado pela aba "Validação" da interface
+    eval_dataset: Path = Path("eval/datasets/perguntas_teste.json")
     chunk_strategy: ChunkStrategy = "recursive"
     chunk_size: int = 800
     chunk_overlap: int = 120
 
     # Recuperação
-    retrieval_mode: RetrievalMode = "hybrid_rerank"
+    # hybrid e não hybrid_rerank: na medição de 14/11 o reranker derrubou o Recall@5 de
+    # 96-98% para 58-60% (ver ADR 002 em docs/arquitetura.md)
+    retrieval_mode: RetrievalMode = "hybrid"
     top_k: int = 5
     candidates_k: int = 20
     rrf_k: int = 60

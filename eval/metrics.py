@@ -3,29 +3,21 @@
 from __future__ import annotations
 
 import math
-import unicodedata
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 
+# A comparação de trechos fica em core.text, compartilhada com a validação interativa da API
+from core.text import contains_snippet, first_relevant_rank, normalize
 
-def normalize(text: str) -> str:
-    """Minúsculas, sem acentos, sem crases/asteriscos do Markdown e com espaços colapsados."""
-    decomposed = unicodedata.normalize("NFKD", text.lower())
-    stripped = "".join(c for c in decomposed if not unicodedata.combining(c))
-    stripped = stripped.replace("`", "").replace("*", "")
-    return " ".join(stripped.split())
-
-
-def contains_snippet(text: str, snippets: Iterable[str]) -> bool:
-    haystack = normalize(text)
-    return any(normalize(s) in haystack for s in snippets)
-
-
-def first_relevant_rank(texts: Sequence[str], snippets: Sequence[str]) -> int | None:
-    """Posição (começando em 1) do primeiro texto que contém um trecho esperado."""
-    for rank, text in enumerate(texts, start=1):
-        if contains_snippet(text, snippets):
-            return rank
-    return None
+__all__ = [
+    "contains_snippet",
+    "first_relevant_rank",
+    "generation_metrics",
+    "mean_reciprocal_rank",
+    "normalize",
+    "recall_at_k",
+    "threshold_sweep",
+    "wilson_interval",
+]
 
 
 def recall_at_k(ranks: Sequence[int | None], k: int) -> float:

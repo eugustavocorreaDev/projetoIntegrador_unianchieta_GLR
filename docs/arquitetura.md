@@ -110,7 +110,7 @@ Regras:
    | `RerankerError` | não chega à API | O `Retriever` degrada para `hybrid` |
 
 4. **Configuração só por ambiente.** Todo parâmetro vem de `core/config.Settings` (variáveis de ambiente / `.env`). Nada de constantes mágicas espalhadas.
-5. **Uma fábrica decide as implementações.** `core/factory.py` é o único lugar que escolhe entre Ollama e mock (`LLM_MODE`), Ollama e hashing (`EMBED_MODE`) e Qdrant servidor ou em disco (`QDRANT_MODE`). API, CLI e avaliação usam a fábrica, então enxergam sempre o mesmo índice. O modo oficial é `ollama/ollama/server`; os demais existem só para desenvolvimento (ver [instalacao.md](instalacao.md#modo-local-sem-docker-windows)).
+5. **Uma fábrica decide as implementações.** `core/factory.py` é o único lugar que escolhe entre Ollama e mock (`LLM_MODE`), Ollama e hashing (`EMBED_MODE`) e Qdrant servidor ou em disco (`QDRANT_MODE`). API, CLI e avaliação usam a fábrica, então enxergam sempre o mesmo índice. O modo oficial é `ollama/ollama/server`; os demais existem só para desenvolvimento (ver [instalacao.md](instalacao.md#caminho-windows)).
 6. **Imports absolutos a partir de `src/`** (`from core.config import get_settings`). O `pytest` e o Docker colocam `src/` no `PYTHONPATH`.
 7. **Toda função pública nova tem teste**, e os testes não dependem de rede (ver `docs/testes-ci.md`).
 
@@ -179,10 +179,22 @@ Regras:
 
 ### ADR 002: Busca híbrida (vetorial + BM25 com RRF) seguida de reranking
 
-- **Status:** aceito, **a confirmar com números** em `eval/` (o desafio do tema exige essa comparação)
+- **Status:** aceito em parte e **revisado em 14/11/2026 com números**. A busca híbrida virou o padrão; o reranking ficou só como opção de comparação.
+- **Medição (14/11/2026):**
+  - **Condições:** API real, `nomic-embed-text` via Ollama, as 50 perguntas com resposta, top-5, aba Validação / `POST /validation/retrieval`, mesma regra de `eval/run_eval.py`.
+
+    | Modo | Recall@5 `fixed` | Recall@5 `recursive` |
+    | --- | --- | --- |
+    | `vector` | 90% | 90% |
+    | `bm25` | 98% | 92% |
+    | `hybrid` | **98%** | **96%** (MRR 0,86) |
+    | `hybrid_rerank` | 58% | 60% |
+
+  - **Causa:** a hipótese de que o FlashRank truncava os trechos (`max_length` padrão de 128 tokens) foi testada com 128, 256 e 512 e **descartada**: o Recall@5 ficou entre 56% e 70% em todos os casos. O modelo `ms-marco-MultiBERT-L-12` reordena mal trechos técnicos em português; ele chegou a dar nota 0,998 a trechos sem relação com a pergunta.
+  - **Limitação:** os trechos esperados do conjunto de teste são literais, o que favorece o BM25. Os números oficiais precisam sair de `eval/run_eval.py` e ir para `evidencias/avaliacao/`.
 - **Contexto:** documentação técnica mistura linguagem natural ("como sobrescrever uma dependência") com identificadores exatos (`dependency_overrides`, `--proxy-headers`). Embeddings capturam o primeiro tipo e diluem o segundo; BM25 faz o contrário.
 - **Decisão:** buscar 20 candidatos em cada método, combinar com **Reciprocal Rank Fusion** (k=60), que usa só a posição e dispensa normalizar escalas diferentes, e reordenar os candidatos com o cross-encoder multilíngue **FlashRank `ms-marco-MultiBERT-L-12`** (ONNX, CPU, sem PyTorch). O BM25 foi implementado à mão (`retrieval/bm25.py`), com tokenização sem acentos e divisão de identificadores com `_`.
-- **Consequências:** custa mais latência por pergunta (reranking de 20 pares), compensada pela precisão no topo da lista, que é o que o LLM vê. Os quatro modos (`vector`, `bm25`, `hybrid`, `hybrid_rerank`) continuam selecionáveis para a avaliação; o baseline oficial é `fixed + vector`.
+- **Consequências:** o reranking custaria mais latência por pergunta (20 pares), e a medição mostrou que, com este modelo, ele **piora** a lista que o LLM vê. Por isso o padrão passou a ser `hybrid` (RRF), e trocar o modelo do reranker é trabalho futuro. Os quatro modos (`vector`, `bm25`, `hybrid`, `hybrid_rerank`) continuam selecionáveis para a avaliação; o baseline oficial é `fixed + vector`.
 - **Alternativas descartadas:**
   - *Só vetorial*: mantida apenas como baseline.
   - *Combinação linear de pontuações*: exige calibrar pesos e normalizar cosseno contra BM25.

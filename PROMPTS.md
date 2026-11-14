@@ -166,9 +166,87 @@ Regras do enunciado: pelo menos **10 interações relevantes**, cada uma com o p
   - apagar do histórico do `PROMPTS.md` o pedido de autoria individual da interação 3: ele foi mantido e marcado como revertido, porque o registro de uso de IA precisa ser fiel;
   - trocar o modelo padrão do Docker para `llama3.2:3b`: o Fluxo A continua com `qwen2.5:3b` (ADR e avaliação) e o Fluxo B aceita os dois;
   - usar um LLM como juiz da fundamentação: dobraria a latência em CPU e fica como trabalho futuro.
-- **Pendências apontadas pelo auditor que dependem do grupo:** rodar a avaliação real com o Ollama (Fluxo A) e versionar as saídas; analisar 3 ou mais casos de falha reais; gravar o vídeo; fazer as capturas; criar o repositório com commits de todos e revisão cruzada; preencher os integrantes 2 e 3; confirmar com o professor o grupo de 3 (o enunciado fala em 4) e o uso de uma base própria em vez de uma documentação pública grande (o script da documentação oficial do FastAPI continua disponível); redigir o PDF ABNT; completar 10 ou mais interações neste arquivo.
+- **Pendências apontadas pelo auditor que dependem do grupo:** rodar a avaliação real com o Ollama (Fluxo A) e versionar as saídas; analisar 3 ou mais casos de falha reais; gravar o vídeo; fazer as capturas; criar o repositório com commits de todos e revisão cruzada; preencher os integrantes 2 e 3 (feito na interação 7); confirmar com o professor o grupo de 3 (o enunciado fala em 4) e o uso de uma base própria em vez de uma documentação pública grande (o script da documentação oficial do FastAPI continua disponível); redigir o PDF ABNT; completar 10 ou mais interações neste arquivo.
 - **Verificação automática:** `ruff check` e `ruff format --check` limpos; **132 testes passando**; cobertura de 94% de `src/` e `eval/`; reindexação real pela API (20 documentos, 94 e 136 chunks); perguntas reais pela API em modo mock: "O que é HTML?" e "O que é JavaScript?" recusadas, e perguntas sobre fixtures e Compose respondidas com citação.
 - **Revisão humana (outro integrante):** [ ] revisou a nova base de conhecimento contra a documentação oficial · [ ] leu as 64 perguntas de teste e as 18 de desenvolvimento · [ ] aprovou o PR
+
+---
+
+## Interação 5: instalação assistida e README simplificado
+
+- **Data:** 2026-11-14 · **Integrante:** Gustavo Correa Lima · **Ferramenta:** Claude Code (Anthropic), modelo Claude Opus 5.5
+- **Objetivo:** tornar a instalação compreensível para quem abre o repositório pela primeira vez. O `docker compose up --build` falhou numa máquina sem Docker, e as seções "Fluxo A" e "Fluxo B" do README não deixavam claro se eram etapas ou alternativas.
+- **Prompt (resumido):** "Crie um facilitador de instalação: audite e valide o Docker, o Python, todas as dependências e os modelos necessários, mostre um checklist do que está instalado e configurado, abra o Ollama, e reescreva a instalação do README de forma simplificada. Hoje há muita informação e não dá para entender se o Fluxo A e o B são continuação um do outro."
+- **Resumo da resposta:**
+  - **`scripts/instalar.ps1`:** audita sistema (winget, Git, Python 3.11+), projeto (`.venv`, dependências, `.env`), IA local (Ollama instalado e aberto, `nomic-embed-text` e o modelo de geração, cada um com um teste real), Docker (opcional) e máquina (RAM, disco, portas). Pergunta antes de instalar cada item pelo `winget`, termina com um checklist OK/FALTA/AVISO/OPCIONAL e oferece iniciar o projeto. Opções `-Verificar` (só audita), `-Sim`, `-ComDocker`, `-Modelo` e `-Iniciar`. O teste do modelo de geração usa `keep_alive` de 30 minutos, deixando o modelo aberto no Ollama.
+  - **`scripts/verificar_dependencias.py`:** compara cada pacote instalado com a versão fixada no `pyproject.toml` (inclusive os extras `dev` e `ui`) e confere os pacotes de `src/`. Fica em Python para ser testável.
+  - **README e `docs/instalacao.md`:** "Fluxo A/B" viraram **Caminho Windows** e **Caminho Docker**, com uma tabela "Você quer... → caminho → comando" e o aviso explícito de que são alternativas. O caminho Windows ficou em três passos: clonar, `instalar.ps1` (uma vez) e `run_local.ps1` (dia a dia).
+  - **`run_local.ps1`:** sem `.venv`, pede para rodar o instalador, em vez de criar o ambiente com o primeiro Python do PATH.
+  - **Interface:** a faixa do Modo de Visualização aponta para o `instalar.ps1`.
+- **Erros e ajustes encontrados ao testar:**
+  - o `.venv` desta máquina, criado com `uv`, não tinha `pip`, e a instalação das dependências falharia. O instalador usa o `uv` quando ele existe e, senão, roda `ensurepip` antes do `pip`;
+  - o `python` do PATH era o 3.13, mas o projeto é testado no 3.11 (Docker e CI). O instalador procura `py -3.11` e `py -3.12` antes, e marca 3.13+ como AVISO;
+  - o checklist repetia a mesma dica de instalação do Ollama em dois itens. As dicas passaram a ser únicas;
+  - o instalador tentaria `ollama pull` com o Ollama respondendo na porta 11434 mas não instalado no Windows (caso do container do compose). O download passou a exigir o executável.
+- **Aceito:** o instalador com confirmação item a item, o verificador de dependências, a reorganização em dois caminhos e um só modelo padrão (`qwen2.5:3b`) nos dois caminhos.
+- **Corrigido:** os 4 itens acima, antes do commit.
+- **Descartado:**
+  - instalar tudo sem perguntar: o script mexe no sistema (Python, Ollama, Docker), então cada instalação é confirmada, a não ser com `-Sim`;
+  - instalar o Docker por padrão: ele exige reiniciar o Windows e só é necessário no caminho Docker, então só entra com `-ComDocker` ou confirmação explícita;
+  - manter `llama3.2:3b` como modelo padrão do caminho Windows: dois modelos diferentes por caminho complicavam a explicação. Ele continua aceito com `-Modelo llama3.2:3b`.
+- **Limitação:** nesta máquina, foram validados de verdade só o modo `-Verificar` e a detecção de Python, `.venv`, dependências, Ollama ausente e Docker ausente. Os ramos que instalam e abrem o Ollama e o Docker ainda não rodaram e precisam ser testados pelo grupo.
+- **Verificação automática:** `ruff check` e `ruff format --check` limpos; **141 testes passando** (9 novos em `tests/test_scripts.py`: versões fixadas, problemas de dependência, códigos de saída e BOM UTF-8 dos `.ps1`); sintaxe dos dois `.ps1` validada pelo parser do PowerShell; `instalar.ps1 -Verificar` executado nesta máquina.
+- **Revisão humana (outro integrante):** [ ] rodou `scripts\instalar.ps1` numa máquina limpa · [ ] seguiu o README do zero sem ajuda · [ ] aprovou o PR
+
+---
+
+## Interação 6: origem das instalações, validação de ponta a ponta e compatibilidade
+
+- **Data:** 2026-11-14 · **Integrante:** Gustavo Correa Lima · **Ferramenta:** Claude Code (Anthropic), modelo Claude Opus 5.5
+- **Objetivo:** garantir que o instalador instale (e não só avise), diga de onde instala, valide tudo e suba o projeto, e deixar claro em quais máquinas o projeto funciona.
+- **Prompt (resumido):** "O script só avisa o que falta ou também instala, dos lugares corretos, perguntando antes? No final, ele precisa validar a instalação e rodar o projeto. O projeto vai funcionar na máquina de qualquer usuário? Isso está no README?"
+- **Resumo da resposta:**
+  - o script já instalava com confirmação. Agora cada pergunta mostra a **origem**: `winget` com o instalador oficial (python.org, ollama.com, git-scm.com, docker.com), PyPI para os pacotes e a biblioteca oficial do Ollama para os modelos. Sem o `winget`, ele mostra o link oficial;
+  - **validação de ponta a ponta:** nova opção `run_local.ps1 -Testar`, que o instalador usa ao iniciar o projeto. Com a API no ar, ela faz uma pergunta coberta pela documentação (precisa responder com citação) e "O que é HTML?" (precisa recusar);
+  - **README:** nova seção "Em que máquina funciona" (Windows 10 1809+/11 nos dois caminhos; Linux/macOS só pelo Docker; RAM, disco, internet, permissão de administrador e GPU) e a opção de baixar o ZIP sem Git.
+- **Erro encontrado ao revisar:** uma edição anterior colou o nome da função à pergunta (`Confirm-Step"Baixar..."`). O parser do PowerShell aceita, mas a execução falharia ao baixar o modelo de embeddings. Foi corrigido, e um teste novo (`test_powershell_functions_are_not_glued_to_arguments`) passou a barrar esse tipo de erro nos dois `.ps1`.
+- **Aceito:** a origem explícita, a validação de ponta a ponta e a seção de compatibilidade.
+- **Corrigido:** o erro acima.
+- **Descartado:** baixar instaladores diretamente por URL quando falta o `winget`: duplicaria o que o `winget` já faz com verificação de hash, para um caso raro (Windows 10 anterior a 1809).
+- **Limitação:** a validação de ponta a ponta foi executada contra a API real, mas no modo mock. Os ramos que instalam o Python, o Ollama e o Docker, e o caminho Docker como um todo, ainda não foram executados em nenhuma máquina.
+- **Verificação automática:** `ruff` limpo; testes passando; sintaxe dos `.ps1` validada; bloco `-Testar` executado contra a API: a pergunta sobre fixtures foi respondida citando `pytest-fixtures.md`, e "O que é HTML?" foi recusada.
+- **Revisão humana (outro integrante):** [ ] rodou o instalador do zero numa máquina sem Ollama · [ ] testou o caminho Docker · [ ] aprovou o PR
+
+---
+
+## Interação 7: validação interativa, perguntas com print, Enter para enviar e auditoria ao vivo
+
+- **Data:** 2026-11-14 · **Integrante:** Gustavo Correa Lima · **Ferramenta:** Claude Code (Anthropic), modelo Claude Opus 5.5
+- **Objetivo:** responder "como eu sei que o sistema atende ao enunciado?" com uma forma interativa de conferir a base e as métricas, aceitar perguntas com print, enviar com Enter e preencher os integrantes 2 e 3.
+- **Prompt (resumido):** "Que documentos ele está usando para responder, e onde estão? Quero um checklist de validação do enunciado e uma página interativa para validar os documentos. Quero mandar um print e ele detectar e responder, enviar com Enter, mais testes automatizados e uma auditoria dinâmica da interface. Adicione os RAs: Larissa Paula de Almeida Campos (2506209) e Rafael Dourado Coimbra (2414807)."
+- **Resumo da resposta:**
+  - **Integrantes:** Larissa como integrante 2 e Rafael como integrante 3, na ordem enviada e nos papéis que já estavam na tabela.
+  - **API:** `GET /documents`, `GET /documents/{arquivo}`, `GET /validation/questions` e `POST /validation/retrieval` (`core/validation.py`, com a mesma regra de acerto da avaliação). A comparação de trechos passou para `core/text.py` e é compartilhada com `eval/metrics.py`.
+  - **Interface:** três abas.
+    - **Perguntar:** `st.chat_input`, que envia com Enter; upload de print; "Você perguntou"; na recusa, os trechos aparecem como "mais próximos encontrados", com a explicação.
+    - **Documentos:** totais, tabela filtrável, texto, chunks por estratégia e perguntas de teste de cada arquivo.
+    - **Validação:** Recall@k ao vivo, respostas fundamentadas, recusas corretas e CSV.
+  - **Prints:** `generation/vision.py` com o `qwen2.5vl:3b` do Ollama. A transcrição entra na pergunta, mas nunca vira fonte: a resposta continua sujeita à verificação de citações. Há validação de formato e tamanho (422) e um 503 claro sem o modelo ou no modo mock. O modelo também foi incluído no `instalar.ps1` como item opcional.
+  - **Documentação:** `docs/checklist-enunciado.md` (Tema 4, rubrica, evidências, resultados preliminares e roteiro de validação), além de `docs/api.md`, do manual (seções 6 e 7) e do README.
+- **Achado mais importante, com dados reais:** a validação ao vivo, com o Ollama e as 50 perguntas, mostrou que o modo **padrão** `hybrid_rerank` tinha Recall@5 de 58–60%, contra 96–98% do `hybrid` sem reranking. A hipótese de truncamento do FlashRank (128, 256 e 512 tokens) foi testada e descartada. O padrão passou a ser `hybrid` em `config.py`, no `docker-compose.yml`, no `.env.example` e na barra lateral, e a ADR 002 foi revisada com a tabela. Antes disso, todas as perguntas feitas na interface usavam a pior configuração.
+- **Teste real da leitura de print:** o modelo de visão transcreveu sem erros um print com `RuntimeError: Form data requires "python-multipart"`, e a busca trouxe o trecho certo em 1º lugar. Mesmo assim, o LLM de 3B recusou (`llm_refusal`). Ficou registrado como o caso de falha 2 em `evidencias/falhas/`, com correção proposta.
+- **Auditoria dinâmica da interface** (a interface real contra a API real, via `AppTest`): abre sem erros; a aba Documentos mostra 20 documentos e 94/136 chunks, iguais ao índice; o Enter envia e a resposta cita `pytest-fixtures.md` (45 s); "Como faz um ovo frito?" é recusada (21 s); a aba Validação mede Recall@5 = 96% (48/50, MRR 0,86) em 15 s.
+- **Aceito:** as três abas, os endpoints de validação, a leitura de prints, o novo padrão `hybrid`, o checklist e os casos de falha.
+- **Corrigido durante a interação:** um erro no próprio script de auditoria (ele lia a caixa de seleção errada), confirmado pelo rótulo antes de concluir.
+- **Descartado:**
+  - **OCR clássico (RapidOCR/Tesseract):** traria o OpenCV e as bibliotecas de sistema do Docker. O modelo de visão já faz parte da stack Ollama;
+  - **atualizar o Streamlit para anexar a imagem no próprio campo de chat:** trocar uma versão fixada sem necessidade arriscaria os testes;
+  - **trocar o modelo do reranker agora:** fica como trabalho futuro, medido na aba Validação.
+- **Limitações:**
+  - o `ollama/ollama:0.5.4` do compose não roda o `qwen2.5vl`. No caminho Docker, a leitura de prints só funciona atualizando a imagem do Ollama, o que não foi testado;
+  - os números da seção 4 do checklist são preliminares, porque saíram da API e não do `eval/run_eval.py`.
+- **Verificação automática:** `ruff` limpo; **185 testes passando** (eram 143), com 94% de cobertura; validação ao vivo das 50 perguntas em 4 modos × 2 estratégias.
+- **Revisão humana (outro integrante):** [ ] Larissa conferiu o conjunto de teste pela aba Documentos · [ ] Rafael revisou a interface e o manual · [ ] PR aprovado por alguém que não conduziu a interação
 
 ---
 
