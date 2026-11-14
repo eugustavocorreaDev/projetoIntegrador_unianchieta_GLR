@@ -1,0 +1,152 @@
+{
+  "name": "perguntas_dev",
+  "version": "1.0.0",
+  "corpus": "data/raw_docs (20 documentos)",
+  "description": "Conjunto de DESENVOLVIMENTO: usado apenas para calibrar parâmetros, como MIN_VECTOR_SCORE. Não compartilha perguntas nem trechos esperados com o conjunto de teste (perguntas_teste.json), e há um teste automatizado que garante isso. Nunca reporte números deste arquivo como resultado final.",
+  "questions": [
+    {
+      "id": "d01",
+      "question": "Qual código de status o RedirectResponse usa por padrão?",
+      "answerable": true,
+      "expected_answer": "307.",
+      "expected_source": "respostas-personalizadas.md",
+      "expected_section": "Respostas personalizadas e códigos de status > Escolhendo a classe de resposta",
+      "expected_snippets": ["por padrão com o status 307"]
+    },
+    {
+      "id": "d02",
+      "question": "Qual constante do módulo status devo usar numa exclusão que não devolve conteúdo?",
+      "answerable": true,
+      "expected_answer": "status.HTTP_204_NO_CONTENT, sem retornar corpo.",
+      "expected_source": "respostas-personalizadas.md",
+      "expected_section": "Respostas personalizadas e códigos de status > Códigos de status com o módulo status",
+      "expected_snippets": ["status.HTTP_204_NO_CONTENT"]
+    },
+    {
+      "id": "d03",
+      "question": "Como torno as instâncias de um modelo Pydantic imutáveis?",
+      "answerable": true,
+      "expected_answer": "Com frozen=True no model_config.",
+      "expected_source": "pydantic-modelos.md",
+      "expected_section": "Pydantic: modelos de dados > Configuração do modelo",
+      "expected_snippets": ["frozen=True torna as instâncias imutáveis"]
+    },
+    {
+      "id": "d04",
+      "question": "Qual método do Pydantic valida diretamente uma string JSON?",
+      "answerable": true,
+      "expected_answer": "model_validate_json.",
+      "expected_source": "pydantic-modelos.md",
+      "expected_section": "Pydantic: modelos de dados > Criando modelos a partir de dados",
+      "expected_snippets": ["Produto.model_validate_json(texto)"]
+    },
+    {
+      "id": "d05",
+      "question": "Como aceito JSON com chaves em camelCase mantendo o atributo Python em snake_case?",
+      "answerable": true,
+      "expected_answer": "Com Field(alias=...), por exemplo Field(alias=\"dataNascimento\").",
+      "expected_source": "pydantic-validacao.md",
+      "expected_section": "Pydantic: validação personalizada > Aliases",
+      "expected_snippets": ["Field(alias=\"dataNascimento\")"]
+    },
+    {
+      "id": "d06",
+      "question": "No pydantic-settings, o que tem mais prioridade: um argumento passado ao criar a classe ou uma variável de ambiente?",
+      "answerable": true,
+      "expected_answer": "O argumento passado ao criar a classe.",
+      "expected_source": "configuracoes.md",
+      "expected_section": "Configurações com pydantic-settings > Ordem de prioridade",
+      "expected_snippets": ["argumentos passados ao criar a classe"]
+    },
+    {
+      "id": "d07",
+      "question": "Qual opção faz o pytest parar na primeira falha?",
+      "answerable": true,
+      "expected_answer": "pytest -x.",
+      "expected_source": "pytest-fundamentos.md",
+      "expected_section": "pytest: fundamentos > Opções úteis da linha de comando",
+      "expected_snippets": ["pytest -x | Para na primeira falha"]
+    },
+    {
+      "id": "d08",
+      "question": "Qual fixture embutida do pytest fornece um diretório temporário por teste?",
+      "answerable": true,
+      "expected_answer": "tmp_path.",
+      "expected_source": "pytest-fixtures.md",
+      "expected_section": "pytest: fixtures > Fixtures embutidas mais usadas",
+      "expected_snippets": ["tmp_path: um diretório temporário exclusivo para o teste"]
+    },
+    {
+      "id": "d09",
+      "question": "Para que serve o arquivo .dockerignore?",
+      "answerable": true,
+      "expected_answer": "Lista o que não deve ir no contexto de construção, como .git, ambientes virtuais e .env.",
+      "expected_source": "docker-imagens.md",
+      "expected_section": "Docker: construindo imagens > O arquivo .dockerignore",
+      "expected_snippets": ["O arquivo .dockerignore lista o que não deve ser enviado"]
+    },
+    {
+      "id": "d10",
+      "question": "Qual política de reinício do Compose reinicia sempre, exceto quando o container foi parado manualmente?",
+      "answerable": true,
+      "expected_answer": "unless-stopped.",
+      "expected_source": "docker-compose.md",
+      "expected_section": "Docker Compose: vários serviços > Política de reinício",
+      "expected_snippets": ["unless-stopped reinicia sempre"]
+    },
+    {
+      "id": "d11",
+      "question": "Qual middleware comprime as respostas da API com gzip?",
+      "answerable": true,
+      "expected_answer": "GZipMiddleware.",
+      "expected_source": "erros-e-middleware.md",
+      "expected_section": "Tratamento de erros, middleware e CORS > Outros middlewares prontos",
+      "expected_snippets": ["GZipMiddleware comprime as respostas"]
+    },
+    {
+      "id": "d12",
+      "question": "Como exijo uma chave de API enviada num cabeçalho?",
+      "answerable": true,
+      "expected_answer": "Com APIKeyHeader, de fastapi.security, usado como dependência.",
+      "expected_source": "seguranca.md",
+      "expected_section": "Segurança e autenticação > Chave de API em cabeçalho",
+      "expected_snippets": ["A classe APIKeyHeader, de fastapi.security"]
+    },
+    {
+      "id": "v01",
+      "question": "Como configuro o Celery Beat para agendar tarefas periódicas?",
+      "answerable": false,
+      "note": "O Celery é citado só como alternativa às tarefas em segundo plano."
+    },
+    {
+      "id": "v02",
+      "question": "Como faço o deploy da API no Heroku?",
+      "answerable": false,
+      "note": "Assunto ausente."
+    },
+    {
+      "id": "v03",
+      "question": "Como uso o SQLAlchemy assíncrono com o FastAPI?",
+      "answerable": false,
+      "note": "Assunto ausente."
+    },
+    {
+      "id": "v04",
+      "question": "O que é CSS?",
+      "answerable": false,
+      "note": "Conhecimento geral."
+    },
+    {
+      "id": "v05",
+      "question": "Como configuro o Nginx como proxy reverso da aplicação?",
+      "answerable": false,
+      "note": "Armadilha: o corpus cita Traefik e Caddy, não o Nginx."
+    },
+    {
+      "id": "v06",
+      "question": "Qual é a versão mínima do Python exigida pelo Pydantic?",
+      "answerable": false,
+      "note": "Assunto ausente."
+    }
+  ]
+}

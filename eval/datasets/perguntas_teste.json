@@ -1,0 +1,646 @@
+{
+  "name": "perguntas_teste",
+  "version": "2.0.0",
+  "corpus": "data/raw_docs (20 documentos)",
+  "description": "Conjunto de teste oficial do Tema 4: 50 perguntas com resposta e trecho-fonte esperados, cobrindo os 20 documentos da base, e 14 perguntas sem resposta (assuntos ausentes, armadilhas próximas ao corpus e conhecimento geral). Escrito antes de qualquer ajuste do sistema (prompts, chunking, limites). Não use este arquivo para calibrar parâmetros.",
+  "fields": {
+    "expected_snippets": "Trechos literais do documento-fonte. Um chunk é relevante se contém algum deles (comparação sem acentos, sem crases e sem diferenciar maiúsculas). Isso torna o Recall@k independente da estratégia de chunking.",
+    "answerable": "false para perguntas cuja resposta NÃO está na documentação; o sistema deve recusar."
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "question": "Como instalo o FastAPI junto com o servidor e a ferramenta de linha de comando?",
+      "answerable": true,
+      "expected_answer": "Com pip install \"fastapi[standard]\", que inclui o Uvicorn e o comando fastapi.",
+      "expected_source": "primeiros-passos.md",
+      "expected_section": "Primeiros passos > Instalação",
+      "expected_snippets": [
+        "pip install \"fastapi[standard]\""
+      ]
+    },
+    {
+      "id": "q02",
+      "question": "Qual comando inicia o servidor em modo de desenvolvimento com recarregamento automático?",
+      "answerable": true,
+      "expected_answer": "fastapi dev main.py",
+      "expected_source": "primeiros-passos.md",
+      "expected_section": "Primeiros passos > Executando o servidor",
+      "expected_snippets": [
+        "fastapi dev main.py"
+      ]
+    },
+    {
+      "id": "q03",
+      "question": "Em qual endereço fica a documentação interativa gerada com o Swagger UI?",
+      "answerable": true,
+      "expected_answer": "Em http://127.0.0.1:8000/docs.",
+      "expected_source": "primeiros-passos.md",
+      "expected_section": "Primeiros passos > Documentação interativa",
+      "expected_snippets": [
+        "http://127.0.0.1:8000/docs"
+      ]
+    },
+    {
+      "id": "q04",
+      "question": "Qual comando devo usar para rodar a aplicação em produção?",
+      "answerable": true,
+      "expected_answer": "fastapi run main.py, que não ativa o recarregamento automático.",
+      "expected_source": "primeiros-passos.md",
+      "expected_section": "Primeiros passos > Executando o servidor",
+      "expected_snippets": [
+        "Em produção, use fastapi run main.py"
+      ]
+    },
+    {
+      "id": "q05",
+      "question": "O que acontece se o cliente enviar um texto num parâmetro de caminho anotado como int?",
+      "answerable": true,
+      "expected_answer": "A API responde com status 422 e uma mensagem indicando o parâmetro inválido.",
+      "expected_source": "parametros.md",
+      "expected_section": "Parâmetros de caminho e de consulta > Parâmetros de caminho",
+      "expected_snippets": [
+        "a API responde com o status 422"
+      ]
+    },
+    {
+      "id": "q06",
+      "question": "Por que a rota /users/me precisa ser declarada antes de /users/{user_id}?",
+      "answerable": true,
+      "expected_answer": "Porque as rotas são avaliadas na ordem de declaração e a rota com parâmetro capturaria 'me' como user_id.",
+      "expected_source": "parametros.md",
+      "expected_section": "Parâmetros de caminho e de consulta > Parâmetros de caminho > A ordem das rotas importa",
+      "expected_snippets": [
+        "a rota com parâmetro captura a requisição"
+      ]
+    },
+    {
+      "id": "q07",
+      "question": "Como valido o tamanho mínimo e máximo de um parâmetro de consulta?",
+      "answerable": true,
+      "expected_answer": "Combinando Annotated com Query(min_length=..., max_length=...).",
+      "expected_source": "parametros.md",
+      "expected_section": "Parâmetros de caminho e de consulta > Validações adicionais",
+      "expected_snippets": [
+        "combine Annotated com Query"
+      ]
+    },
+    {
+      "id": "q08",
+      "question": "Como limito os valores aceitos em um parâmetro de caminho a uma lista predefinida?",
+      "answerable": true,
+      "expected_answer": "Com uma classe que herda de str e de Enum.",
+      "expected_source": "parametros.md",
+      "expected_section": "Parâmetros de caminho e de consulta > Parâmetros de caminho > Valores predefinidos com Enum",
+      "expected_snippets": [
+        "use uma classe que herda de str e de Enum"
+      ]
+    },
+    {
+      "id": "q09",
+      "question": "Como converto um modelo Pydantic recebido no corpo em dicionário?",
+      "answerable": true,
+      "expected_answer": "Com item.model_dump().",
+      "expected_source": "corpo-da-requisicao.md",
+      "expected_section": "Corpo da requisição e modelos de resposta > Declarando um modelo",
+      "expected_snippets": [
+        "item.model_dump()"
+      ]
+    },
+    {
+      "id": "q10",
+      "question": "Como o FastAPI decide se um parâmetro vem do caminho, da consulta ou do corpo da requisição?",
+      "answerable": true,
+      "expected_answer": "Nome no caminho: caminho; tipo simples: consulta; modelo Pydantic: corpo.",
+      "expected_source": "corpo-da-requisicao.md",
+      "expected_section": "Corpo da requisição e modelos de resposta > Como o FastAPI decide a origem de cada parâmetro",
+      "expected_snippets": [
+        "se o tipo é um modelo Pydantic, é lido do corpo da requisição"
+      ]
+    },
+    {
+      "id": "q11",
+      "question": "Como evito que a senha do usuário apareça na resposta da API?",
+      "answerable": true,
+      "expected_answer": "Definindo um response_model sem o campo de senha; campos fora do modelo são removidos.",
+      "expected_source": "corpo-da-requisicao.md",
+      "expected_section": "Corpo da requisição e modelos de resposta > Modelo de resposta",
+      "expected_snippets": [
+        "remove qualquer campo que não esteja nele"
+      ]
+    },
+    {
+      "id": "q12",
+      "question": "Como exijo que o corpo da requisição venha dentro de uma chave com o nome do parâmetro?",
+      "answerable": true,
+      "expected_answer": "Com Body(embed=True).",
+      "expected_source": "corpo-da-requisicao.md",
+      "expected_section": "Corpo da requisição e modelos de resposta > Como o FastAPI decide a origem de cada parâmetro",
+      "expected_snippets": [
+        "use Body(embed=True)"
+      ]
+    },
+    {
+      "id": "q13",
+      "question": "O que acontece quando a mesma dependência aparece várias vezes na mesma requisição?",
+      "answerable": true,
+      "expected_answer": "Ela é executada uma vez só e o resultado fica em cache durante a requisição (use_cache=False muda isso).",
+      "expected_source": "dependencias.md",
+      "expected_section": "Dependências > Subdependências",
+      "expected_snippets": [
+        "ela é executada só uma vez"
+      ]
+    },
+    {
+      "id": "q14",
+      "question": "Como executo código de limpeza, como fechar a sessão do banco, depois que a rota termina?",
+      "answerable": true,
+      "expected_answer": "Com uma dependência que usa yield em vez de return, colocando a limpeza num bloco finally.",
+      "expected_source": "dependencias.md",
+      "expected_section": "Dependências > Dependências com yield",
+      "expected_snippets": [
+        "pode usar yield em vez de return"
+      ]
+    },
+    {
+      "id": "q15",
+      "question": "Como aplico uma dependência a todas as rotas da aplicação?",
+      "answerable": true,
+      "expected_answer": "Passando dependencies=[Depends(...)] na criação do FastAPI.",
+      "expected_source": "dependencias.md",
+      "expected_section": "Dependências > Dependências globais e em decoradores",
+      "expected_snippets": [
+        "app = FastAPI(dependencies=[Depends(verify_token)])"
+      ]
+    },
+    {
+      "id": "q16",
+      "question": "Em qual cabeçalho e formato o cliente envia o token quando uso OAuth2PasswordBearer?",
+      "answerable": true,
+      "expected_answer": "No cabeçalho Authorization, no formato Bearer <token>.",
+      "expected_source": "seguranca.md",
+      "expected_section": "Segurança e autenticação > Fluxo de senha com OAuth2 e token Bearer",
+      "expected_snippets": [
+        "no formato Bearer <token>"
+      ]
+    },
+    {
+      "id": "q17",
+      "question": "Onde deve ficar a chave usada para assinar os tokens JWT?",
+      "answerable": true,
+      "expected_answer": "Numa variável de ambiente, nunca no código ou no repositório.",
+      "expected_source": "seguranca.md",
+      "expected_section": "Segurança e autenticação > Senhas e tokens JWT",
+      "expected_snippets": [
+        "deve ficar em uma variável de ambiente"
+      ]
+    },
+    {
+      "id": "q18",
+      "question": "O que o OAuth2PasswordBearer faz quando a requisição chega sem o cabeçalho de autorização?",
+      "answerable": true,
+      "expected_answer": "Responde automaticamente com status 401.",
+      "expected_source": "seguranca.md",
+      "expected_section": "Segurança e autenticação > Fluxo de senha com OAuth2 e token Bearer",
+      "expected_snippets": [
+        "responde automaticamente com o status 401"
+      ]
+    },
+    {
+      "id": "q19",
+      "question": "Como restrinjo rotas por permissões como items:read e items:write?",
+      "answerable": true,
+      "expected_answer": "Com escopos OAuth2: a classe Security e o parâmetro scopes.",
+      "expected_source": "seguranca.md",
+      "expected_section": "Segurança e autenticação > Escopos",
+      "expected_snippets": [
+        "Com a classe Security e o parâmetro scopes"
+      ]
+    },
+    {
+      "id": "q20",
+      "question": "Como executo uma função depois que a resposta já foi enviada ao cliente?",
+      "answerable": true,
+      "expected_answer": "Declarando um parâmetro BackgroundTasks e chamando background_tasks.add_task(funcao, ...).",
+      "expected_source": "tarefas-em-segundo-plano.md",
+      "expected_section": "Tarefas em segundo plano > Usando BackgroundTasks",
+      "expected_snippets": [
+        "adicione tarefas com o método add_task"
+      ]
+    },
+    {
+      "id": "q21",
+      "question": "Quando devo usar o Celery em vez das tarefas em segundo plano do FastAPI?",
+      "answerable": true,
+      "expected_answer": "Para cálculos pesados ou trabalhos que precisam sobreviver a uma reinicialização do servidor.",
+      "expected_source": "tarefas-em-segundo-plano.md",
+      "expected_section": "Tarefas em segundo plano > Quando usar outra ferramenta",
+      "expected_snippets": [
+        "para cálculos pesados ou trabalhos que precisam sobreviver a uma reinicialização"
+      ]
+    },
+    {
+      "id": "q22",
+      "question": "Como substituo uma dependência real por uma versão de teste?",
+      "answerable": true,
+      "expected_answer": "Atribuindo a função substituta em app.dependency_overrides[dependencia_original].",
+      "expected_source": "testes.md",
+      "expected_section": "Testes > Sobrescrevendo dependências",
+      "expected_snippets": [
+        "use o dicionário app.dependency_overrides"
+      ]
+    },
+    {
+      "id": "q23",
+      "question": "Por que o código do lifespan não roda nos meus testes com TestClient?",
+      "answerable": true,
+      "expected_answer": "Porque ele só roda quando o cliente é usado como gerenciador de contexto: with TestClient(app) as client.",
+      "expected_source": "testes.md",
+      "expected_section": "Testes > Eventos de inicialização",
+      "expected_snippets": [
+        "with TestClient(app) as client:"
+      ]
+    },
+    {
+      "id": "q24",
+      "question": "Por que copiar o requirements.txt antes do código no Dockerfile?",
+      "answerable": true,
+      "expected_answer": "Para aproveitar o cache de camadas do Docker e não reinstalar as bibliotecas quando só o código muda.",
+      "expected_source": "implantacao.md",
+      "expected_section": "Implantação > Docker",
+      "expected_snippets": [
+        "aproveita o cache de camadas do Docker"
+      ]
+    },
+    {
+      "id": "q25",
+      "question": "Qual opção do fastapi run devo usar quando a aplicação roda atrás de um proxy reverso?",
+      "answerable": true,
+      "expected_answer": "--proxy-headers.",
+      "expected_source": "implantacao.md",
+      "expected_section": "Implantação > Proxy reverso e HTTPS",
+      "expected_snippets": [
+        "adicione a opção --proxy-headers"
+      ]
+    },
+    {
+      "id": "q26",
+      "question": "Como retorno um erro 404 com uma mensagem personalizada?",
+      "answerable": true,
+      "expected_answer": "Levantando HTTPException(status_code=404, detail=\"...\").",
+      "expected_source": "erros-e-middleware.md",
+      "expected_section": "Tratamento de erros, middleware e CORS > Levantando erros HTTP",
+      "expected_snippets": [
+        "raise HTTPException(status_code=404, detail=\"Item não encontrado\")"
+      ]
+    },
+    {
+      "id": "q27",
+      "question": "Quais métodos HTTP o CORSMiddleware permite por padrão?",
+      "answerable": true,
+      "expected_answer": "Apenas GET.",
+      "expected_source": "erros-e-middleware.md",
+      "expected_section": "Tratamento de erros, middleware e CORS > CORS",
+      "expected_snippets": [
+        "permite apenas o método GET"
+      ]
+    },
+    {
+      "id": "q28",
+      "question": "Posso usar allow_origins com o curinga \"*\" junto com allow_credentials=True?",
+      "answerable": true,
+      "expected_answer": "Não; com allow_credentials as origens precisam ser listadas explicitamente.",
+      "expected_source": "erros-e-middleware.md",
+      "expected_section": "Tratamento de erros, middleware e CORS > CORS",
+      "expected_snippets": [
+        "a lista de origens não pode ser o curinga"
+      ]
+    },
+    {
+      "id": "q29",
+      "question": "Como divido as rotas de uma aplicação grande em vários arquivos?",
+      "answerable": true,
+      "expected_answer": "Criando um APIRouter em cada módulo e registrando cada um com app.include_router.",
+      "expected_source": "aplicacoes-maiores.md",
+      "expected_section": "Aplicações maiores com APIRouter > Incluindo o roteador na aplicação",
+      "expected_snippets": [
+        "registre o roteador com include_router"
+      ]
+    },
+    {
+      "id": "q30",
+      "question": "Para que serve o argumento prefix do APIRouter?",
+      "answerable": true,
+      "expected_answer": "Ele é adicionado ao início de todos os caminhos do roteador e não pode terminar com barra.",
+      "expected_source": "aplicacoes-maiores.md",
+      "expected_section": "Aplicações maiores com APIRouter > Criando um roteador",
+      "expected_snippets": [
+        "O argumento prefix é adicionado ao início de todos os caminhos do roteador"
+      ]
+    },
+    {
+      "id": "q31",
+      "question": "Qual constante do módulo status do FastAPI representa o código 201?",
+      "answerable": true,
+      "expected_answer": "status.HTTP_201_CREATED.",
+      "expected_source": "respostas-personalizadas.md",
+      "expected_section": "Respostas personalizadas e códigos de status > Códigos de status com o módulo status",
+      "expected_snippets": [
+        "A constante status.HTTP_201_CREATED vale 201"
+      ]
+    },
+    {
+      "id": "q32",
+      "question": "O FastAPI aplica o response_model quando a rota retorna um objeto Response diretamente?",
+      "answerable": true,
+      "expected_answer": "Não; a resposta é enviada como está, sem response_model nem conversão de dados.",
+      "expected_source": "respostas-personalizadas.md",
+      "expected_section": "Respostas personalizadas e códigos de status > Retornando uma resposta diretamente",
+      "expected_snippets": [
+        "ele não aplica o response_model e não faz nenhuma conversão de dados"
+      ]
+    },
+    {
+      "id": "q33",
+      "question": "Como envio uma resposta aos poucos, sem carregar todo o conteúdo na memória?",
+      "answerable": true,
+      "expected_answer": "Com StreamingResponse, que recebe um gerador e envia cada parte quando fica pronta.",
+      "expected_source": "respostas-personalizadas.md",
+      "expected_section": "Respostas personalizadas e códigos de status > Streaming de conteúdo",
+      "expected_snippets": [
+        "O StreamingResponse recebe um gerador"
+      ]
+    },
+    {
+      "id": "q34",
+      "question": "Por que um parâmetro chamado user_agent recebe o valor do cabeçalho User-Agent?",
+      "answerable": true,
+      "expected_answer": "Porque o Header converte automaticamente os sublinhados do nome em hífens.",
+      "expected_source": "cabecalhos-cookies-formularios.md",
+      "expected_section": "Cabeçalhos, cookies e formulários > Cabeçalhos com Header",
+      "expected_snippets": [
+        "converte automaticamente os sublinhados do nome do parâmetro em hífens"
+      ]
+    },
+    {
+      "id": "q35",
+      "question": "Posso receber campos de formulário e um corpo JSON na mesma rota do FastAPI?",
+      "answerable": true,
+      "expected_answer": "Não; o corpo HTTP tem uma única codificação, formulário ou JSON.",
+      "expected_source": "cabecalhos-cookies-formularios.md",
+      "expected_section": "Cabeçalhos, cookies e formulários > Formulários com Form",
+      "expected_snippets": [
+        "Não é possível declarar, na mesma operação de caminho, campos de formulário e um corpo JSON"
+      ]
+    },
+    {
+      "id": "q36",
+      "question": "O que o Pydantic faz quando recebe o texto \"19.90\" em um campo float?",
+      "answerable": true,
+      "expected_answer": "No modo flexível padrão, converte para o número 19.9.",
+      "expected_source": "pydantic-modelos.md",
+      "expected_section": "Pydantic: modelos de dados > Declarando um modelo",
+      "expected_snippets": [
+        "o texto \"19.90\" é convertido para o número 19.9"
+      ]
+    },
+    {
+      "id": "q37",
+      "question": "Como faço um modelo Pydantic rejeitar campos que não foram declarados?",
+      "answerable": true,
+      "expected_answer": "Com extra=\"forbid\" no model_config (ConfigDict).",
+      "expected_source": "pydantic-modelos.md",
+      "expected_section": "Pydantic: modelos de dados > Configuração do modelo",
+      "expected_snippets": [
+        "extra=\"forbid\" rejeita campos que não foram declarados"
+      ]
+    },
+    {
+      "id": "q38",
+      "question": "Como crio uma regra de validação própria para um campo de um modelo Pydantic?",
+      "answerable": true,
+      "expected_answer": "Com o decorador field_validator, levantando ValueError quando o valor for inválido.",
+      "expected_source": "pydantic-validacao.md",
+      "expected_section": "Pydantic: validação personalizada > Validadores de campo",
+      "expected_snippets": [
+        "use o decorador field_validator"
+      ]
+    },
+    {
+      "id": "q39",
+      "question": "Como valido uma regra que envolve dois campos do modelo, como início e fim de um período?",
+      "answerable": true,
+      "expected_answer": "Com model_validator(mode=\"after\"), que recebe a instância já validada.",
+      "expected_source": "pydantic-validacao.md",
+      "expected_section": "Pydantic: validação personalizada > Validadores de modelo",
+      "expected_snippets": [
+        "Quando a regra envolve mais de um campo, use model_validator"
+      ]
+    },
+    {
+      "id": "q40",
+      "question": "Com env_prefix=\"APP_\", de qual variável de ambiente vem o campo banco_url?",
+      "answerable": true,
+      "expected_answer": "Da variável APP_BANCO_URL.",
+      "expected_source": "configuracoes.md",
+      "expected_section": "Configurações com pydantic-settings > Declarando as configurações",
+      "expected_snippets": [
+        "o campo banco_url vem da variável APP_BANCO_URL"
+      ]
+    },
+    {
+      "id": "q41",
+      "question": "Como evito que uma senha apareça no log quando imprimo as configurações?",
+      "answerable": true,
+      "expected_answer": "Declarando o campo com o tipo SecretStr, que mostra o valor mascarado.",
+      "expected_source": "configuracoes.md",
+      "expected_section": "Configurações com pydantic-settings > Valores secretos",
+      "expected_snippets": [
+        "Use o tipo SecretStr para senhas e chaves"
+      ]
+    },
+    {
+      "id": "q42",
+      "question": "Quais nomes de arquivo o pytest reconhece como arquivos de teste?",
+      "answerable": true,
+      "expected_answer": "test_*.py e *_test.py.",
+      "expected_source": "pytest-fundamentos.md",
+      "expected_section": "pytest: fundamentos > Como o pytest encontra os testes",
+      "expected_snippets": [
+        "arquivos com nome test_*.py ou *_test.py"
+      ]
+    },
+    {
+      "id": "q43",
+      "question": "Como verifico com pytest que um código levanta uma exceção?",
+      "answerable": true,
+      "expected_answer": "Com pytest.raises usado como gerenciador de contexto, opcionalmente com match.",
+      "expected_source": "pytest-fundamentos.md",
+      "expected_section": "pytest: fundamentos > Testando exceções",
+      "expected_snippets": [
+        "use pytest.raises como gerenciador de contexto"
+      ]
+    },
+    {
+      "id": "q44",
+      "question": "Qual é o escopo padrão de uma fixture do pytest?",
+      "answerable": true,
+      "expected_answer": "function: a fixture é criada uma vez por teste.",
+      "expected_source": "pytest-fixtures.md",
+      "expected_section": "pytest: fixtures > Escopo",
+      "expected_snippets": [
+        "function (padrão) | uma vez por teste"
+      ]
+    },
+    {
+      "id": "q45",
+      "question": "Como compartilho fixtures entre vários arquivos de teste sem precisar importá-las?",
+      "answerable": true,
+      "expected_answer": "Definindo-as em um arquivo conftest.py na pasta dos testes.",
+      "expected_source": "pytest-fixtures.md",
+      "expected_section": "pytest: fixtures > Compartilhando fixtures com conftest.py",
+      "expected_snippets": [
+        "Fixtures definidas em um arquivo conftest.py ficam disponíveis"
+      ]
+    },
+    {
+      "id": "q46",
+      "question": "A instrução EXPOSE do Dockerfile publica a porta do container no computador hospedeiro?",
+      "answerable": true,
+      "expected_answer": "Não; só documenta a porta. É preciso publicar com docker run -p.",
+      "expected_source": "docker-imagens.md",
+      "expected_section": "Docker: construindo imagens > Instruções principais do Dockerfile",
+      "expected_snippets": [
+        "ela não publica a porta no computador hospedeiro"
+      ]
+    },
+    {
+      "id": "q47",
+      "question": "No Docker Compose, como a API acessa o banco de dados que está em outro serviço?",
+      "answerable": true,
+      "expected_answer": "Usando o nome do serviço como endereço (ex.: host db), não localhost.",
+      "expected_source": "docker-compose.md",
+      "expected_section": "Docker Compose: vários serviços > Rede entre os serviços",
+      "expected_snippets": [
+        "usando o nome do serviço como endereço"
+      ]
+    },
+    {
+      "id": "q48",
+      "question": "Qual a diferença entre usar depends_on simples e com condition: service_healthy?",
+      "answerable": true,
+      "expected_answer": "A forma simples só espera o container iniciar; com service_healthy o Compose espera o healthcheck passar.",
+      "expected_source": "docker-compose.md",
+      "expected_section": "Docker Compose: vários serviços > Ordem de inicialização",
+      "expected_snippets": [
+        "o Compose espera o healthcheck do serviço passar"
+      ]
+    },
+    {
+      "id": "q49",
+      "question": "Como o FastAPI executa uma rota declarada com def comum, sem async?",
+      "answerable": true,
+      "expected_answer": "Em um pool de threads externo, aguardando o resultado, para não bloquear o laço de eventos.",
+      "expected_source": "async-e-concorrencia.md",
+      "expected_section": "Concorrência: async def ou def > Como cada forma é executada",
+      "expected_snippets": [
+        "são executadas em um pool de threads externo"
+      ]
+    },
+    {
+      "id": "q50",
+      "question": "O AsyncClient do HTTPX dispara os eventos de lifespan da aplicação nos testes?",
+      "answerable": true,
+      "expected_answer": "Não; é preciso usar uma ferramenta como o LifespanManager do asgi-lifespan.",
+      "expected_source": "testes.md",
+      "expected_section": "Testes > Testes assíncronos > Exemplo com AsyncClient",
+      "expected_snippets": [
+        "o AsyncClient não dispara os eventos de lifespan"
+      ]
+    },
+    {
+      "id": "u01",
+      "question": "Como configuro uma API GraphQL com Strawberry no FastAPI?",
+      "answerable": false,
+      "note": "Assunto ausente do corpus."
+    },
+    {
+      "id": "u02",
+      "question": "Como recebo upload de arquivos com UploadFile?",
+      "answerable": false,
+      "note": "Assunto ausente do corpus."
+    },
+    {
+      "id": "u03",
+      "question": "Como implemento WebSockets no FastAPI?",
+      "answerable": false,
+      "note": "Assunto ausente do corpus."
+    },
+    {
+      "id": "u04",
+      "question": "Qual é o tempo limite padrão de uma tarefa em segundo plano antes de ela ser cancelada?",
+      "answerable": false,
+      "note": "Armadilha: tarefas em segundo plano são documentadas, mas nenhum tempo limite é mencionado."
+    },
+    {
+      "id": "u05",
+      "question": "Como ativo o limite de requisições por minuto (rate limiting) nativo do FastAPI?",
+      "answerable": false,
+      "note": "Assunto ausente; a pergunta pressupõe um recurso que o corpus não descreve."
+    },
+    {
+      "id": "u06",
+      "question": "Qual é o preço da licença comercial do FastAPI?",
+      "answerable": false,
+      "note": "Fora do escopo da documentação."
+    },
+    {
+      "id": "u07",
+      "question": "Quantos workers o fastapi run usa por padrão?",
+      "answerable": false,
+      "note": "Armadilha: a opção --workers é documentada, mas o valor padrão não."
+    },
+    {
+      "id": "u08",
+      "question": "Como conecto o FastAPI ao MongoDB usando o driver Motor?",
+      "answerable": false,
+      "note": "Assunto ausente do corpus."
+    },
+    {
+      "id": "u09",
+      "question": "Qual algoritmo de hashing de senha o FastAPI usa internamente por padrão?",
+      "answerable": false,
+      "note": "Armadilha: o corpus fala em guardar o hash, mas não cita nenhum algoritmo."
+    },
+    {
+      "id": "u10",
+      "question": "Como configuro cache de respostas HTTP com Redis no FastAPI?",
+      "answerable": false,
+      "note": "Armadilha: Redis aparece só como broker do Celery."
+    },
+    {
+      "id": "u11",
+      "question": "Qual é a receita de um bolo de cenoura?",
+      "answerable": false,
+      "note": "Fora do domínio."
+    },
+    {
+      "id": "u12",
+      "question": "Qual comando gera um cliente TypeScript a partir do esquema OpenAPI?",
+      "answerable": false,
+      "note": "Armadilha: o corpus diz que o esquema pode gerar clientes, mas não ensina como."
+    },
+    {
+      "id": "u13",
+      "question": "O que é HTML?",
+      "answerable": false,
+      "note": "Conhecimento geral fora do corpus: a palavra HTML aparece (HTMLResponse), mas nenhum trecho define o que é HTML."
+    },
+    {
+      "id": "u14",
+      "question": "O que é JavaScript?",
+      "answerable": false,
+      "note": "Conhecimento geral fora do corpus. O sistema não pode usar o conhecimento prévio do LLM."
+    }
+  ]
+}
