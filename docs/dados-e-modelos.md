@@ -31,7 +31,7 @@
 | Critério de relevância | Um chunk é relevante se contém um dos `expected_snippets` (sem acentos, sem crases, sem diferenciar maiúsculas). Assim o Recall@k independe da estratégia de chunking |
 | Validação automática | `tests/test_eval.py` confere que todo trecho esperado existe no arquivo-fonte e cabe inteiro em algum chunk das duas estratégias |
 | Conjunto de desenvolvimento | `eval/datasets/perguntas_dev.json`: 12 perguntas com resposta e 6 sem, sobre fatos que o conjunto de teste não usa. Serve só para calibrar `MIN_VECTOR_SCORE` |
-| Ordem de escrita | Escrito e versionado antes de qualquer ajuste do sistema (versão 2.0.0, junto com a ampliação da base). Não deve ser usado para calibrar parâmetros |
+| Ordem de escrita e congelamento | Versão 2.0.0, escrita junto com a ampliação da base. Na versão 2.1.0 (15/11/2026), 14 perguntas foram reescritas em linguagem de usuário, sem copiar o identificador de código nem o trecho esperado (q16, q18, q19, q23, q27, q28, q30, q31, q32, q34, q40, q46, q48 e q50), para reduzir o viés a favor da busca lexical. Os trechos esperados não mudaram. A 2.1.0 foi **congelada antes da avaliação oficial**: o campo `questions_sha256` é conferido pelo teste `test_test_set_is_frozen`, então qualquer mudança aparece no histórico do Git. Não deve ser usado para calibrar parâmetros |
 | Autoria | Perguntas redigidas com apoio de IA e revisadas pelo grupo contra o corpus; registro no `PROMPTS.md` (interações 3 e 4) |
 
 ## Modelos

@@ -177,7 +177,31 @@ def test_enter_in_chat_input_sends_the_question(fake_api):
     assert url.endswith("/ask")
     assert payload["question"] == "Como sobrescrever uma dependência?"
     assert "image_base64" not in payload
-    assert "Você perguntou: <b>Como sobrescrever uma dependência?</b>" in _html(at)
+    assert '<div class="rag-user">Como sobrescrever uma dependência?</div>' in _html(at)
+    assert [m.name for m in at.chat_message] == ["user", "assistant"]
+
+
+def test_conversation_keeps_history_like_a_chat(fake_api):
+    at = _ask("Primeira pergunta sobre dependências")
+    at.chat_input[0].set_value("Segunda pergunta sobre dependências").run()
+    # O AppTest mantém elementos da execução interrompida pelo st.rerun(); o navegador os
+    # descarta. Uma nova execução, sem entrada, mostra a tela como o usuário a vê.
+    at.run()
+    assert [m.name for m in at.chat_message] == ["user", "assistant"] * 2
+    page = _html(at)
+    assert page.index("Primeira pergunta") < page.index("Segunda pergunta")
+    # Só a resposta mais recente lista todos os trechos; as antigas mostram as fontes citadas
+    assert page.count("Todos os trechos enviados ao modelo") == 1
+    assert page.count("Fontes citadas") == 2
+    assert not any("GraphQL" in b.label for b in at.button)  # exemplos somem depois da 1ª
+
+
+def test_new_chat_clears_the_conversation(fake_api):
+    at = _ask("Uma pergunta qualquer")
+    _button(at, "Nova conversa").click()
+    at.run()
+    assert at.chat_message == [] or len(at.chat_message) == 0
+    assert any("GraphQL" in b.label for b in at.button)  # exemplos voltam
 
 
 def test_renders_answer_with_citation_badges_and_sources(fake_api):

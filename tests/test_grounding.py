@@ -19,12 +19,12 @@ TEXTS = [
 ]
 
 
-def _chunks(n: int) -> list[RetrievedChunk]:
+def _chunks(n: int, text: str | None = None) -> list[RetrievedChunk]:
     return [
         RetrievedChunk(
             Chunk(
                 id=f"id{i}",
-                text=TEXTS[(i - 1) % len(TEXTS)],
+                text=text or TEXTS[(i - 1) % len(TEXTS)],
                 source=f"doc{i}.md",
                 section=f"S{i}",
                 chunk_index=i,
@@ -133,7 +133,33 @@ def test_formatted_answer_with_list_and_code_passes():
     )
     result = ground_answer(text, _chunks(2))
     assert not result.refused
-    assert len(statements(text)) == 2  # linhas com ':' e o bloco de código não contam
+    # o bloco de código não conta; introduções com ':' contam porque trazem citação
+    assert len(statements(text)) == 4
+
+
+def test_cited_intro_before_code_counts_as_claim():
+    # Formato real do qwen2.5:3b (q22): a citação fica na introdução do código, e a linha
+    # depois do código vem sem citação. Antes, a introdução era ignorada, a cobertura ia a 0
+    # e uma resposta correta era descartada como ungrounded_answer.
+    text = (
+        "- Para trocar uma dependência por uma versão de teste, use o dicionário "
+        "`app.dependency_overrides`:\n\n"
+        "[1] Para trocar uma dependência real por uma versão de teste, use o dicionário "
+        "`app.dependency_overrides`:\n\n"
+        "```python\napp.dependency_overrides[get_db] = override_get_db\n```\n\n"
+        "- Limpe as substituições depois dos testes."
+    )
+    chunk_text = (
+        "Para trocar uma dependência real por uma versão de teste, use o dicionário "
+        "app.dependency_overrides. Limpe as substituições depois dos testes."
+    )
+    result = ground_answer(text, _chunks(1, text=chunk_text))
+    assert not result.refused, result.refusal_reason
+    assert result.coverage == 0.5
+
+
+def test_bare_intro_without_citation_is_still_ignored():
+    assert statements("Veja o exemplo:\n\n```python\nx = 1\n```\n\nUse x [1].") == ["Use x [1]."]
 
 
 def test_support_ratio():

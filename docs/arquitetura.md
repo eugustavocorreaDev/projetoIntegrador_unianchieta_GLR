@@ -191,7 +191,17 @@ Regras:
     | `hybrid_rerank` | 58% | 60% |
 
   - **Causa:** a hipótese de que o FlashRank truncava os trechos (`max_length` padrão de 128 tokens) foi testada com 128, 256 e 512 e **descartada**: o Recall@5 ficou entre 56% e 70% em todos os casos. O modelo `ms-marco-MultiBERT-L-12` reordena mal trechos técnicos em português; ele chegou a dar nota 0,998 a trechos sem relação com a pergunta.
-  - **Limitação:** os trechos esperados do conjunto de teste são literais, o que favorece o BM25. Os números oficiais precisam sair de `eval/run_eval.py` e ir para `evidencias/avaliacao/`.
+  - **Limitação:** os trechos esperados do conjunto de teste são literais, o que favorece o BM25.
+  - **Confirmação oficial (15/11/2026):** `eval/run_eval.py`, conjunto de teste 2.1.0 (14 perguntas reescritas para reduzir o viés lexical), em `evidencias/avaliacao/20261115-172143-principal-recursive-hybrid/`. Recall@5:
+
+    | Modo | `fixed` | `recursive` |
+    | --- | --- | --- |
+    | `vector` | 80% | 82% |
+    | `bm25` | 92% | 90% |
+    | `hybrid` | **92%** | **92%** (MRR 0,79) |
+    | `hybrid_rerank` | 58% | 56% |
+
+    A conclusão se mantém: a híbrida é a melhor, e o reranker piora a recuperação.
 - **Contexto:** documentação técnica mistura linguagem natural ("como sobrescrever uma dependência") com identificadores exatos (`dependency_overrides`, `--proxy-headers`). Embeddings capturam o primeiro tipo e diluem o segundo; BM25 faz o contrário.
 - **Decisão:** buscar 20 candidatos em cada método, combinar com **Reciprocal Rank Fusion** (k=60), que usa só a posição e dispensa normalizar escalas diferentes, e reordenar os candidatos com o cross-encoder multilíngue **FlashRank `ms-marco-MultiBERT-L-12`** (ONNX, CPU, sem PyTorch). O BM25 foi implementado à mão (`retrieval/bm25.py`), com tokenização sem acentos e divisão de identificadores com `_`.
 - **Consequências:** o reranking custaria mais latência por pergunta (20 pares), e a medição mostrou que, com este modelo, ele **piora** a lista que o LLM vê. Por isso o padrão passou a ser `hybrid` (RRF), e trocar o modelo do reranker é trabalho futuro. Os quatro modos (`vector`, `bm25`, `hybrid`, `hybrid_rerank`) continuam selecionáveis para a avaliação; o baseline oficial é `fixed + vector`.
@@ -211,6 +221,7 @@ Regras:
   3. **Depois do LLM, em código** (`generation/grounding.py`):
      - citações para trechos inexistentes são removidas;
      - uma recusa continua sendo recusa mesmo com citação;
+     - as afirmações verificadas são as frases e os tópicos fora dos blocos de código. Uma linha de introdução terminada em ":" só conta se trouxer citação ("Use o dicionário X [1]:"). Correção de 15/11/2026: antes ela era sempre ignorada, e uma resposta correta no formato "explicação + código" (pergunta q22) era descartada com cobertura 0;
      - a resposta é **descartada e trocada pela recusa** (`ungrounded_answer`) quando não tem citação válida, quando menos de `MIN_CITATION_COVERAGE` (0,5) das afirmações têm citação, ou quando a maioria das afirmações citadas não compartilha pelo menos `MIN_SUPPORT_RATIO` (0,3) dos seus termos com os trechos que cita. Isso bloqueia conhecimento externo com uma citação qualquer, como "HTML é uma linguagem de marcação [1]".
      - A resposta original fica em `raw_answer` nos logs, junto com a cobertura e as frases sem sustentação, para análise.
 - **Consequências:** a camada 3 pode recusar respostas corretas que o modelo esqueceu de citar (falso negativo). Esse custo é medido pela `false_refusal_rate` e pela `ungrounded_blocked_rate` em `eval/`. `MIN_VECTOR_SCORE` começa em 0 (desligado) e deve ser calibrado com o `best_threshold` que a avaliação calcula no **conjunto de desenvolvimento** (`eval/datasets/perguntas_dev.json`), usando a mesma estatística do filtro (`relevance_signal`). A checagem de sustentação é lexical: ela não garante que uma paráfrase com os mesmos termos esteja correta.

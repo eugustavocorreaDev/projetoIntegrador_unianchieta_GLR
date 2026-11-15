@@ -20,12 +20,16 @@ As opções da barra lateral valem para as três.
 
 ## 2. Fazer uma pergunta (aba Perguntar)
 
-1. Digite a pergunta no campo **"Escreva sua pergunta e tecle Enter"** e tecle **Enter**. Outra opção é clicar num dos botões em **Experimente**, que já enviam a pergunta.
-2. Aguarde: em CPU, a resposta leva de 10 s a 60 s.
-3. Acima da resposta aparece **"Você perguntou: ..."**, para conferir o que foi enviado.
+A aba funciona como um chat:
+
+- **Para perguntar:** digite no campo **"Escreva sua pergunta e tecle Enter"**, no fim da conversa, e tecle **Enter**. Com a conversa vazia, os botões em **Experimente** também enviam uma pergunta.
+- **A conversa:** cada pergunta aparece num balão azul 🧑, e a resposta logo abaixo 📘. Em CPU, a resposta leva de 10 s a 60 s.
+- **Os detalhes:** as perguntas anteriores continuam na tela com a resposta e as fontes citadas. A lista completa de trechos aparece só na resposta mais recente.
+- **Nova conversa:** limpa a tela.
+- **Independência:** cada pergunta é respondida de forma independente, só com a documentação. O assistente **não** usa as mensagens anteriores. Por isso, "e no Docker?" sem contexto tende a ser recusada; escreva a pergunta completa.
 
 **Perguntar com um print:**
-1. Arraste a imagem para **"Anexar um print"** (PNG, JPG ou WEBP, até 5 MB) ou clique para escolher o arquivo.
+1. Abra **"📎 Anexar um print (opcional)"**, logo acima do campo de pergunta, e arraste a imagem ou clique para escolher (PNG, JPG ou WEBP, até 5 MB).
 2. Escreva a pergunta e tecle Enter. Para perguntar só sobre a imagem, use **"Perguntar só sobre a imagem"**.
 
 O modelo de visão lê o texto e o código do print. O que ele leu aparece em **"Texto lido do print"**. A resposta continua vindo só da documentação, com citações. A leitura de prints precisa do Ollama com o modelo `qwen2.5vl:3b` e fica desativada no Modo de Visualização.

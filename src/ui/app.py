@@ -209,7 +209,9 @@ def render_source(title: str, item: dict, expanded: bool = False) -> None:
         )
 
 
-def render_result(data: dict, mode: str, only_search: bool, mock: bool = False) -> None:
+def render_result(
+    data: dict, mode: str, only_search: bool, mock: bool = False, show_all: bool = True
+) -> None:
     retrieved = data.get("retrieved", [])
     by_id = {r["chunk_id"]: r for r in retrieved}
     refused = not only_search and data["refused"]
@@ -248,7 +250,7 @@ def render_result(data: dict, mode: str, only_search: bool, mock: bool = False) 
         st.info("O reranker não estava disponível; a resposta usou a busca híbrida sem reranking.")
 
     if not only_search and data.get("citations"):
-        st.markdown("### Fontes citadas")
+        st.markdown("##### Fontes citadas")
         for citation in data["citations"]:
             item = by_id.get(citation["chunk_id"]) or {
                 **citation,
@@ -258,8 +260,10 @@ def render_result(data: dict, mode: str, only_search: bool, mock: bool = False) 
             }
             render_source(f"[{citation['id']}] {citation['source']}", item)
 
+    if not show_all:  # mensagens antigas da conversa: só a resposta e as fontes citadas
+        return
     if refused:
-        st.markdown("### Trechos mais próximos encontrados")
+        st.markdown("##### Trechos mais próximos encontrados")
         st.caption(
             "A busca sempre devolve os trechos mais parecidos, mesmo quando nenhum responde à "
             "pergunta. Uma pontuação alta de relevância não significa que a resposta esteja ali: "
@@ -267,7 +271,7 @@ def render_result(data: dict, mode: str, only_search: bool, mock: bool = False) 
         )
     else:
         title = "Trechos recuperados" if only_search else "Todos os trechos enviados ao modelo"
-        st.markdown(f"### {title}")
+        st.markdown(f"##### {title}")
     if not retrieved:
         st.caption("Nenhum trecho recuperado.")
     for item in retrieved:
@@ -351,6 +355,9 @@ tab_ask, tab_docs, tab_validation = st.tabs(["💬 Perguntar", "📚 Documentos"
 # --- Aba 1: Perguntar --------------------------------------------------------------
 
 
+MAX_MESSAGES = 20  # trocas guardadas na sessão; as mais antigas saem da tela
+
+
 def _use_example(text: str) -> None:
     st.session_state["pending_question"] = text
 
@@ -360,26 +367,67 @@ def _ask_about_image() -> None:
     st.session_state["image_only"] = True
 
 
+def _new_chat() -> None:
+    st.session_state["messages"] = []
+    st.session_state["upload_round"] = st.session_state.get("upload_round", 0) + 1
+
+
+def render_message(message: dict, latest: bool) -> None:
+    """Uma troca da conversa: a pergunta do usuário e a resposta do assistente."""
+    with st.chat_message("user", avatar="🧑"):
+        attachment = (
+            f' <span class="chip">📎 {html.escape(message["image_name"])}</span>'
+            if message.get("image_name")
+            else ""
+        )
+        asked = html.escape(message["question"] or "(pergunta só sobre a imagem)")
+        st.markdown(f'<div class="rag-user">{asked}{attachment}</div>', unsafe_allow_html=True)
+    with st.chat_message("assistant", avatar="📘"):
+        if message["error"]:
+            st.error(message["error"])
+        elif message["data"]:
+            if message["data"].get("image_text"):
+                with st.expander("Texto lido do print (entrou na pergunta)"):
+                    st.code(message["data"]["image_text"], language=None)
+            render_result(
+                message["data"], message["mode"], message["only"], mock=MOCK_MODE, show_all=latest
+            )
+
+
 with tab_ask:
-    st.caption("Experimente")
-    for column, text in zip(st.columns(len(EXAMPLES)), EXAMPLES, strict=True):
-        column.button(text, on_click=_use_example, args=(text,), use_container_width=True)
+    messages = st.session_state.setdefault("messages", [])
+    head = st.columns([5, 1])
+    head[0].caption(
+        "Cada pergunta é respondida de forma independente, só com a documentação indexada: "
+        "o assistente não usa as mensagens anteriores da conversa."
+    )
+    if messages:
+        head[1].button("🧹 Nova conversa", on_click=_new_chat, use_container_width=True)
+
+    if not messages:
+        st.caption("Experimente")
+        for column, text in zip(st.columns(len(EXAMPLES)), EXAMPLES, strict=True):
+            column.button(text, on_click=_use_example, args=(text,), use_container_width=True)
+
+    for i, message in enumerate(messages):
+        render_message(message, latest=i == len(messages) - 1)
 
     upload_key = f"image_{st.session_state.get('upload_round', 0)}"
-    image = st.file_uploader(
-        f"Anexar um print (opcional): PNG, JPG ou WEBP, até {MAX_IMAGE_MB} MB",
-        type=["png", "jpg", "jpeg", "webp"],
-        key=upload_key,
-        help="O modelo de visão lê o texto e o código do print; a resposta continua vindo "
-        "só da documentação, com citações.",
-    )
-    if MOCK_MODE:
-        st.caption(
-            "A leitura de prints precisa do Ollama e fica desativada no Modo de Visualização."
+    with st.expander("📎 Anexar um print (opcional)"):
+        image = st.file_uploader(
+            f"PNG, JPG ou WEBP, até {MAX_IMAGE_MB} MB",
+            type=["png", "jpg", "jpeg", "webp"],
+            key=upload_key,
+            help="O modelo de visão lê o texto e o código do print; a resposta continua vindo "
+            "só da documentação, com citações.",
         )
-    if image is not None:
-        st.image(image.getvalue(), caption=image.name, width=320)
-        st.button("Perguntar só sobre a imagem", on_click=_ask_about_image)
+        if MOCK_MODE:
+            st.caption(
+                "A leitura de prints precisa do Ollama e fica desativada no Modo de Visualização."
+            )
+        if image is not None:
+            st.image(image.getvalue(), caption=image.name, width=280)
+            st.button("Perguntar só sobre a imagem", on_click=_ask_about_image)
 
     typed = st.chat_input("Escreva sua pergunta e tecle Enter", max_chars=1000)
     pending = st.session_state.pop("pending_question", None)
@@ -402,14 +450,17 @@ with tab_ask:
                 label = "Lendo o print e " + label[0].lower() + label[1:]
             with st.spinner(label):
                 data, error = call_api("/search" if only_search else "/ask", payload)
-            st.session_state["last"] = {
-                "data": data,
-                "error": error,
-                "mode": mode,
-                "only": only_search,
-                "question": question,
-                "image_name": image.name if image is not None else None,
-            }
+            messages.append(
+                {
+                    "data": data,
+                    "error": error,
+                    "mode": mode,
+                    "only": only_search,
+                    "question": question,
+                    "image_name": image.name if image is not None else None,
+                }
+            )
+            del messages[:-MAX_MESSAGES]
             if data and not only_search:
                 mark = "🛡️" if data["refused"] else "✅"
                 shown = question[:90] or f"[imagem] {image.name}"
@@ -417,26 +468,6 @@ with tab_ask:
             if data and image is not None:
                 st.session_state["upload_round"] = st.session_state.get("upload_round", 0) + 1
             st.rerun()
-
-    last = st.session_state.get("last")
-    if last:
-        asked = html.escape(last.get("question") or "(só a imagem)")
-        attachment = (
-            f' <span class="chip">📎 {html.escape(last["image_name"])}</span>'
-            if last.get("image_name")
-            else ""
-        )
-        st.markdown(
-            f'<div class="rag-asked">Você perguntou: <b>{asked}</b>{attachment}</div>',
-            unsafe_allow_html=True,
-        )
-        if last["error"]:
-            st.error(last["error"])
-        elif last["data"]:
-            if last["data"].get("image_text"):
-                with st.expander("Texto lido do print (entrou na pergunta)"):
-                    st.code(last["data"]["image_text"], language=None)
-            render_result(last["data"], last["mode"], last["only"], mock=MOCK_MODE)
 
 
 # --- Aba 2: Documentos --------------------------------------------------------------

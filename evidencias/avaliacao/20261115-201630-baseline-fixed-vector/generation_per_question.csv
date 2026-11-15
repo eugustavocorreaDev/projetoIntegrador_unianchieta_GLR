@@ -1,0 +1,250 @@
+id,question,answerable,refused,refusal_reason,answer,raw_answer,n_citations,cited_sources,expected_source,grounded_snippet,grounded_source,citation_coverage,latency_ms,llm_mode,embed_mode
+q01,Como instalo o FastAPI junto com o servidor e a ferramenta de linha de comando?,True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"Para instalar o FastAPI junto com o servidor e a ferramenta de linha de comando, siga os passos abaixo:
+
+- Instale o FastAPI e a ferramenta de linha de comando `fastapi` usando os extras padrão:
+
+```bash
+# Crie e ative um ambiente virtual antes de instalar
+pip install ""fastapi[standard]""
+```",0,,primeiros-passos.md,False,False,0.0,33610.7,ollama,ollama
+q02,Qual comando inicia o servidor em modo de desenvolvimento com recarregamento automático?,True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"1. O comando que inicia o servidor em modo de desenvolvimento com recarregamento automático é:
+
+[1] ```fastapi dev main.py```",0,,primeiros-passos.md,False,False,0.0,14243.1,ollama,ollama
+q03,Em qual endereço fica a documentação interativa gerada com o Swagger UI?,True,False,,- A documentação interativa gerada com o Swagger UI fica em [1] http://127.0.0.1:8000/docs.,- A documentação interativa gerada com o Swagger UI fica em [1] http://127.0.0.1:8000/docs.,1,primeiros-passos.md,primeiros-passos.md,False,True,1.0,11707.0,ollama,ollama
+q04,Qual comando devo usar para rodar a aplicação em produção?,True,False,,[5] O comando para rodar a aplicação em produção é `fastapi run main.py`.,[5] O comando para rodar a aplicação em produção é `fastapi run main.py`.,1,primeiros-passos.md,primeiros-passos.md,True,True,1.0,20423.5,ollama,ollama
+q05,O que acontece se o cliente enviar um texto num parâmetro de caminho anotado como int?,True,False,,"O cliente enviar um texto num parâmetro de caminho anotado como int resultará em um erro 422, pois o FastAPI não pode converter o texto para um inteiro. [1]","O cliente enviar um texto num parâmetro de caminho anotado como int resultará em um erro 422, pois o FastAPI não pode converter o texto para um inteiro. [1]",1,parametros.md,parametros.md,True,True,1.0,24571.6,ollama,ollama
+q06,Por que a rota /users/me precisa ser declarada antes de /users/{user_id}?,True,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,parametros.md,False,False,0.0,16838.9,ollama,ollama
+q07,Como valido o tamanho mínimo e máximo de um parâmetro de consulta?,True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"Para validar o tamanho mínimo e máximo de um parâmetro de consulta, você pode usar a função `Query` do FastAPI junto com anotações `Annotated`. Isso permite que você defina um valor mínimo (`min_length`) e um valor máximo (`max_length`) para o parâmetro de consulta. Veja o exemplo abaixo:
+
+```python
+from typing import Annotated
+from fastapi import Query
+
+@app.get(""/search/"")
+async def search(q: Annotated[str | None, Query(min_length=3, max_length=50)] = None):
+    return {""q"": q}
+```
+
+Neste exemplo, o parâmetro `q` é opcional (`str | None`) e é validado para ter um comprimento mínimo de 3 e máximo de 50 caracteres. Caso contrário, a API responderá com um erro de validação.",0,,parametros.md,False,False,0.0,33346.3,ollama,ollama
+q08,Como limito os valores aceitos em um parâmetro de caminho a uma lista predefinida?,True,False,,"Para limitar os valores aceitos em um parâmetro de caminho a uma lista predefinida, você pode usar uma classe que herda de `str` e de `Enum`. A documentação interativa passa a mostrar a lista de valores válidos, e qualquer outro valor é rejeitado com erro de validação. [1]","Para limitar os valores aceitos em um parâmetro de caminho a uma lista predefinida, você pode usar uma classe que herda de `str` e de `Enum`. A documentação interativa passa a mostrar a lista de valores válidos, e qualquer outro valor é rejeitado com erro de validação. [1]",1,parametros.md,parametros.md,True,True,0.5,26615.7,ollama,ollama
+q09,Como converto um modelo Pydantic recebido no corpo em dicionário?,True,False,,"- Para converter um modelo Pydantic recebido no corpo da requisição em um dicionário dentro da função, use a função `model_dump()` do modelo Pydantic. [2]","- Para converter um modelo Pydantic recebido no corpo da requisição em um dicionário dentro da função, use a função `model_dump()` do modelo Pydantic. [2]",1,corpo-da-requisicao.md,corpo-da-requisicao.md,True,True,1.0,20467.3,ollama,ollama
+q10,"Como o FastAPI decide se um parâmetro vem do caminho, da consulta ou do corpo da requisição?",True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"- O FastAPI decide a origem de um parâmetro de acordo com a seguinte regra:
+
+[1] fonte: corpo-da-requisicao.md › Corpo da requisição e modelos de resposta > Como o FastAPI decide a origem de cada parâmetro
+
+- Se o nome do parâmetro aparecer no caminho, ele é considerado um parâmetro de caminho.
+- Se o tipo do parâmetro é simples, como `int`, `str` ou `bool`, ele é considerado um parâmetro de consulta.
+- Se o tipo do parâmetro é um modelo Pydantic, ele é lido do corpo da requisição.
+
+- Portanto, a ordem das rotas importa, pois as operações de caminho são avaliadas na ordem em que foram declaradas. Se existir uma rota fixa e uma rota com parâmetro, a rota fixa captura a requisição e trata ""me"" como se fosse um `user_id`.",0,,corpo-da-requisicao.md,False,False,0.0,35649.3,ollama,ollama
+q11,Como evito que a senha do usuário apareça na resposta da API?,True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"- Para evitar que a senha do usuário apareça na resposta da API, você pode usar o argumento `response_model_exclude_unset=True` ao definir o modelo de resposta. Isso garante que os campos que não foram definidos explicitamente não sejam incluídos na resposta.
+
+```python
+@app.post(""/users/"", response_model=UserOut, status_code=201)
+async def create_user(user: UserIn):
+    # A senha recebida nunca aparece na resposta
+    return user
+```
+
+[5]",0,,corpo-da-requisicao.md,False,False,0.0,25553.6,ollama,ollama
+q12,Como exijo que o corpo da requisição venha dentro de uma chave com o nome do parâmetro?,True,False,,"- Para exigir que o corpo da requisição venha dentro de uma chave com o nome do parâmetro, use o argumento `Body(embed=True)` no decorador da função. [3]","- Para exigir que o corpo da requisição venha dentro de uma chave com o nome do parâmetro, use o argumento `Body(embed=True)` no decorador da função. [3]",1,corpo-da-requisicao.md,corpo-da-requisicao.md,True,True,1.0,22662.4,ollama,ollama
+q13,O que acontece quando a mesma dependência aparece várias vezes na mesma requisição?,True,False,,"- Quando a mesma dependência aparece várias vezes na mesma requisição, ela é executada apenas uma vez e o resultado é armazenado em cache durante aquela requisição. Para forçar uma nova execução a cada uso, deve-se declarar a dependência com `Depends(dependencia, use_cache=False)`. [1]","- Quando a mesma dependência aparece várias vezes na mesma requisição, ela é executada apenas uma vez e o resultado é armazenado em cache durante aquela requisição. Para forçar uma nova execução a cada uso, deve-se declarar a dependência com `Depends(dependencia, use_cache=False)`. [1]",1,dependencias.md,dependencias.md,True,True,0.5,23922.8,ollama,ollama
+q14,"Como executo código de limpeza, como fechar a sessão do banco, depois que a rota termina?",True,False,,"Para executar código de limpeza, como fechar a sessão do banco de dados, depois que a rota termina, você pode usar a técnica de `yield` em uma dependência. [1] Exemplo de como isso pode ser feito é mostrado no trecho [1], onde uma função de dependência é definida para gerenciar a sessão de banco de dados. A função `get_db` é definida com `async def`, e usa `yield` para gerenciar a sessão de banco de dados. Quando a rota termina, a sessão é fechada, garantindo que o recurso seja liberado mesmo que ocorra um erro.","Para executar código de limpeza, como fechar a sessão do banco de dados, depois que a rota termina, você pode usar a técnica de `yield` em uma dependência. [1] Exemplo de como isso pode ser feito é mostrado no trecho [1], onde uma função de dependência é definida para gerenciar a sessão de banco de dados. A função `get_db` é definida com `async def`, e usa `yield` para gerenciar a sessão de banco de dados. Quando a rota termina, a sessão é fechada, garantindo que o recurso seja liberado mesmo que ocorra um erro.",1,dependencias.md,dependencias.md,True,True,0.5,27132.0,ollama,ollama
+q15,Como aplico uma dependência a todas as rotas da aplicação?,True,False,,"- Para aplicar uma dependência a todas as rotas da aplicação, você deve passar a lista de dependências na criação do objeto `FastAPI`. [4]","- Para aplicar uma dependência a todas as rotas da aplicação, você deve passar a lista de dependências na criação do objeto `FastAPI`. [4]",1,dependencias.md,dependencias.md,False,True,1.0,37880.0,ollama,ollama
+q16,"Depois do login, em que formato o cliente deve mandar o token nas próximas requisições?",True,False,,"- Depois do login, o cliente deve enviar o token no cabeçalho `Authorization` no formato `Bearer <token>`. Isso é indicado pelo esquema `OAuth2PasswordBearer` no FastAPI, que usa o formato `Bearer <token>` para tokens JWT. [1][3]","- Depois do login, o cliente deve enviar o token no cabeçalho `Authorization` no formato `Bearer <token>`. Isso é indicado pelo esquema `OAuth2PasswordBearer` no FastAPI, que usa o formato `Bearer <token>` para tokens JWT. [1][3]",2,seguranca.md,seguranca.md,True,True,0.5,31862.5,ollama,ollama
+q17,Onde deve ficar a chave usada para assinar os tokens JWT?,True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,Onde deve ficar a chave usada para assinar os tokens JWT? [3],0,,seguranca.md,False,False,0.0,21671.2,ollama,ollama
+q18,O que acontece se alguém chamar uma rota protegida sem mandar o token de acesso?,True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,O que acontece se alguém chamar uma rota protegida sem mandar o token de acesso? [1],0,,seguranca.md,False,False,0.0,12237.7,ollama,ollama
+q19,"Como dou permissões diferentes, como só leitura ou também escrita, para cada rota?",True,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,seguranca.md,False,False,0.0,22941.4,ollama,ollama
+q20,Como executo uma função depois que a resposta já foi enviada ao cliente?,True,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,tarefas-em-segundo-plano.md,False,False,0.0,26907.7,ollama,ollama
+q21,Quando devo usar o Celery em vez das tarefas em segundo plano do FastAPI?,True,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada. [1],0,,tarefas-em-segundo-plano.md,False,False,0.0,25231.3,ollama,ollama
+q22,Como substituo uma dependência real por uma versão de teste?,True,False,,"[1] Para trocar uma dependência real por uma versão de teste, use o dicionário `app.dependency_overrides`. Aqui está um exemplo de como fazer isso:
+
+```python
+def override_get_db():
+ # Banco de dados temporário só para os testes
+ yield TestingSessionLocal()
+
+app.dependency_overrides[get_db] = override_get_db
+```","[1] Para trocar uma dependência real por uma versão de teste, use o dicionário `app.dependency_overrides`. Aqui está um exemplo de como fazer isso:
+
+```python
+def override_get_db():
+    # Banco de dados temporário só para os testes
+    yield TestingSessionLocal()
+
+app.dependency_overrides[get_db] = override_get_db
+```",1,testes.md,testes.md,True,True,1.0,27632.2,ollama,ollama
+q23,Meus testes não executam o código de inicialização da aplicação. Como faço ele rodar?,True,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada. [3],0,,testes.md,False,False,0.0,18468.7,ollama,ollama
+q24,Por que copiar o requirements.txt antes do código no Dockerfile?,True,False,,"- Copiar o arquivo `requirements.txt` antes do código no Dockerfile aproveita o cache de camadas do Docker. Assim, alterar só o código não reinstala todas as bibliotecas a cada construção da imagem. [2]","- Copiar o arquivo `requirements.txt` antes do código no Dockerfile aproveita o cache de camadas do Docker. Assim, alterar só o código não reinstala todas as bibliotecas a cada construção da imagem. [2]",1,implantacao.md,implantacao.md,True,True,0.5,24473.4,ollama,ollama
+q25,Qual opção do fastapi run devo usar quando a aplicação roda atrás de um proxy reverso?,True,False,,"[1] Para quando a aplicação roda atrás de um proxy reverso, deve-se usar a opção `--proxy-headers` ao comando `fastapi run`, para que ela confie nos cabeçalhos encaminhados pelo proxy. [1]","[1] Para quando a aplicação roda atrás de um proxy reverso, deve-se usar a opção `--proxy-headers` ao comando `fastapi run`, para que ela confie nos cabeçalhos encaminhados pelo proxy. [1]",1,implantacao.md,implantacao.md,True,True,1.0,25211.9,ollama,ollama
+q26,Como retorno um erro 404 com uma mensagem personalizada?,True,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,erros-e-middleware.md,False,False,0.0,18885.2,ollama,ollama
+q27,"Se eu liberar o acesso de outro domínio sem dizer quais métodos HTTP, quais ficam liberados?",True,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,erros-e-middleware.md,False,False,0.0,14023.0,ollama,ollama
+q28,"Posso liberar qualquer origem no navegador e, ao mesmo tempo, aceitar cookies de login?",True,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,erros-e-middleware.md,False,False,0.0,17862.2,ollama,ollama
+q29,Como divido as rotas de uma aplicação grande em vários arquivos?,True,False,,"- Para dividir as rotas de uma aplicação grande em vários arquivos, a documentação sugere uma estrutura de pastas organizada. [1][3]
+
+- Uma organização comum separa rotas, modelos e dependências em pacotes Python. [3]
+
+- Cada pasta com um arquivo `__init__.py` vira um pacote, o que permite importações como `from app.routers import items`. [3]
+
+- A aplicação é executada a partir do arquivo principal, que importa o módulo e registra o roteador com `include_router`. [4][5]
+
+- O método `include_router` também aceita `prefix`, `tags`, `dependencies` e `responses`. Isso é útil para incluir um roteador de terceiros, que você não pode editar, aplicando um prefixo como `/admin` e uma dependência de autenticação só àquele grupo de rotas. [5]","- Para dividir as rotas de uma aplicação grande em vários arquivos, a documentação sugere uma estrutura de pastas organizada. [1][3]
+
+- Uma organização comum separa rotas, modelos e dependências em pacotes Python. [3]
+
+- Cada pasta com um arquivo `__init__.py` vira um pacote, o que permite importações como `from app.routers import items`. [3]
+
+- A aplicação é executada a partir do arquivo principal, que importa o módulo e registra o roteador com `include_router`. [4][5]
+
+- O método `include_router` também aceita `prefix`, `tags`, `dependencies` e `responses`. Isso é útil para incluir um roteador de terceiros, que você não pode editar, aplicando um prefixo como `/admin` e uma dependência de autenticação só àquele grupo de rotas. [5]",4,aplicacoes-maiores.md;primeiros-passos.md,aplicacoes-maiores.md,True,True,0.8333,37078.8,ollama,ollama
+q30,Como faço todas as rotas de um módulo começarem com o mesmo caminho sem repetir em cada uma?,True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"- Para que todas as rotas de um módulo comecem com o mesmo caminho sem repetir em cada uma, você pode usar o `APIRouter` do FastAPI. Isso permite que você inclua múltiplos roteadores dentro de uma única aplicação, cada um com seu próprio conjunto de rotas. Isso é útil para organizar rotas por domínios ou funcionalidades específicas.
+
+[4] fonte: dependencias.md › Dependências
+# Dependências
+
+O sistema de injeção de dependências do FastAPI permite declarar o que uma operação de caminho precisa para funcionar, como uma conexão com o banco de dados, o usuário autenticado ou parâmetros comuns a várias rotas. O FastAPI resolve essas dependências antes de chamar a função.
+
+## Criando uma dependência
+
+Uma dependência é uma função comum que recebe os mesmos tipos de parâmetro que uma operação de caminho:
+
+```python
+from typing import Annotated
+from fastapi import Depends
+
+async def common_parameters(q: str | None = None, skip: int = 0, limit: int = 100):
+    return {""q"": q, ""skip"": skip, ""limit"": limit}
+
+@app.get(""/items/"")
+async def read_items(commons: Annotated[dict, Depends(common_parameters)]):
+    return commons
+```
+
+O resultado da função `common_parameters` é
+
+[5] fonte: aplicacoes-maiores.md › Aplicações maiores com APIRouter > Incluindo o roteador na aplicação
+editar, aplicando um prefixo como `/admin` e uma dependência de autenticação só àquele grupo de rotas.
+
+## Dependências por roteador
+
+O parâmetro `dependencies` do `APIRouter` aplica uma lista de dependências a todas as rotas do roteador, por exemplo para exigir um token em todo o módulo de administração. As dependências do roteador são executadas antes das dependências declaradas em cada rota.
+
+## Respostas documentadas por roteador
+
+O parâmetro `responses` recebe um dicionário com códigos de status e descrições adicionais, como `{404: {""description"": ""Não encontrado""}}`. Essas respostas aparecem na documentação OpenAPI de todas as rotas",0,,aplicacoes-maiores.md,False,False,0.0,89214.4,ollama,ollama
+q31,"Em vez de escrever o número 201 no código, que nome mais legível posso usar?",True,False,,"2
+
+Em vez de escrever o número 201 no código, você pode usar a constante `status.HTTP_201_CREATED` para obter um nome mais legível e evitar erros de digitação. [2]","2
+
+Em vez de escrever o número 201 no código, você pode usar a constante `status.HTTP_201_CREATED` para obter um nome mais legível e evitar erros de digitação. [2]",1,respostas-personalizadas.md,respostas-personalizadas.md,True,True,1.0,25407.6,ollama,ollama
+q32,"Se a rota devolver um objeto de resposta pronto, o FastAPI ainda filtra e converte os dados?",True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"Não encontrei essa informação na documentação indexada. [4] indica que o FastAPI filtra e converte os dados, mas não explicitamente fala sobre rotares que retornam objetos de resposta prontos.",0,,respostas-personalizadas.md,False,False,0.0,20450.0,ollama,ollama
+q33,"Como envio uma resposta aos poucos, sem carregar todo o conteúdo na memória?",True,False,,"- Para enviar uma resposta aos poucos sem carregar todo o conteúdo na memória, você pode usar a classe `StreamingResponse` do FastAPI. [1] Exemplo de como isso pode ser feito é mostrado no trecho de código abaixo:
+
+```python
+from fastapi.responses import StreamingResponse
+
+async def gerar_linhas():
+ for numero in range(3):
+ # Cada linha é enviada ao cliente assim que é produzida
+ yield f""linha {numero}\n""
+
+@app.get(""/relatorio"")
+async def relatorio():
+ return StreamingResponse(gerar_linhas(), media_type=""text/plain"")
+```","- Para enviar uma resposta aos poucos sem carregar todo o conteúdo na memória, você pode usar a classe `StreamingResponse` do FastAPI. [1] Exemplo de como isso pode ser feito é mostrado no trecho de código abaixo:
+
+```python
+from fastapi.responses import StreamingResponse
+
+async def gerar_linhas():
+    for numero in range(3):
+        # Cada linha é enviada ao cliente assim que é produzida
+        yield f""linha {numero}\n""
+
+@app.get(""/relatorio"")
+async def relatorio():
+    return StreamingResponse(gerar_linhas(), media_type=""text/plain"")
+```",1,respostas-personalizadas.md,respostas-personalizadas.md,True,True,1.0,34878.6,ollama,ollama
+q34,Como um parâmetro com sublinhado no código recebe um cabeçalho HTTP que usa hífen no nome?,True,False,,"- Para um parâmetro com sublinhado no código receber um cabeçalho HTTP que usa hífen no nome, o `Header` deve ser usado com a opção `convert_underscores=False` para desativar a conversão de sublinhados em hífens. [1]","- Para um parâmetro com sublinhado no código receber um cabeçalho HTTP que usa hífen no nome, o `Header` deve ser usado com a opção `convert_underscores=False` para desativar a conversão de sublinhados em hífens. [1]",1,cabecalhos-cookies-formularios.md,cabecalhos-cookies-formularios.md,False,True,1.0,27469.2,ollama,ollama
+q35,Posso receber campos de formulário e um corpo JSON na mesma rota do FastAPI?,True,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,cabecalhos-cookies-formularios.md,False,False,0.0,18048.4,ollama,ollama
+q36,"O que o Pydantic faz quando recebe o texto ""19.90"" em um campo float?",True,False,,"O Pydantic, ao receber o texto ""19.90"" em um campo float, realiza uma conversão automática para o número 19.9, seguindo a configuração de modo flexível. [1]","O Pydantic, ao receber o texto ""19.90"" em um campo float, realiza uma conversão automática para o número 19.9, seguindo a configuração de modo flexível. [1]",1,configuracoes.md,pydantic-modelos.md,False,False,1.0,26081.9,ollama,ollama
+q37,Como faço um modelo Pydantic rejeitar campos que não foram declarados?,True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"Para rejeitar campos que não foram declarados em um modelo Pydantic, você pode usar a configuração `extra=""forbid""` no atributo `model_config`. Isso é explicado no trecho [5] do documento fornecido:
+
+```python
+class Imagem(BaseModel):
+    url: str
+    largura: int
+
+class ProdutoComImagens(BaseModel):
+    nome: str
+    imagens: list[Imagem] = []
+```
+
+Neste exemplo, a configuração `extra=""forbid""` é usada para rejeitar campos que não foram declarados explicitamente. Sem essa configuração, campos não declarados seriam ignorados. Para outros modelos ou campos, você pode adicionar a configuração conforme necessário.",0,,pydantic-modelos.md,False,False,0.0,42628.5,ollama,ollama
+q38,Como crio uma regra de validação própria para um campo de um modelo Pydantic?,True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"- Para criar uma regra de validação própria para um campo de um modelo Pydantic, você pode usar o decorador `field_validator`. Este decorador permite que você defina um validador personalizado para um campo específico.
+
+1. No decorador `field_validator`, você pode especificar o nome do campo que deseja validar e a função que será chamada para validar esse campo.
+
+```python
+from pydantic import BaseModel, field_validator
+
+class Cadastro(BaseModel):
+    nome_completo: str
+
+    @field_validator(""nome_completo"")
+    @classmethod
+    def precisa_de_sobrenome(cls, valor: str) -> str:
+        # Levantar ValueError gera um erro de validação para este campo
+        if "" "" not in valor.strip():
+            raise ValueError(""informe nome e sobrenome"")
+        return valor.title()
+```
+
+- O validador `precisa_de_sobrenome` é chamado automaticamente pelo Pydantic antes que o valor seja convertido para o tipo do campo. Ele recebe o valor já convertido para o tipo do campo e deve retornar o valor final, que pode ser transformado. No exemplo, o nome é colocado em formato de título.",0,,pydantic-validacao.md,False,False,0.0,57963.0,ollama,ollama
+q39,"Como valido uma regra que envolve dois campos do modelo, como início e fim de um período?",True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"- Para validar uma regra que envolve dois campos do modelo, como início e fim de um período, você pode usar o decorador `model_validator` com o modo `after`. Este decorador permite que você defina um método que receberá a instância já validada e deve retorná-la com as alterações necessárias.
+
+[4] fonte: corpo-da-requisicao.md › Corpo da requisição e modelos de resposta > Como o FastAPI decide a origem de cada parâmetro
+
+Com `model_validator(""campo"", mode=""after"")`, o validador roda após a validação de todos os campos e recebe a instância já validada, permitindo que você aplique regras adicionais. No seu caso, você pode criar um método `model_validator` que verifique se o `fim` é maior ou igual ao `inicio` e, se necessário, levantar uma `ValidationError` para indicar que a regra não foi atendida.",0,,pydantic-validacao.md,False,False,0.0,50197.4,ollama,ollama
+q40,"Se as configurações usam um prefixo nas variáveis de ambiente, de qual variável vem cada campo?",True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"[1] fonte: configuracoes.md › Configurações com pydantic-settings > Declarando as configurações
+
+Os campos das configurações são lidos de uma variável de ambiente com o mesmo nome, acrescido do prefixo definido em `env_prefix`. Por exemplo, se o campo `banco_url` está declarado, ele vem da variável `APP_BANCO_URL`. Portanto, cada campo vem da variável de ambiente com o nome correspondente ao campo, com o prefixo `APP_` adicionado.",0,,configuracoes.md,False,False,0.0,33831.0,ollama,ollama
+q41,Como evito que uma senha apareça no log quando imprimo as configurações?,True,False,,"Para evitar que uma senha apareça no log quando imprime as configurações, use o tipo `SecretStr` do Pydantic. Isso garante que o valor seja impresso como `**********` ao imprimir as configurações, e o valor real pode ser obtido chamando explicitamente o método `get_secret_value()`. [3]","Para evitar que uma senha apareça no log quando imprime as configurações, use o tipo `SecretStr` do Pydantic. Isso garante que o valor seja impresso como `**********` ao imprimir as configurações, e o valor real pode ser obtido chamando explicitamente o método `get_secret_value()`. [3]",1,configuracoes.md,configuracoes.md,True,True,0.5,26584.6,ollama,ollama
+q42,Quais nomes de arquivo o pytest reconhece como arquivos de teste?,True,False,,"- O pytest reconhece arquivos com nomes `test_*.py` ou `*_test.py` como arquivos de teste. Além disso, ele também reconhece funções cujo nome começa com `test` e métodos que começam com `test` dentro de classes cujo nome começa com `Test`, desde que essas classes não tenham um método `__init__`. [4][5]","- O pytest reconhece arquivos com nomes `test_*.py` ou `*_test.py` como arquivos de teste. Além disso, ele também reconhece funções cujo nome começa com `test` e métodos que começam com `test` dentro de classes cujo nome começa com `Test`, desde que essas classes não tenham um método `__init__`. [4][5]",2,pytest-fundamentos.md,pytest-fundamentos.md,True,True,0.5,32256.3,ollama,ollama
+q43,Como verifico com pytest que um código levanta uma exceção?,True,False,,"Para verificar se um código levanta uma exceção durante os testes com pytest, você pode usar a função `pytest.raises` como gerenciador de contexto. Isso permite que você teste se uma exceção específica é levantada em um determinado bloco de código. [1]","Para verificar se um código levanta uma exceção durante os testes com pytest, você pode usar a função `pytest.raises` como gerenciador de contexto. Isso permite que você teste se uma exceção específica é levantada em um determinado bloco de código. [1]",1,pytest-fundamentos.md,pytest-fundamentos.md,True,True,0.5,27030.9,ollama,ollama
+q44,Qual é o escopo padrão de uma fixture do pytest?,True,False,,"- O escopo padrão de uma fixture do pytest é `function`, conforme mencionado em [2].","- O escopo padrão de uma fixture do pytest é `function`, conforme mencionado em [2].",1,pytest-fixtures.md,pytest-fixtures.md,True,True,1.0,18564.3,ollama,ollama
+q45,Como compartilho fixtures entre vários arquivos de teste sem precisar importá-las?,True,False,,"- Para compartilhar fixtures entre vários arquivos de teste sem precisar importá-las, basta definir as fixtures em um arquivo chamado `conftest.py`. Este arquivo deve estar na mesma pasta ou em uma pasta superior a todas as pastas de testes que você deseja que compartilhem as fixtures. [1][2]","- Para compartilhar fixtures entre vários arquivos de teste sem precisar importá-las, basta definir as fixtures em um arquivo chamado `conftest.py`. Este arquivo deve estar na mesma pasta ou em uma pasta superior a todas as pastas de testes que você deseja que compartilhem as fixtures. [1][2]",2,pytest-fixtures.md,pytest-fixtures.md,True,True,0.5,20266.5,ollama,ollama
+q46,Declarar a porta no Dockerfile já basta para acessar o container pelo meu computador?,True,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada. [4],0,,docker-imagens.md,False,False,0.0,20701.7,ollama,ollama
+q47,"No Docker Compose, como a API acessa o banco de dados que está em outro serviço?",True,False,,"- A API acessa o banco de dados que está em outro serviço através do nome do serviço como endereço. No exemplo fornecido, a API se conecta ao banco de dados através do host `db`, não por `localhost`, porque `localhost` dentro de um container aponta para o próprio container. [1][2]","- A API acessa o banco de dados que está em outro serviço através do nome do serviço como endereço. No exemplo fornecido, a API se conecta ao banco de dados através do host `db`, não por `localhost`, porque `localhost` dentro de um container aponta para o próprio container. [1][2]",2,docker-compose.md,docker-compose.md,True,True,0.5,28109.0,ollama,ollama
+q48,"Como faço um serviço do Compose esperar o banco estar realmente pronto, e não só iniciado?",True,True,ungrounded_answer,Não encontrei essa informação na documentação indexada.,"Para um serviço do Compose esperar o banco estar realmente pronto, e não apenas iniciado, você pode usar a chave `condition` na chave `depends_on`. [3] Sugere que a opção `condition: service_healthy` espera que o serviço dependente passe por seu `healthcheck`. Portanto, para garantir que o banco de dados esteja realmente pronto antes de iniciar o serviço dependente, você pode configurar a chave `depends_on` da seguinte forma:
+
+```yaml
+services:
+  api:
+    build: .
+    ports:
+      - ""8000:80""
+    environment:
+      BANCO_URL: postgresql://app:senha@db:5432/app
+    depends_on:
+      db:
+        condition: service_healthy
+```
+
+Neste exemplo, o serviço `api` dependerá do serviço `db`, e o Compose só iniciará o serviço `api` após o `db` passar seu `healthcheck`. Isso garante que o banco de dados esteja realmente pronto antes de iniciar o serviço `api`.",0,,docker-compose.md,False,False,0.0,51052.0,ollama,ollama
+q49,"Como o FastAPI executa uma rota declarada com def comum, sem async?",True,False,,"- O FastAPI executa uma rota declarada com `def` comum, sem `async def`, no pool de threads externo. Assim, a função síncrona que demora não bloqueia o laço de eventos, mas o código síncrono espera o resultado da função, o que pode causar travamento se a função demorar muito. [1][3]","- O FastAPI executa uma rota declarada com `def` comum, sem `async def`, no pool de threads externo. Assim, a função síncrona que demora não bloqueia o laço de eventos, mas o código síncrono espera o resultado da função, o que pode causar travamento se a função demorar muito. [1][3]",2,async-e-concorrencia.md,async-e-concorrencia.md,True,True,0.5,30473.9,ollama,ollama
+q50,"Nos testes assíncronos com HTTPX, o código de inicialização da aplicação roda sozinho?",True,False,,"Nos testes assíncronos com HTTPX, o código de inicialização da aplicação não roda sozinho. [1]","Nos testes assíncronos com HTTPX, o código de inicialização da aplicação não roda sozinho. [1]",1,testes.md,testes.md,False,True,1.0,21690.8,ollama,ollama
+u01,Como configuro uma API GraphQL com Strawberry no FastAPI?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,16986.3,ollama,ollama
+u02,Como recebo upload de arquivos com UploadFile?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,13250.1,ollama,ollama
+u03,Como implemento WebSockets no FastAPI?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,17020.6,ollama,ollama
+u04,Qual é o tempo limite padrão de uma tarefa em segundo plano antes de ela ser cancelada?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,17644.0,ollama,ollama
+u05,Como ativo o limite de requisições por minuto (rate limiting) nativo do FastAPI?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,19684.1,ollama,ollama
+u06,Qual é o preço da licença comercial do FastAPI?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,16531.4,ollama,ollama
+u07,Quantos workers o fastapi run usa por padrão?,False,False,,O FastAPI run usa por padrão 1 worker. [3],O FastAPI run usa por padrão 1 worker. [3],1,implantacao.md,,False,False,1.0,19693.9,ollama,ollama
+u08,Como conecto o FastAPI ao MongoDB usando o driver Motor?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,16743.1,ollama,ollama
+u09,Qual algoritmo de hashing de senha o FastAPI usa internamente por padrão?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,16329.8,ollama,ollama
+u10,Como configuro cache de respostas HTTP com Redis no FastAPI?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,16445.2,ollama,ollama
+u11,Qual é a receita de um bolo de cenoura?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,16001.2,ollama,ollama
+u12,Qual comando gera um cliente TypeScript a partir do esquema OpenAPI?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,16338.6,ollama,ollama
+u13,O que é HTML?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,16693.2,ollama,ollama
+u14,O que é JavaScript?,False,True,llm_refusal,Não encontrei essa informação na documentação indexada.,Não encontrei essa informação na documentação indexada.,0,,,False,False,0.0,11517.2,ollama,ollama

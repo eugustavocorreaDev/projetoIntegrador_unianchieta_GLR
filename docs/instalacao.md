@@ -157,6 +157,7 @@ docker compose run --rm ingest
 ### Opções
 
 - **GPU NVIDIA:** descomente o bloco `deploy` do serviço `ollama` no `docker-compose.yml`. É preciso ter o NVIDIA Container Toolkit.
+- **Perguntas com print:** crie um `.env` com `PULL_VISION_MODEL=true` antes do `docker compose up`. O `ollama-pull` baixa então também o `qwen2.5vl:3b` (~3,2 GB). Sem isso, as perguntas com imagem respondem 503 com a instrução de instalar o modelo. O compose usa o `ollama/ollama:0.12.6`, porque a 0.5.4 não roda esse modelo.
 - **Porta 11434 ocupada** (Ollama também instalado no Windows, pelo caminho Windows): crie um `.env` com `OLLAMA_PORT=11435`, ou feche o Ollama do Windows antes.
 - **Hosts Linux:** os containers gravam em `./logs` e `./eval` com o UID 1000. Se o seu usuário tiver outro UID, rode `sudo chown -R 1000:1000 logs eval` uma vez.
 

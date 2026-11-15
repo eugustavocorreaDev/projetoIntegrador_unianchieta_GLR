@@ -39,7 +39,7 @@ Os testes **não precisam de Ollama, Qdrant em rede nem internet**. Eles usam du
 | `test_ingestion_cli.py` | CLI de ingestão: duas estratégias, `--skip-existing`, pasta inexistente, Ollama fora do ar, aquecimento do reranker com sucesso e falha, espera pelos serviços |
 | `test_logging_setup.py` | Logs JSON (ts, level, event, campos extra, exceções), gravação em arquivo, idempotência, truncamento |
 
-Cobertura em 14/11/2026: **94%** de `src/` e `eval/` (185 testes). Para conferir: `pytest --cov --cov-report=term-missing`. A configuração de cobertura fica em `pyproject.toml`.
+Cobertura em 15/11/2026: **94%** de `src/` e `eval/` (190 testes). Para conferir: `pytest --cov --cov-report=term-missing`. A configuração de cobertura fica em `pyproject.toml`.
 
 ## Integração contínua
 

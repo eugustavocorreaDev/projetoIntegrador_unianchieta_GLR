@@ -1,0 +1,38 @@
+{
+  "cobertura>=0.50 (atual)": {
+    "respostas_fundamentadas": "9/12",
+    "fonte_errada": 0,
+    "recusas_corretas": "6/6",
+    "falsas_aceitas_adversariais": "1/4"
+  },
+  "cobertura>=0.25 ": {
+    "respostas_fundamentadas": "9/12",
+    "fonte_errada": 0,
+    "recusas_corretas": "6/6",
+    "falsas_aceitas_adversariais": "1/4"
+  },
+  "cobertura>=0.00 ": {
+    "respostas_fundamentadas": "10/12",
+    "fonte_errada": 0,
+    "recusas_corretas": "6/6",
+    "falsas_aceitas_adversariais": "1/4"
+  },
+  "cobertura>=0.50 + confere frases sem citação": {
+    "respostas_fundamentadas": "9/12",
+    "fonte_errada": 0,
+    "recusas_corretas": "6/6",
+    "falsas_aceitas_adversariais": "3/4"
+  },
+  "cobertura>=0.25 + confere frases sem citação": {
+    "respostas_fundamentadas": "10/12",
+    "fonte_errada": 0,
+    "recusas_corretas": "6/6",
+    "falsas_aceitas_adversariais": "3/4"
+  },
+  "cobertura>=0.00 + confere frases sem citação": {
+    "respostas_fundamentadas": "11/12",
+    "fonte_errada": 0,
+    "recusas_corretas": "6/6",
+    "falsas_aceitas_adversariais": "3/4"
+  }
+}

@@ -1,76 +1,113 @@
 # Checklist de conformidade com o enunciado (Tema 4)
 
-Confronta cada exigência de `Projetos-IA-Programacao-Enunciados.md` com o que o repositório entrega e diz **como conferir**. Revise antes de cada marco e antes da tag `v1.0`. O subagente `.claude/agents/auditor-rag-enunciado.md` faz esta auditoria de forma automática.
+Este documento confronta cada exigência de `Projetos-IA-Programacao-Enunciados.md` com o que o repositório entrega e diz **como conferir** cada item. A auditoria automática equivalente é o subagente `.claude/agents/auditor-rag-enunciado.md`.
 
-**Situação em 14/11/2026.**
+Situação em **15/11/2026**, depois da avaliação oficial com o Ollama real.
 
 | Legenda | Significado |
 | --- | --- |
 | ✅ Atendido | Pronto e verificável |
-| 🟡 Parcial | Implementado, mas falta prova ou execução oficial |
-| ⏳ Pendente | Depende do grupo (execução, gravação, escrita) |
+| 🟡 Parcial | Implementado; falta uma prova ou uma execução |
+| ⏳ Pendente | Exige ação fora do código (gravação, escrita, histórico do Git) |
 
-## 1. Tema 4: exigências específicas
+## 1. Prioridades e plano executado
 
-| Exigência do enunciado | Situação | Onde está | Como conferir |
-| --- | --- | --- | --- |
-| Indexar uma documentação, buscar, responder com citações e ter interface web | ✅ | `src/`, interface em <http://localhost:8501> | Aba **Perguntar**: toda resposta traz selos `[n]` e "Fontes citadas" |
-| Documentação "de código aberto, grande" | 🟡 | `data/raw_docs/` (20 documentos sobre FastAPI, Pydantic, pytest e Docker, escritos para o projeto) | Aba **Documentos**. Confirmar com o professor se a base própria vale. A documentação oficial do FastAPI pode ser usada com `scripts/download_fastapi_docs.py` |
-| Stack: Qdrant, Ollama, reranker, FastAPI, Streamlit | ✅ | `docker-compose.yml`, `src/` | `GET /health` e a barra lateral da interface |
-| MVP até 14/11: responder com citação a 50 perguntas, com a recuperação medida | 🟡 | `eval/datasets/perguntas_teste.json`, aba **Validação** | A recuperação foi medida ao vivo (seção 4). Falta rodar a parte 2 da aba Validação, ou `eval/run_eval.py --generate`, nas 50 perguntas |
-| Comparar estratégias de chunking | ✅ | `src/ingestion/chunking.py` (`fixed` × `recursive`) | Aba **Documentos** → **Chunks** (troque a estratégia na barra lateral) e aba **Validação** |
-| Busca híbrida e reranking | ✅ | `src/retrieval/` | Seção 4: a comparação mostrou que o reranker piora a busca, e o padrão virou `hybrid` (ADR 002) |
-| Dizer que não sabe quando a resposta não está na documentação | ✅ | `src/generation/grounding.py`, `prompts.py`, `core/pipeline.py` | Pergunte "O que é HTML?" ou "Como faz um ovo frito?" e veja o cartão amarelo de recusa |
-| 50 perguntas com resposta e trecho-fonte esperados, **escritas antes de ajustar o sistema** | 🟡 | `perguntas_teste.json` (50 com resposta e 14 sem) | Um teste automatizado confere que todo trecho esperado existe na base. A anterioridade só fica provada pelo histórico do Git, e o dataset foi refeito quando a base foi ampliada: declarem isso no trabalho |
-| Recall@k por estratégia, em tabela comparativa | 🟡 | `eval/run_eval.py`, aba **Validação** | Os números ao vivo estão na seção 4. Falta salvar a saída oficial em `evidencias/avaliacao/` |
-| Taxa de respostas fundamentadas e de recusas corretas | ⏳ | Aba **Validação**, parte 2, e `eval/run_eval.py --generate` | Rodar com o Ollama ativo e salvar o CSV |
-| Análise dos casos de alucinação e da correção aplicada | 🟡 | `evidencias/falhas/casos-de-falha.md` | 2 casos reais registrados (reranker e recusa indevida). Faltam 1 ou mais, de preferência uma alucinação |
+As decisões de escopo foram validadas com o professor: a base própria de 20 documentos, o grupo de 3 integrantes e o uso do Claude Code. Os itens técnicos foram priorizados pelo peso na rubrica (critérios 2 e 3 valem 40 pontos) e pelo risco.
 
-## 2. Rubrica (critérios 1 a 7)
+| # | Prioridade | Item | Situação | Onde está a prova |
+| --- | --- | --- | --- | --- |
+| P1 | Crítica | Avaliação oficial com geração (respostas fundamentadas e recusas corretas) | ✅ | `evidencias/avaliacao/20261115-172143-principal-recursive-hybrid/` |
+| P2 | Crítica | Baseline com geração, para comparação | ✅ | `evidencias/avaliacao/20261115-201630-baseline-fixed-vector/` |
+| P3 | Crítica | Conjunto de teste revisado e **congelado** antes da avaliação | ✅ | Versão 2.1.0, `questions_sha256` e teste `test_test_set_is_frozen` |
+| P4 | Alta | Casos de falha (3 ou mais) com alucinação real e correção | ✅ | `evidencias/falhas/casos-de-falha.md` (5 casos) |
+| P5 | Alta | Logs de uma execução completa | ✅ | `evidencias/logs/execucao-completa.jsonl` (128 perguntas) |
+| P6 | Alta | Bug da verificação que descartava respostas "explicação + código" | ✅ | Caso de falha 5, testes de regressão em `test_grounding.py` |
+| P7 | Média | Interface em estilo chat, com responsividade | ✅ | Aba Perguntar; `tests/test_ui.py` (17 testes) |
+| P8 | Média | Leitura de prints também no caminho Docker | 🟡 | `docker-compose.yml` (Ollama 0.12.6, `PULL_VISION_MODEL`); falta executar o compose |
+| P9 | Média | Calibração da verificação no conjunto de desenvolvimento | ✅ | `evidencias/avaliacao/calibracao-verificacao-dev/` |
+| P10 | — | Vídeo, capturas, tag `v1.0`, PDF ABNT, commits de todos | ⏳ | Fora do código; ver seção 4 |
+
+## 2. Tema 4: exigências específicas
+
+| Exigência | Situação | Como conferir |
+| --- | --- | --- |
+| Indexar documentação, buscar, responder com citação, interface web | ✅ | Aba **Perguntar**: cada resposta traz selos `[n]` e "Fontes citadas" |
+| Documentação de código aberto (base própria validada com o professor) | ✅ | Aba **Documentos**: 20 arquivos, 94 chunks `fixed` e 136 `recursive` |
+| Stack: Qdrant, Ollama, reranker, FastAPI, Streamlit | ✅ | `GET /health` e a barra lateral |
+| MVP: responder com citação às 50 perguntas, com a recuperação medida | ✅ | `generation_per_question.csv` da avaliação oficial |
+| Comparar estratégias de chunking | ✅ | `retrieval_summary.csv`: `fixed` × `recursive` em 4 modos e k = 1, 3, 5, 10 |
+| Busca híbrida e reranking | ✅ | Seção 3: a híbrida é a melhor; o reranker piora (ADR 002) |
+| Dizer que não sabe | ✅ | 92,9% de recusas corretas (13/14) |
+| 50 perguntas com resposta e trecho-fonte, escritas antes de ajustar | ✅ | Conjunto 2.1.0, congelado por hash antes da avaliação oficial. O histórico da revisão está em `docs/dados-e-modelos.md` |
+| Recall@k por estratégia, em tabela comparativa | ✅ | Seção 3 e `retrieval_summary.csv` |
+| Taxa de respostas fundamentadas e de recusas corretas | ✅ | Seção 3 e `summary.json` |
+| Análise das alucinações e da correção aplicada | ✅ | Casos de falha 3 (alucinação do u07, correção tentada e medida) e 4 (calibração) |
+
+## 3. Resultados oficiais (15/11/2026)
+
+- **Comando:** `python -m eval.run_eval --reindex --generate`, e para o baseline `--generate --strategies fixed --modes vector --gen-strategy fixed --gen-mode vector`.
+- **Condições:** Ollama real (`nomic-embed-text` e `qwen2.5:3b`), conjunto de teste 2.1.0 (50 perguntas com resposta e 14 sem), top-5.
+
+**Recuperação (Recall@k, 50 perguntas):**
+
+| Modo | `fixed` R@1 | `fixed` R@5 | `fixed` R@10 | `recursive` R@1 | `recursive` R@5 | `recursive` R@10 | MRR `recursive` |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `vector` (baseline) | 38% | 80% | 90% | 58% | 82% | 88% | 0,69 |
+| `bm25` | 66% | 92% | 98% | 70% | 90% | 96% | 0,79 |
+| **`hybrid` (padrão)** | 54% | **92%** | 98% | **72%** | **92%** | 96% | **0,79** |
+| `hybrid_rerank` | 16% | 58% | 80% | 28% | 56% | 82% | 0,42 |
+
+O intervalo de confiança de 95% (Wilson) do Recall@5 da híbrida é [0,81; 0,97]; o do baseline, [0,67; 0,89].
+
+**Geração (64 perguntas):**
+
+| Métrica | Baseline `fixed + vector` | **Padrão `recursive + hybrid`** |
+| --- | --- | --- |
+| Perguntas respondidas | 52% | **62%** |
+| Respostas fundamentadas (no total) | 42% | **58%** |
+| Fundamentadas, entre as respondidas | 80,8% | **93,5%** |
+| Recusas corretas | 92,9% | 92,9% |
+| Falsas recusas | 48% | **38%** |
+| Candidatas a alucinação | 2 (q36, u07) | **1** (u07) |
+
+**Leitura:**
+- A recuperação híbrida com chunking recursivo supera o baseline em todas as métricas de geração, menos nas recusas, onde empata.
+- O reranker `ms-marco-MultiBERT-L-12` piora a recuperação (ADR 002, caso 1).
+- O ponto fraco são as **falsas recusas**: a verificação de citações descarta respostas corretas em que o modelo de 3B cita poucas frases (caso 4). A calibração no conjunto de desenvolvimento mostrou que afrouxar a regra deixaria passar respostas forjadas, por isso ela foi mantida.
+- A única alucinação que passou (u07) mostra o limite da verificação lexical (caso 3).
+
+## 4. Rubrica (critérios 1 a 7)
 
 | # | Critério (peso) | Situação | O que existe | O que falta |
 | --- | --- | --- | --- | --- |
-| 1 | Problema, arquitetura e planejamento (10) | 🟡 | README com problema e métricas; `docs/arquitetura.md` com diagramas, camadas e 3 ADRs | Provar os marcos: o Marco 1 (24/10, repositório e CI) é anterior ao primeiro commit |
-| 2 | Funcionamento do MVP e desafio do tema (20) | 🟡 | Fluxo de ponta a ponta validado com o Ollama real (instalador `-Testar`, abas da interface) | Vídeo e evidências salvas |
-| 3 | Avaliação experimental (20) | 🟡 | Conjunto de teste separado do de calibração, baseline `fixed + vector`, medição real da recuperação | Rodar `eval/run_eval.py` completo, com `--generate`, e versionar as saídas |
-| 4 | Qualidade de engenharia (15) | 🟡 | 185 testes automatizados, 94% de cobertura, CI configurada, Docker, erros tratados (422/404/409/503), sem segredos, custo zero | CI verde no GitHub (ainda sem push) e o caminho Docker nunca executado |
-| 5 | Uso crítico da IA (10) | 🟡 | `PROMPTS.md` com 7 interações, erros da IA e descartes | Chegar a 10 ou mais interações, de todos os integrantes |
-| 6 | Documentação ABNT e técnica, e demonstração (15) | 🟡 | `docs/` completo, README com instalação assistida | PDF ABNT e vídeo |
-| 7 | Contribuição individual e defesa oral (10) | ⏳ | Papéis definidos no README | Commits e PRs de **todos** os integrantes, revisão cruzada e preparo para a defesa |
+| 1 | Problema, arquitetura e planejamento (10) | ✅ | README com problema e métricas; `docs/arquitetura.md` com diagramas, camadas e 3 ADRs (a ADR 002 foi revisada com dados) | — |
+| 2 | Funcionamento do MVP e desafio do tema (20) | 🟡 | Fluxo de ponta a ponta com o Ollama real, avaliação oficial, auditoria ao vivo da interface | Vídeo |
+| 3 | Avaliação experimental (20) | ✅ | Conjunto de teste congelado e separado do de calibração, baseline, 2 estratégias × 4 modos, análise de erros e resultados reproduzíveis | — |
+| 4 | Qualidade de engenharia (15) | 🟡 | 190 testes, 94% de cobertura, CI verde nos 3 pushes (inclusive o build das imagens), erros tratados, sem segredos, custo zero | Executar `docker compose up` de ponta a ponta |
+| 5 | Uso crítico da IA (10) | 🟡 | `PROMPTS.md` com 8 interações, erros da IA, correções medidas e descartes | Chegar a 10 ou mais |
+| 6 | Documentação ABNT e técnica, e demonstração (15) | 🟡 | `docs/` completo e instalação assistida | PDF ABNT e vídeo |
+| 7 | Contribuição individual e defesa oral (10) | ⏳ | Papéis no README | Commits e PRs de todos os integrantes |
 
-## 3. Evidências obrigatórias (`evidencias/`)
+## 5. Evidências obrigatórias (`evidencias/`)
 
-| # | Evidência | Situação | Como gerar |
-| --- | --- | --- | --- |
-| 1 | Vídeo de 3 a 5 min, do `docker compose up` ao fluxo principal | ⏳ | Precisa do Docker Desktop: `scripts\instalar.ps1 -ComDocker` |
-| 2 | CI verde na tag `v1.0` | ⏳ | Push para o GitHub e a tag `v1.0` |
-| 3 | Resultados da avaliação (tabelas, CSV, JSON) | 🟡 | `python -m eval.run_eval --reindex --generate`; enquanto isso, o "Baixar CSV" da aba Validação |
-| 4 | Logs de uma execução completa | ⏳ | Copiar trechos de `logs/app.log` de uma sessão com o Ollama ativo |
-| 5 | Capturas de tela (5 ou mais, com uma falha tratada) | ⏳ | Lista em `docs/manual-usuario.md` (01 a 09) |
-| 6 | Casos de falha (3 ou mais) | 🟡 | 2 registrados em `evidencias/falhas/casos-de-falha.md` |
-| 7 | Histórico do Git com commits de todos e PRs revisados | ⏳ | Cada integrante abre PRs revisados por outro |
+| # | Evidência | Situação |
+| --- | --- | --- |
+| 1 | Vídeo de 3 a 5 min, do `docker compose up` ao fluxo principal | ⏳ |
+| 2 | CI verde na tag `v1.0` | 🟡 A CI está verde no `main`; falta a tag |
+| 3 | Resultados da avaliação | ✅ |
+| 4 | Logs de uma execução completa | ✅ |
+| 5 | Capturas de tela (5 ou mais, com uma falha tratada) | ⏳ |
+| 6 | Casos de falha (3 ou mais) | ✅ (5 casos) |
+| 7 | Histórico do Git com commits de todos e PRs revisados | ⏳ |
 
-## 4. Resultados medidos até agora (preliminares)
+## 6. Como validar você mesmo
 
-Medidos em 14/11/2026 com a API real (embeddings `nomic-embed-text` via Ollama), as 50 perguntas com resposta e top-5, pela aba Validação (`POST /validation/retrieval`). A regra de acerto é a mesma de `eval/run_eval.py`. Para virar resultado oficial, a avaliação precisa ser reexecutada pelo script e salva em `evidencias/avaliacao/`.
-
-| Modo de recuperação | Recall@5 `fixed` | MRR `fixed` | Recall@5 `recursive` | MRR `recursive` |
-| --- | --- | --- | --- | --- |
-| `vector` (baseline) | 90% | 0,64 | 90% | 0,80 |
-| `bm25` | 98% | 0,83 | 92% | 0,84 |
-| `hybrid` (**padrão**) | **98%** | 0,78 | **96%** | **0,86** |
-| `hybrid_rerank` | 58% | 0,35 | 60% | 0,41 |
-
-**Leitura:**
-- A busca híbrida supera a vetorial pura nas duas estratégias.
-- O reranker `ms-marco-MultiBERT-L-12` piora a ordem, e a causa foi investigada (ADR 002, caso de falha 1).
-- Os trechos esperados são literais, o que favorece o BM25. Isso é uma limitação a discutir no trabalho.
-
-## 5. Como validar você mesmo, em 5 minutos
-
-1. Suba o projeto: `powershell -ExecutionPolicy Bypass -File scripts\instalar.ps1`. No final, ele faz duas perguntas de teste.
-2. **Aba Documentos:** confira os 20 arquivos e os chunks de cada um. É só isto que o assistente sabe.
-3. **Aba Perguntar:** pergunte algo coberto ("Como compartilho fixtures entre arquivos de teste?") e algo fora da base ("O que é HTML?"). A primeira precisa citar `pytest-fixtures.md`, e a segunda precisa ser recusada.
-4. **Aba Validação, parte 1:** clique em "Rodar as 50 perguntas com resposta". O Recall@5 deve ficar próximo da seção 4.
-5. **Aba Validação, parte 2:** rode as 14 perguntas sem resposta e algumas com resposta, e baixe o CSV para `evidencias/avaliacao/`.
-6. **Testes automatizados:** `.\.venv\Scripts\python.exe -m pytest`.
+1. **Subir o sistema:** `powershell -ExecutionPolicy Bypass -File scripts\instalar.ps1`. No final, ele valida o sistema com duas perguntas.
+2. **Aba Documentos:** os 20 arquivos e os chunks de cada um.
+3. **Aba Perguntar:**
+   - "Como compartilho fixtures entre arquivos de teste?" precisa citar `pytest-fixtures.md`;
+   - "O que é HTML?" precisa ser recusada;
+   - "Quantos workers o fastapi run usa por padrão?" reproduz a alucinação do caso 3.
+4. **Aba Validação:** a parte 1 reproduz o Recall@5 de cerca de 92%, e a parte 2 reproduz as taxas de geração.
+5. **Avaliação oficial:** `python -m eval.run_eval --reindex --generate` (cerca de 30 min em CPU). No Windows sem Docker, use `QDRANT_MODE=local` e um `QDRANT_PATH` próprio, para não disputar a trava do índice com a API.
+6. **Testes:** `.\.venv\Scripts\python.exe -m pytest` deve terminar com `190 passed`.

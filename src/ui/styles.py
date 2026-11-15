@@ -109,7 +109,32 @@ textarea { border-radius: 10px !important; }
 }
 .status-line { font-size: .85rem; margin: .15rem 0; }
 .hist { font-size: .82rem; color: var(--muted); margin: .2rem 0; line-height: 1.35; }
-.rag-asked { font-size: .92rem; color: var(--muted); margin: 1rem 0 .25rem; }
-.rag-asked b { color: var(--text, #0F172A); }
+
+/* Conversa (aba Perguntar) */
+[data-testid="stChatMessage"] { background: transparent; padding: .5rem 0; gap: .6rem; }
+.rag-user {
+  display: inline-block; background: var(--accent-soft); border: 1px solid #BFDBFE;
+  border-radius: 14px 14px 14px 4px; padding: .55rem .9rem; line-height: 1.5;
+  max-width: 100%; overflow-wrap: anywhere;
+}
+[data-testid="stChatMessage"] .rag-card { margin-top: 0; }
+[data-testid="stChatInput"] textarea { font-family: var(--font-body) !important; }
+
+/* Responsividade: tablet e celular */
+@media (max-width: 900px) {
+  .block-container { padding-left: 1rem; padding-right: 1rem; }
+}
+@media (max-width: 640px) {
+  .block-container { padding-top: 1rem; }
+  .rag-hero h1 { font-size: 1.45rem; }
+  .rag-hero p { font-size: .88rem; }
+  .rag-card { padding: .8rem .9rem; border-radius: 10px; }
+  .rag-card .body { font-size: .95rem; }
+  .rag-card .body pre, .rag-excerpt { font-size: .82rem; }
+  .chip { font-size: .72rem; padding: .1rem .5rem; }
+  .rag-source-meta { flex-direction: column; align-items: flex-start; gap: .15rem; }
+  .stButton > button { font-size: .85rem; padding: .35rem .6rem; }
+  [data-testid="stMetricValue"] { font-size: 1.3rem; }
+}
 </style>
 """

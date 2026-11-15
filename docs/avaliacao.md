@@ -37,6 +37,16 @@ Ou fora do Docker, com o `.venv` ativo e Ollama e Qdrant acessíveis:
 python -m eval.run_eval --reindex --generate
 ```
 
+No caminho Windows, sem Docker, use um índice próprio, para não disputar a trava do `.qdrant_local/` com a API. Foi assim que a avaliação oficial de 15/11/2026 foi gerada:
+
+```powershell
+$env:QDRANT_MODE="local"; $env:QDRANT_PATH=".cache/qdrant_eval"; $env:LLM_MODE="ollama"; $env:EMBED_MODE="ollama"
+.\.venv\Scripts\python.exe -m eval.run_eval --reindex --generate
+.\.venv\Scripts\python.exe -m eval.run_eval --generate --strategies fixed --modes vector --gen-strategy fixed --gen-mode vector
+```
+
+A execução principal leva cerca de 30 min em CPU, e o baseline mais 30 min.
+
 Opções úteis:
 
 ```bash
@@ -68,7 +78,12 @@ A avaliação também calcula, no **conjunto de desenvolvimento** e com o modo d
 
 ## Protocolo para o resultado oficial
 
-1. O conjunto oficial `eval/datasets/perguntas_teste.json` (50 perguntas com resposta e trecho-fonte esperados, cobrindo os 20 documentos, e 14 sem resposta) foi escrito e versionado **antes** de qualquer ajuste de prompts, chunking ou limites. O commit em que ele entrou é a prova dessa ordem.
+1. O conjunto oficial `eval/datasets/perguntas_teste.json` (50 perguntas com resposta e trecho-fonte esperados, cobrindo os 20 documentos, e 14 sem resposta) está **congelado** desde a versão 2.1.0: o campo `questions_sha256` é conferido pelo teste `test_test_set_is_frozen`, e qualquer mudança exige subir a versão, o que fica explícito no histórico do Git. A revisão 2.1.0 (14 perguntas reescritas para reduzir o viés lexical) foi feita **antes** da avaliação oficial e não mexeu nos trechos esperados.
 2. Ajustes de parâmetros (ex.: `MIN_VECTOR_SCORE`) usam perguntas novas de desenvolvimento, nunca as do conjunto oficial. Se o conjunto oficial for usado para calibrar, isso precisa ser declarado como limitação no trabalho de pesquisa.
 3. Na avaliação final, roda-se uma vez sobre o conjunto oficial, com o comando registrado em `summary.json`.
 4. Os casos em `hallucination_candidates` e as perguntas com `relevant_rank` vazio entram na análise de erros (`evidencias/falhas/`).
+5. Uma regra da verificação de citações só muda se a mudança for calibrada no conjunto de desenvolvimento e testada contra respostas forjadas (`evidencias/avaliacao/calibracao-verificacao-dev/`). Foi assim que a regra de cobertura foi avaliada e mantida em 15/11/2026.
+
+## Resultado oficial (15/11/2026)
+
+Os números estão no [checklist, seção 3](checklist-enunciado.md#3-resultados-oficiais-15112026), e as saídas brutas em `evidencias/avaliacao/`.

@@ -63,16 +63,25 @@ def extract_citation_ids(text: str) -> list[int]:
 
 
 def statements(text: str) -> list[str]:
-    """Afirmações da resposta: frases e tópicos, sem blocos de código e sem linhas
-    introdutórias terminadas em ':' (ex.: "Exemplo de código do trecho [1]:")."""
+    """Afirmações da resposta: frases e tópicos, sem blocos de código.
+
+    Linhas introdutórias terminadas em ':' só contam quando trazem citação: "Use o
+    dicionário X [1]:" seguido de código afirma algo e cita a fonte, enquanto "Veja o
+    exemplo:" não afirma nada. Se só houver introduções sem citação, elas contam assim
+    mesmo, para que a resposta tenha o que verificar (e seja recusada por falta de citação).
+    """
     prose = _CODE_RE.sub("\n", text)
-    result = []
+    result, bare_intros = [], []
     for part in _SENTENCE_SPLIT_RE.split(prose.strip()):
         part = part.strip()
         content = _CITATION_RE.sub("", part).strip(" -*•\t")
-        if len(content) > 3 and not content.endswith(":"):
+        if len(content) <= 3:
+            continue
+        if content.endswith(":") and not _CITATION_RE.search(part):
+            bare_intros.append(part)
+        else:
             result.append(part)
-    return result
+    return result or bare_intros
 
 
 def citation_coverage(text: str) -> float:

@@ -1,5 +1,6 @@
 """Métricas, integridade do dataset e execução do script de avaliação sem serviços externos."""
 
+import hashlib
 import json
 import re
 
@@ -38,6 +39,17 @@ def questions():
 @pytest.fixture(scope="module")
 def dev_questions():
     return load_dataset(DEV_DATASET)
+
+
+def test_test_set_is_frozen():
+    """O conjunto de teste está congelado desde a 2.1.0: mudar qualquer pergunta exige subir
+    a versão e regravar questions_sha256, o que fica explícito no histórico do Git."""
+    data = json.loads(DATASET.read_text(encoding="utf-8"))
+    canonical = json.dumps(
+        data["questions"], ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    assert hashlib.sha256(canonical.encode("utf-8")).hexdigest() == data["questions_sha256"]
+    assert data["version"] == "2.1.0"
 
 
 # --- Métricas ---------------------------------------------------------------
@@ -168,10 +180,10 @@ def test_main_refuses_to_calibrate_on_the_test_set():
 
 def test_evaluate_retrieval_and_generation_offline(questions):
     def responder(system, user):
-        # Responde citando [1] só quando a pergunta fala de CORS
+        # Responde citando [1] só na pergunta q27 (métodos liberados pelo CORS por padrão)
         return (
-            "O CORSMiddleware permite apenas GET por padrão [1]."
-            if "CORS" in user.split("PERGUNTA:")[1]
+            "O CORSMiddleware permite apenas o método GET por padrão [1]."
+            if "quais métodos HTTP" in user.split("PERGUNTA:")[1]
             else REFUSAL_MESSAGE
         )
 
@@ -199,7 +211,7 @@ def test_evaluate_retrieval_and_generation_offline(questions):
     assert gen["questions"] == len(questions)
     assert gen["correct_refusal_rate"] == 1.0
     assert gen["llm_mode"] == "ollama" and "grounded_among_answered" in gen
-    cors = next(r for r in gen_rows if "CORSMiddleware permite por padr" in r["question"])
+    cors = next(r for r in gen_rows if r["id"] == "q27")
     assert not cors["refused"] and cors["grounded_source"]
 
     report = build_report(

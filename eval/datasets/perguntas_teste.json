@@ -1,12 +1,13 @@
 {
   "name": "perguntas_teste",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "corpus": "data/raw_docs (20 documentos)",
-  "description": "Conjunto de teste oficial do Tema 4: 50 perguntas com resposta e trecho-fonte esperados, cobrindo os 20 documentos da base, e 14 perguntas sem resposta (assuntos ausentes, armadilhas próximas ao corpus e conhecimento geral). Escrito antes de qualquer ajuste do sistema (prompts, chunking, limites). Não use este arquivo para calibrar parâmetros.",
+  "description": "Conjunto de teste oficial do Tema 4: 50 perguntas com resposta e trecho-fonte esperados, cobrindo os 20 documentos da base, e 14 perguntas sem resposta (assuntos ausentes, armadilhas próximas ao corpus e conhecimento geral). Versão 2.1.0 (15/11/2026): 14 perguntas reescritas em linguagem de usuário, sem copiar o identificador de código ou o trecho esperado, para reduzir o viés a favor da busca lexical. Os trechos esperados não mudaram. Congelado antes da avaliação oficial: questions_sha256 é conferido por teste automatizado. Não use este arquivo para calibrar parâmetros.",
   "fields": {
     "expected_snippets": "Trechos literais do documento-fonte. Um chunk é relevante se contém algum deles (comparação sem acentos, sem crases e sem diferenciar maiúsculas). Isso torna o Recall@k independente da estratégia de chunking.",
     "answerable": "false para perguntas cuja resposta NÃO está na documentação; o sistema deve recusar."
   },
+  "questions_sha256": "4c8ed52c478e04eabf9d593805311ba07d1c24f9c00f5f5636b4e16b08518c22",
   "questions": [
     {
       "id": "q01",
@@ -175,7 +176,7 @@
     },
     {
       "id": "q16",
-      "question": "Em qual cabeçalho e formato o cliente envia o token quando uso OAuth2PasswordBearer?",
+      "question": "Depois do login, em que formato o cliente deve mandar o token nas próximas requisições?",
       "answerable": true,
       "expected_answer": "No cabeçalho Authorization, no formato Bearer <token>.",
       "expected_source": "seguranca.md",
@@ -197,7 +198,7 @@
     },
     {
       "id": "q18",
-      "question": "O que o OAuth2PasswordBearer faz quando a requisição chega sem o cabeçalho de autorização?",
+      "question": "O que acontece se alguém chamar uma rota protegida sem mandar o token de acesso?",
       "answerable": true,
       "expected_answer": "Responde automaticamente com status 401.",
       "expected_source": "seguranca.md",
@@ -208,7 +209,7 @@
     },
     {
       "id": "q19",
-      "question": "Como restrinjo rotas por permissões como items:read e items:write?",
+      "question": "Como dou permissões diferentes, como só leitura ou também escrita, para cada rota?",
       "answerable": true,
       "expected_answer": "Com escopos OAuth2: a classe Security e o parâmetro scopes.",
       "expected_source": "seguranca.md",
@@ -252,7 +253,7 @@
     },
     {
       "id": "q23",
-      "question": "Por que o código do lifespan não roda nos meus testes com TestClient?",
+      "question": "Meus testes não executam o código de inicialização da aplicação. Como faço ele rodar?",
       "answerable": true,
       "expected_answer": "Porque ele só roda quando o cliente é usado como gerenciador de contexto: with TestClient(app) as client.",
       "expected_source": "testes.md",
@@ -296,7 +297,7 @@
     },
     {
       "id": "q27",
-      "question": "Quais métodos HTTP o CORSMiddleware permite por padrão?",
+      "question": "Se eu liberar o acesso de outro domínio sem dizer quais métodos HTTP, quais ficam liberados?",
       "answerable": true,
       "expected_answer": "Apenas GET.",
       "expected_source": "erros-e-middleware.md",
@@ -307,7 +308,7 @@
     },
     {
       "id": "q28",
-      "question": "Posso usar allow_origins com o curinga \"*\" junto com allow_credentials=True?",
+      "question": "Posso liberar qualquer origem no navegador e, ao mesmo tempo, aceitar cookies de login?",
       "answerable": true,
       "expected_answer": "Não; com allow_credentials as origens precisam ser listadas explicitamente.",
       "expected_source": "erros-e-middleware.md",
@@ -329,7 +330,7 @@
     },
     {
       "id": "q30",
-      "question": "Para que serve o argumento prefix do APIRouter?",
+      "question": "Como faço todas as rotas de um módulo começarem com o mesmo caminho sem repetir em cada uma?",
       "answerable": true,
       "expected_answer": "Ele é adicionado ao início de todos os caminhos do roteador e não pode terminar com barra.",
       "expected_source": "aplicacoes-maiores.md",
@@ -340,7 +341,7 @@
     },
     {
       "id": "q31",
-      "question": "Qual constante do módulo status do FastAPI representa o código 201?",
+      "question": "Em vez de escrever o número 201 no código, que nome mais legível posso usar?",
       "answerable": true,
       "expected_answer": "status.HTTP_201_CREATED.",
       "expected_source": "respostas-personalizadas.md",
@@ -351,7 +352,7 @@
     },
     {
       "id": "q32",
-      "question": "O FastAPI aplica o response_model quando a rota retorna um objeto Response diretamente?",
+      "question": "Se a rota devolver um objeto de resposta pronto, o FastAPI ainda filtra e converte os dados?",
       "answerable": true,
       "expected_answer": "Não; a resposta é enviada como está, sem response_model nem conversão de dados.",
       "expected_source": "respostas-personalizadas.md",
@@ -373,7 +374,7 @@
     },
     {
       "id": "q34",
-      "question": "Por que um parâmetro chamado user_agent recebe o valor do cabeçalho User-Agent?",
+      "question": "Como um parâmetro com sublinhado no código recebe um cabeçalho HTTP que usa hífen no nome?",
       "answerable": true,
       "expected_answer": "Porque o Header converte automaticamente os sublinhados do nome em hífens.",
       "expected_source": "cabecalhos-cookies-formularios.md",
@@ -439,7 +440,7 @@
     },
     {
       "id": "q40",
-      "question": "Com env_prefix=\"APP_\", de qual variável de ambiente vem o campo banco_url?",
+      "question": "Se as configurações usam um prefixo nas variáveis de ambiente, de qual variável vem cada campo?",
       "answerable": true,
       "expected_answer": "Da variável APP_BANCO_URL.",
       "expected_source": "configuracoes.md",
@@ -505,7 +506,7 @@
     },
     {
       "id": "q46",
-      "question": "A instrução EXPOSE do Dockerfile publica a porta do container no computador hospedeiro?",
+      "question": "Declarar a porta no Dockerfile já basta para acessar o container pelo meu computador?",
       "answerable": true,
       "expected_answer": "Não; só documenta a porta. É preciso publicar com docker run -p.",
       "expected_source": "docker-imagens.md",
@@ -527,7 +528,7 @@
     },
     {
       "id": "q48",
-      "question": "Qual a diferença entre usar depends_on simples e com condition: service_healthy?",
+      "question": "Como faço um serviço do Compose esperar o banco estar realmente pronto, e não só iniciado?",
       "answerable": true,
       "expected_answer": "A forma simples só espera o container iniciar; com service_healthy o Compose espera o healthcheck passar.",
       "expected_source": "docker-compose.md",
@@ -549,7 +550,7 @@
     },
     {
       "id": "q50",
-      "question": "O AsyncClient do HTTPX dispara os eventos de lifespan da aplicação nos testes?",
+      "question": "Nos testes assíncronos com HTTPX, o código de inicialização da aplicação roda sozinho?",
       "answerable": true,
       "expected_answer": "Não; é preciso usar uma ferramenta como o LifespanManager do asgi-lifespan.",
       "expected_source": "testes.md",

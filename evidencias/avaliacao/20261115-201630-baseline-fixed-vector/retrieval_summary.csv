@@ -1,0 +1,2 @@
+strategy,mode,mode_effective,baseline,n,avg_chunk_chars,recall@1,recall@3,recall@5,recall@10,hits@5,recall@5_ci95,mrr,mean_latency_ms
+fixed,vector,vector,True,50,717.9,0.38,0.7,0.8,0.9,40,"[0.67, 0.89]",0.5549,46.1

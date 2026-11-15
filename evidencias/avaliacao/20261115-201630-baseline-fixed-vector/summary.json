@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "timestamp": "20261115-201630",
+    "dataset": "eval\\datasets\\perguntas_teste.json",
+    "dev_dataset": "eval\\datasets\\perguntas_dev.json",
+    "n_questions": 64,
+    "command": "python -m eval.run_eval --generate --strategies fixed --modes vector --gen-strategy fixed --gen-mode vector",
+    "config": {
+      "llm_mode": "ollama",
+      "embed_mode": "ollama",
+      "qdrant_mode": "local",
+      "qdrant_path": ".cache\\qdrant_eval",
+      "ollama_base_url": "http://localhost:11434",
+      "embed_model": "nomic-embed-text",
+      "embed_query_prefix": "search_query: ",
+      "embed_document_prefix": "search_document: ",
+      "embed_batch_size": 32,
+      "llm_model": "qwen2.5:3b",
+      "llm_temperature": 0.0,
+      "llm_num_ctx": 4096,
+      "llm_max_tokens": 512,
+      "llm_seed": 42,
+      "request_timeout_s": 180.0,
+      "vision_model": "qwen2.5vl:3b",
+      "vision_max_tokens": 600,
+      "max_image_mb": 5.0,
+      "qdrant_url": "http://localhost:6333",
+      "qdrant_collection_prefix": "techdocs",
+      "docs_dir": "data\\raw_docs",
+      "eval_dataset": "eval\\datasets\\perguntas_teste.json",
+      "chunk_strategy": "recursive",
+      "chunk_size": 800,
+      "chunk_overlap": 120,
+      "retrieval_mode": "hybrid",
+      "top_k": 5,
+      "candidates_k": 20,
+      "rrf_k": 60,
+      "reranker_model": "ms-marco-MultiBERT-L-12",
+      "reranker_cache_dir": ".cache/flashrank",
+      "min_vector_score": 0.0,
+      "min_citation_coverage": 0.5,
+      "min_support_ratio": 0.3,
+      "enable_ingest_endpoint": true,
+      "log_level": "INFO"
+    },
+    "seconds": 1645.4
+  },
+  "retrieval": [
+    {
+      "strategy": "fixed",
+      "mode": "vector",
+      "mode_effective": "vector",
+      "baseline": true,
+      "n": 50,
+      "avg_chunk_chars": 717.9,
+      "recall@1": 0.38,
+      "recall@3": 0.7,
+      "recall@5": 0.8,
+      "recall@10": 0.9,
+      "hits@5": 40,
+      "recall@5_ci95": "[0.67, 0.89]",
+      "mrr": 0.5549,
+      "mean_latency_ms": 46.1
+    }
+  ],
+  "gate": {
+    "fixed": {
+      "mode": "hybrid",
+      "n_answerable": 12,
+      "n_unanswerable": 6,
+      "mean_signal_answerable": 0.7613,
+      "mean_signal_unanswerable": 0.704,
+      "best_threshold": 0.7071,
+      "accuracy": 0.8333
+    }
+  },
+  "generation": {
+    "questions": 64,
+    "answerable": 50,
+    "unanswerable": 14,
+    "answer_rate": 0.52,
+    "grounded_rate_snippet": 0.42,
+    "grounded_among_answered": 0.8077,
+    "grounded_rate_source": 0.5,
+    "correct_refusal_rate": 0.9286,
+    "false_refusal_rate": 0.48,
+    "ungrounded_blocked_rate": 0.2188,
+    "mean_citation_coverage": 0.7901,
+    "hallucination_candidates": [
+      "q36",
+      "u07"
+    ],
+    "strategy": "fixed",
+    "mode": "vector",
+    "top_k": 5,
+    "llm_mode": "ollama",
+    "embed_mode": "ollama"
+  }
+}

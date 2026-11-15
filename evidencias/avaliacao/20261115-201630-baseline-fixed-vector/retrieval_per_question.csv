@@ -1,0 +1,51 @@
+strategy,mode,mode_effective,id,question,relevant_rank,top1_source,expected_source,source_hit_top1,latency_ms,llm_mode,embed_mode
+fixed,vector,vector,q01,Como instalo o FastAPI junto com o servidor e a ferramenta de linha de comando?,2,primeiros-passos.md,primeiros-passos.md,True,57.0,ollama,ollama
+fixed,vector,vector,q02,Qual comando inicia o servidor em modo de desenvolvimento com recarregamento automático?,1,primeiros-passos.md,primeiros-passos.md,True,44.9,ollama,ollama
+fixed,vector,vector,q03,Em qual endereço fica a documentação interativa gerada com o Swagger UI?,2,primeiros-passos.md,primeiros-passos.md,True,40.9,ollama,ollama
+fixed,vector,vector,q04,Qual comando devo usar para rodar a aplicação em produção?,5,aplicacoes-maiores.md,primeiros-passos.md,False,155.4,ollama,ollama
+fixed,vector,vector,q05,O que acontece se o cliente enviar um texto num parâmetro de caminho anotado como int?,1,parametros.md,parametros.md,True,48.6,ollama,ollama
+fixed,vector,vector,q06,Por que a rota /users/me precisa ser declarada antes de /users/{user_id}?,6,aplicacoes-maiores.md,parametros.md,False,44.3,ollama,ollama
+fixed,vector,vector,q07,Como valido o tamanho mínimo e máximo de um parâmetro de consulta?,2,parametros.md,parametros.md,True,36.5,ollama,ollama
+fixed,vector,vector,q08,Como limito os valores aceitos em um parâmetro de caminho a uma lista predefinida?,1,parametros.md,parametros.md,True,41.1,ollama,ollama
+fixed,vector,vector,q09,Como converto um modelo Pydantic recebido no corpo em dicionário?,2,corpo-da-requisicao.md,corpo-da-requisicao.md,True,39.8,ollama,ollama
+fixed,vector,vector,q10,"Como o FastAPI decide se um parâmetro vem do caminho, da consulta ou do corpo da requisição?",4,corpo-da-requisicao.md,corpo-da-requisicao.md,True,45.9,ollama,ollama
+fixed,vector,vector,q11,Como evito que a senha do usuário apareça na resposta da API?,10,respostas-personalizadas.md,corpo-da-requisicao.md,False,40.8,ollama,ollama
+fixed,vector,vector,q12,Como exijo que o corpo da requisição venha dentro de uma chave com o nome do parâmetro?,1,corpo-da-requisicao.md,corpo-da-requisicao.md,True,50.0,ollama,ollama
+fixed,vector,vector,q13,O que acontece quando a mesma dependência aparece várias vezes na mesma requisição?,1,dependencias.md,dependencias.md,True,46.4,ollama,ollama
+fixed,vector,vector,q14,"Como executo código de limpeza, como fechar a sessão do banco, depois que a rota termina?",1,dependencias.md,dependencias.md,True,45.4,ollama,ollama
+fixed,vector,vector,q15,Como aplico uma dependência a todas as rotas da aplicação?,2,aplicacoes-maiores.md,dependencias.md,False,36.2,ollama,ollama
+fixed,vector,vector,q16,"Depois do login, em que formato o cliente deve mandar o token nas próximas requisições?",3,seguranca.md,seguranca.md,True,45.4,ollama,ollama
+fixed,vector,vector,q17,Onde deve ficar a chave usada para assinar os tokens JWT?,1,seguranca.md,seguranca.md,True,39.6,ollama,ollama
+fixed,vector,vector,q18,O que acontece se alguém chamar uma rota protegida sem mandar o token de acesso?,1,seguranca.md,seguranca.md,True,45.5,ollama,ollama
+fixed,vector,vector,q19,"Como dou permissões diferentes, como só leitura ou também escrita, para cada rota?",,primeiros-passos.md,seguranca.md,False,46.9,ollama,ollama
+fixed,vector,vector,q20,Como executo uma função depois que a resposta já foi enviada ao cliente?,,respostas-personalizadas.md,tarefas-em-segundo-plano.md,False,40.8,ollama,ollama
+fixed,vector,vector,q21,Quando devo usar o Celery em vez das tarefas em segundo plano do FastAPI?,1,tarefas-em-segundo-plano.md,tarefas-em-segundo-plano.md,True,46.2,ollama,ollama
+fixed,vector,vector,q22,Como substituo uma dependência real por uma versão de teste?,1,testes.md,testes.md,True,33.6,ollama,ollama
+fixed,vector,vector,q23,Meus testes não executam o código de inicialização da aplicação. Como faço ele rodar?,7,pytest-fundamentos.md,testes.md,False,48.3,ollama,ollama
+fixed,vector,vector,q24,Por que copiar o requirements.txt antes do código no Dockerfile?,2,docker-imagens.md,implantacao.md,False,40.5,ollama,ollama
+fixed,vector,vector,q25,Qual opção do fastapi run devo usar quando a aplicação roda atrás de um proxy reverso?,1,implantacao.md,implantacao.md,True,47.9,ollama,ollama
+fixed,vector,vector,q26,Como retorno um erro 404 com uma mensagem personalizada?,9,respostas-personalizadas.md,erros-e-middleware.md,False,57.8,ollama,ollama
+fixed,vector,vector,q27,"Se eu liberar o acesso de outro domínio sem dizer quais métodos HTTP, quais ficam liberados?",,primeiros-passos.md,erros-e-middleware.md,False,48.7,ollama,ollama
+fixed,vector,vector,q28,"Posso liberar qualquer origem no navegador e, ao mesmo tempo, aceitar cookies de login?",,cabecalhos-cookies-formularios.md,erros-e-middleware.md,False,44.5,ollama,ollama
+fixed,vector,vector,q29,Como divido as rotas de uma aplicação grande em vários arquivos?,5,aplicacoes-maiores.md,aplicacoes-maiores.md,True,39.0,ollama,ollama
+fixed,vector,vector,q30,Como faço todas as rotas de um módulo começarem com o mesmo caminho sem repetir em cada uma?,,parametros.md,aplicacoes-maiores.md,False,50.1,ollama,ollama
+fixed,vector,vector,q31,"Em vez de escrever o número 201 no código, que nome mais legível posso usar?",2,cabecalhos-cookies-formularios.md,respostas-personalizadas.md,False,42.2,ollama,ollama
+fixed,vector,vector,q32,"Se a rota devolver um objeto de resposta pronto, o FastAPI ainda filtra e converte os dados?",8,corpo-da-requisicao.md,respostas-personalizadas.md,False,54.2,ollama,ollama
+fixed,vector,vector,q33,"Como envio uma resposta aos poucos, sem carregar todo o conteúdo na memória?",1,respostas-personalizadas.md,respostas-personalizadas.md,True,44.6,ollama,ollama
+fixed,vector,vector,q34,Como um parâmetro com sublinhado no código recebe um cabeçalho HTTP que usa hífen no nome?,2,cabecalhos-cookies-formularios.md,cabecalhos-cookies-formularios.md,True,44.8,ollama,ollama
+fixed,vector,vector,q35,Posso receber campos de formulário e um corpo JSON na mesma rota do FastAPI?,1,cabecalhos-cookies-formularios.md,cabecalhos-cookies-formularios.md,True,40.3,ollama,ollama
+fixed,vector,vector,q36,"O que o Pydantic faz quando recebe o texto ""19.90"" em um campo float?",2,configuracoes.md,pydantic-modelos.md,False,38.2,ollama,ollama
+fixed,vector,vector,q37,Como faço um modelo Pydantic rejeitar campos que não foram declarados?,5,pydantic-modelos.md,pydantic-modelos.md,True,40.2,ollama,ollama
+fixed,vector,vector,q38,Como crio uma regra de validação própria para um campo de um modelo Pydantic?,3,pydantic-validacao.md,pydantic-validacao.md,True,42.9,ollama,ollama
+fixed,vector,vector,q39,"Como valido uma regra que envolve dois campos do modelo, como início e fim de um período?",3,pydantic-validacao.md,pydantic-validacao.md,True,44.7,ollama,ollama
+fixed,vector,vector,q40,"Se as configurações usam um prefixo nas variáveis de ambiente, de qual variável vem cada campo?",1,configuracoes.md,configuracoes.md,True,46.0,ollama,ollama
+fixed,vector,vector,q41,Como evito que uma senha apareça no log quando imprimo as configurações?,3,configuracoes.md,configuracoes.md,True,40.6,ollama,ollama
+fixed,vector,vector,q42,Quais nomes de arquivo o pytest reconhece como arquivos de teste?,4,pytest-fixtures.md,pytest-fundamentos.md,False,39.5,ollama,ollama
+fixed,vector,vector,q43,Como verifico com pytest que um código levanta uma exceção?,1,pytest-fundamentos.md,pytest-fundamentos.md,True,39.3,ollama,ollama
+fixed,vector,vector,q44,Qual é o escopo padrão de uma fixture do pytest?,2,pytest-fixtures.md,pytest-fixtures.md,True,37.3,ollama,ollama
+fixed,vector,vector,q45,Como compartilho fixtures entre vários arquivos de teste sem precisar importá-las?,1,pytest-fixtures.md,pytest-fixtures.md,True,40.5,ollama,ollama
+fixed,vector,vector,q46,Declarar a porta no Dockerfile já basta para acessar o container pelo meu computador?,3,docker-imagens.md,docker-imagens.md,True,43.5,ollama,ollama
+fixed,vector,vector,q47,"No Docker Compose, como a API acessa o banco de dados que está em outro serviço?",1,docker-compose.md,docker-compose.md,True,39.1,ollama,ollama
+fixed,vector,vector,q48,"Como faço um serviço do Compose esperar o banco estar realmente pronto, e não só iniciado?",1,docker-compose.md,docker-compose.md,True,45.8,ollama,ollama
+fixed,vector,vector,q49,"Como o FastAPI executa uma rota declarada com def comum, sem async?",1,async-e-concorrencia.md,async-e-concorrencia.md,True,44.0,ollama,ollama
+fixed,vector,vector,q50,"Nos testes assíncronos com HTTPX, o código de inicialização da aplicação roda sozinho?",3,testes.md,testes.md,True,47.7,ollama,ollama

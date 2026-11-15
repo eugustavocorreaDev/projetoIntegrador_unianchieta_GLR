@@ -18,6 +18,22 @@ Este projeto ataca três perguntas, todas medidas na pasta `eval/`:
 
 **Base de conhecimento:** guia técnico em português do ecossistema FastAPI + Pydantic + pytest + Docker, em `data/raw_docs/` (ver [data/README.md](data/README.md)). O assistente responde **só** com base nesses documentos: perguntas fora deles, mesmo de conhecimento geral, como "O que é HTML?", são recusadas de propósito.
 
+## Resultados
+
+Avaliação oficial de 15/11/2026, com o Ollama real (`nomic-embed-text` e `qwen2.5:3b`), o conjunto de teste congelado (50 perguntas com resposta e 14 sem) e top-5. As saídas brutas estão em [`evidencias/avaliacao/`](evidencias/avaliacao/), e a análise completa em [docs/checklist-enunciado.md](docs/checklist-enunciado.md#3-resultados-oficiais-15112026).
+
+| | Baseline `fixed + vector` | **Padrão `recursive + hybrid`** |
+| --- | --- | --- |
+| Recall@5 da recuperação | 80% | **92%** |
+| Respostas fundamentadas, entre as respondidas | 80,8% | **93,5%** |
+| Recusas corretas (perguntas sem resposta) | 92,9% | 92,9% |
+| Falsas recusas | 48% | **38%** |
+
+- **Reranker:** o `ms-marco-MultiBERT-L-12` derrubou o Recall@5 para 56–58%. Por isso o padrão é a busca híbrida sem reranking (ADR 002).
+- **Limitações** (5 casos de falha analisados em [`evidencias/falhas/`](evidencias/falhas/casos-de-falha.md)):
+  - uma alucinação passou pela verificação lexical (caso 3);
+  - a verificação rígida recusa respostas corretas pouco citadas (caso 4).
+
 ## Arquitetura
 
 ```mermaid

@@ -250,4 +250,122 @@ Regras do enunciado: pelo menos **10 interações relevantes**, cada uma com o p
 
 ---
 
+## Interação 8: execução do checklist de conformidade (avaliação oficial, conjunto congelado, verificação e interface de chat)
+
+- **Data:** 2026-11-15 · **Integrante:** Gustavo Correa Lima · **Ferramenta:** Claude Code (Anthropic), modelo Claude Opus 5.5
+- **Objetivo:** fechar os itens técnicos do checklist de conformidade com o Tema 4, priorizados pelo peso na rubrica (critérios 2 e 3), e produzir as evidências 3, 4 e 6.
+- **Prompt (resumido):** "Melhore o checklist geral, pontue os pontos principais, faça um plano de implementação e execute-o. As dúvidas com o professor e com o grupo já foram resolvidas: siga com o desenvolvimento, rode os testes e o que for preciso no terminal e registre a interação em formato técnico."
+
+### Plano executado
+
+| # | Item | Resultado |
+| --- | --- | --- |
+| P1 | Avaliação oficial com geração (`recursive + hybrid`) | ✅ `evidencias/avaliacao/20261115-172143-principal-recursive-hybrid/` |
+| P2 | Baseline com geração (`fixed + vector`) | ✅ `evidencias/avaliacao/20261115-201630-baseline-fixed-vector/` |
+| P3 | Revisão e congelamento do conjunto de teste | ✅ v2.1.0, `questions_sha256` e `test_test_set_is_frozen` |
+| P4 | Casos de falha com alucinação real | ✅ casos 3, 4 e 5 em `evidencias/falhas/casos-de-falha.md` |
+| P5 | Log de execução completa | ✅ `evidencias/logs/execucao-completa.jsonl` (138 eventos, 128 perguntas) |
+| P6 | Bug da verificação de citações | ✅ `generation/grounding.py` e testes de regressão |
+| P7 | Interface em estilo chat e responsiva | ✅ `src/ui/app.py`, `src/ui/styles.py`, `tests/test_ui.py` |
+| P8 | Leitura de prints no caminho Docker | 🟡 compose atualizado (Ollama 0.12.6 e `PULL_VISION_MODEL`); `docker compose up` não executado |
+| P9 | Calibração da verificação no conjunto de desenvolvimento | ✅ `evidencias/avaliacao/calibracao-verificacao-dev/` |
+
+### Alterações por arquivo
+
+- **`eval/datasets/perguntas_teste.json` (v2.1.0):** 14 perguntas reescritas em linguagem de usuário: q16, q18, q19, q23, q27, q28, q30, q31, q32, q34, q40, q46, q48 e q50. Antes, 17 das 50 perguntas continham o identificador de código esperado, e q40, q46 e q50 tinham de 88% a 100% dos termos do trecho esperado. Os trechos esperados não mudaram. Novo campo `questions_sha256`.
+- **`tests/test_eval.py`:** `test_test_set_is_frozen` (hash SHA-256 canônico das perguntas). O teste offline passou a localizar a q27 pelo id.
+- **`src/generation/grounding.py`:** `statements()` conta as linhas de introdução terminadas em ":" quando elas trazem citação; as sem citação continuam ignoradas. Testes: `test_cited_intro_before_code_counts_as_claim` e `test_bare_intro_without_citation_is_still_ignored`.
+- **`src/ui/app.py` e `styles.py`:**
+  - aba Perguntar em formato de conversa (`st.chat_message`), com o histórico de até 20 trocas;
+  - a lista completa de trechos aparece só na última resposta (`render_result(show_all=...)`);
+  - botão "Nova conversa", anexo num expansível 📎 e exemplos só com a conversa vazia;
+  - aviso de que cada pergunta é respondida de forma independente;
+  - regras `@media` para 900 px e 640 px;
+  - testes `test_conversation_keeps_history_like_a_chat` e `test_new_chat_clears_the_conversation`.
+- **`docker-compose.yml`:**
+  - `ollama/ollama:0.5.4` → `0.12.6`, porque a 0.5.4 não roda o `qwen2.5vl`; a existência da tag foi conferida na API do Docker Hub;
+  - `VISION_MODEL` no ambiente da API;
+  - `ollama-pull` baixa o modelo de visão só com `PULL_VISION_MODEL=true`;
+  - a ausência de chaves duplicadas foi validada com um loader YAML estrito.
+- **Documentação:**
+  - `docs/checklist-enunciado.md`, reescrito com prioridades, resultados oficiais e roteiro de validação;
+  - README, com a nova seção "Resultados";
+  - ADR 002, com a confirmação oficial;
+  - `docs/avaliacao.md`, com o comando no Windows, o congelamento e a regra de calibração;
+  - `docs/dados-e-modelos.md`, `docs/manual-usuario.md`, `docs/instalacao.md`, `docs/testes-ci.md`, `.env.example` e `evidencias/README.md`.
+
+### Experimentos (hipótese → método → resultado → decisão)
+
+1. **Prompt contra a alucinação do u07 e a recusa do caso 2.**
+   - *Hipótese:* duas regras novas no prompt (valor padrão só se estiver explícito; mensagem de erro em inglês faz parte da pergunta) corrigem os dois casos.
+   - *Método:* A/B ao vivo com 9 perguntas: o caso 2, as armadilhas u04, u07, u09, u10, u12 e u13, e os controles q22 e q45.
+   - *Resultado:* 6/9 antes e 6/9 depois. O modelo de 3B manteve a alucinação do u07 e a recusa do caso 2.
+   - *Decisão:* regras **retiradas**, para não alterar o prompt sem ganho medido antes da avaliação oficial.
+2. **Bug da verificação no q22.**
+   - *Hipótese:* a resposta correta era descartada porque a citação estava numa linha terminada em ":".
+   - *Método:* reprodução fora da API com a resposta bruta completa, mais teste de regressão.
+   - *Resultado:* com a correção, o q22 é respondido citando `testes.md` na medição ao vivo (7/9 no A/B).
+   - *Decisão:* correção **mantida**.
+3. **Falsas recusas por cobertura (avaliação oficial).**
+   - *Observação:* 16 das 19 falsas recusas são `ungrounded_answer` com cobertura de 0% a 33% e nenhuma frase sem sustentação.
+   - *Método:* seis variações da regra reaplicadas às respostas reais do **conjunto de desenvolvimento** (12 com resposta e 6 sem), mais 4 respostas forjadas de controle. O conjunto de teste não participou.
+   - *Resultado:*
+     - afrouxar a cobertura ganha no máximo 1 de 12 perguntas;
+     - conferir as frases sem citação contra todo o contexto aceita 3 de 4 respostas forjadas, contra 1 de 4 hoje;
+     - a forjada aceita pela regra atual é "O FastAPI usa bcrypt com 12 rodadas por padrão [1]".
+   - *Decisão:* regra **mantida**. A troca entre precisão e cobertura fica documentada no caso 4.
+4. **Interface de chat no AppTest.**
+   - *Observação:* depois do `st.rerun()`, a resposta antiga ainda mostrava todos os trechos.
+   - *Hipótese:* resíduo do AppTest, que não descarta os elementos da execução interrompida.
+   - *Método:* nova execução, sem entrada.
+   - *Resultado:* só a última resposta mostra todos os trechos.
+   - *Decisão:* o teste faz um `at.run()` extra, comentado.
+
+### Métricas oficiais
+
+Ollama real, conjunto 2.1.0, top-5.
+
+| Métrica | Baseline `fixed + vector` | Padrão `recursive + hybrid` |
+| --- | --- | --- |
+| Recall@5 | 80% | 92% |
+| Fundamentadas entre as respondidas | 80,8% | 93,5% |
+| Fundamentadas no total | 42% | 58% |
+| Recusas corretas | 92,9% | 92,9% |
+| Falsas recusas | 48% | 38% |
+| Candidatas a alucinação | q36, u07 | u07 |
+
+O `hybrid_rerank` teve Recall@5 de 58% (`fixed`) e 56% (`recursive`), o que confirma a ADR 002.
+
+### Decisão
+
+- **Aceito:**
+  - o plano P1–P9;
+  - a correção da verificação;
+  - o conjunto 2.1.0 congelado;
+  - a interface de chat;
+  - o compose com o Ollama 0.12.6;
+  - as evidências 3, 4 e 6.
+- **Corrigido:**
+  - o teste offline que dependia do texto antigo da q27;
+  - o script de evidências, que passou a ignorar a execução interrompida por uma queda de internet (pasta sem `summary.json`).
+- **Descartado:**
+  - as duas regras novas de prompt, sem efeito medido;
+  - afrouxar a cobertura de citações, sem ganho no conjunto de desenvolvimento e com risco nas respostas forjadas;
+  - calibrar qualquer regra olhando o conjunto de teste.
+
+### Limitações registradas
+
+- A verificação é lexical: a alucinação do u07 e a resposta forjada do bcrypt passam por ela.
+- O `docker compose up` com o Ollama 0.12.6 ainda não foi executado. A CI só faz o build das imagens.
+- A avaliação oficial rodou no caminho Windows (`QDRANT_MODE=local`), não no Docker.
+
+### Verificação
+
+- `ruff check` e `ruff format --check` limpos.
+- **190 testes passando** (eram 185), com 94% de cobertura.
+- Auditoria ao vivo da interface de chat contra a API real: 9 de 9 itens.
+- CI verde no GitHub nos 3 pushes anteriores, inclusive o job de build das imagens.
+
+---
+
 <!-- Próximas interações: 3 a 10+. Registre também usos menores mas relevantes (ex.: depurar um erro, ajustar um prompt após a avaliação). -->

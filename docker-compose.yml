@@ -12,6 +12,7 @@ x-app-env: &app-env
   EMBED_DOCUMENT_PREFIX: "${EMBED_DOCUMENT_PREFIX-search_document: }"
   EMBED_BATCH_SIZE: ${EMBED_BATCH_SIZE:-32}
   LLM_MODEL: ${LLM_MODEL:-qwen2.5:3b}
+  VISION_MODEL: ${VISION_MODEL:-qwen2.5vl:3b}
   LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.0}
   LLM_NUM_CTX: ${LLM_NUM_CTX:-4096}
   LLM_MAX_TOKENS: ${LLM_MAX_TOKENS:-512}
@@ -39,7 +40,8 @@ x-api-build: &api-build
 
 services:
   ollama:
-    image: ollama/ollama:0.5.4
+    # 0.12.6: primeira linha estável que roda o modelo de visão qwen2.5vl (0.5.4 não roda)
+    image: ollama/ollama:0.12.6
     volumes:
       - ollama_data:/root/.ollama
     ports:
@@ -60,9 +62,10 @@ services:
     #           count: all
     #           capabilities: [gpu]
 
-  # Baixa os modelos uma vez (ficam no volume ollama_data) e termina
+  # Baixa os modelos uma vez (ficam no volume ollama_data) e termina.
+  # O modelo de visão (perguntas com print, ~3,2 GB) só é baixado com PULL_VISION_MODEL=true.
   ollama-pull:
-    image: ollama/ollama:0.5.4
+    image: ollama/ollama:0.12.6
     depends_on:
       ollama:
         condition: service_healthy
@@ -70,7 +73,14 @@ services:
       OLLAMA_HOST: http://ollama:11434
       EMBED_MODEL: ${EMBED_MODEL:-nomic-embed-text}
       LLM_MODEL: ${LLM_MODEL:-qwen2.5:3b}
-    entrypoint: ["/bin/sh", "-c", "ollama pull \"$$EMBED_MODEL\" && ollama pull \"$$LLM_MODEL\""]
+      VISION_MODEL: ${VISION_MODEL:-qwen2.5vl:3b}
+      PULL_VISION_MODEL: ${PULL_VISION_MODEL:-false}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - >-
+        ollama pull "$$EMBED_MODEL" && ollama pull "$$LLM_MODEL" &&
+        if [ "$$PULL_VISION_MODEL" = "true" ]; then ollama pull "$$VISION_MODEL"; fi
     restart: "no"
 
   qdrant:
