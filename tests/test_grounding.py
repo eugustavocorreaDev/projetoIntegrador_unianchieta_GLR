@@ -6,6 +6,7 @@ from generation.grounding import (
     extract_citation_ids,
     ground_answer,
     is_refusal,
+    missing_critical_terms,
     statements,
     support_ratio,
 )
@@ -19,13 +20,15 @@ TEXTS = [
 ]
 
 
-def _chunks(n: int, text: str | None = None) -> list[RetrievedChunk]:
+def _chunks(
+    n: int, text: str | None = None, sources: list[str] | None = None
+) -> list[RetrievedChunk]:
     return [
         RetrievedChunk(
             Chunk(
                 id=f"id{i}",
                 text=text or TEXTS[(i - 1) % len(TEXTS)],
-                source=f"doc{i}.md",
+                source=sources[i - 1] if sources else f"doc{i}.md",
                 section=f"S{i}",
                 chunk_index=i,
                 strategy="recursive",
@@ -155,7 +158,9 @@ def test_cited_intro_before_code_counts_as_claim():
     )
     result = ground_answer(text, _chunks(1, text=chunk_text))
     assert not result.refused, result.refusal_reason
-    assert result.coverage == 0.5
+    # a última linha vem sem citação, mas o trecho 1 a sustenta sozinho: ela ganha o [1]
+    assert result.resolved == 1 and result.coverage == 1.0
+    assert "Limpe as substituições depois dos testes. [1]" in result.answer
 
 
 def test_bare_intro_without_citation_is_still_ignored():
@@ -188,3 +193,139 @@ def test_citation_coverage():
     assert citation_coverage("Frase um [1]. Frase sem citação.") == 0.5
     assert citation_coverage("Introdução:\n```\ncódigo\n```\nFrase [1].") == 1.0
     assert citation_coverage("") == 0.0
+
+
+# Caso 3 (u07): o modelo reaproveita as palavras do trecho e inventa o valor padrão
+WORKERS_TEXT = (
+    "O comando `fastapi run` aceita a opção `--workers` para iniciar vários processos, "
+    "por exemplo `fastapi run --workers 4 main.py`. Em um cluster com Kubernetes, o "
+    "recomendado é rodar um único processo por container."
+)
+
+
+@pytest.mark.parametrize(
+    "answer",
+    [
+        "O FastAPI run usa por padrão um único processo. [1]",  # qualificador inventado
+        "O FastAPI run usa 1 worker. [1]",  # número inventado
+        "Use `fastapi run --threads 4` para isso. [1]",  # identificador inventado
+    ],
+)
+def test_invented_value_reusing_chunk_words_is_refused(answer):
+    result = ground_answer(answer, _chunks(1, WORKERS_TEXT))
+    assert result.refused and result.refusal_reason == "ungrounded_answer"
+    assert result.unsupported == [answer]
+
+
+def test_one_invented_claim_refuses_the_whole_answer():
+    """A regra da maioria deixaria passar: 2 frases boas e 1 inventada."""
+    text = (
+        "A opção `--workers` inicia vários processos [1]. "
+        "O exemplo é `fastapi run --workers 4 main.py` [1]. "
+        "O valor padrão é 8 workers [1]."
+    )
+    result = ground_answer(text, _chunks(1, WORKERS_TEXT))
+    assert result.refused
+    assert result.unsupported == ["O valor padrão é 8 workers [1]."]
+
+
+def test_faithful_answer_with_numbers_and_code_is_kept():
+    text = "Use `fastapi run --workers 4 main.py` para iniciar 4 processos [1]."
+    assert not ground_answer(text, _chunks(1, WORKERS_TEXT)).refused
+
+
+def test_numbered_list_markers_are_not_critical_terms():
+    claim = "1. Instale o pacote com `fastapi run`"
+    assert missing_critical_terms(claim, [WORKERS_TEXT]) == []
+    assert missing_critical_terms("3) Use sempre `fastapi run`", [WORKERS_TEXT]) == ["sempre"]
+
+
+def test_missing_critical_terms_reports_each_kind():
+    assert missing_critical_terms("São 7 processos", [WORKERS_TEXT]) == ["7"]
+    assert missing_critical_terms("Use `fastapi dev`", [WORKERS_TEXT]) == ["fastapi dev"]
+    assert missing_critical_terms("Use --reload sempre", [WORKERS_TEXT]) == ["--reload", "sempre"]
+    # com o qualificador no trecho, ele deixa de faltar
+    assert missing_critical_terms("É o padrão", ["O valor padrão é 4."]) == []
+
+
+# --- Falsas recusas: parser, reparo de citação e atribuição ----------------------
+
+FROZEN = "O parâmetro `frozen=True` torna as instâncias imutáveis depois de criadas."
+EXTRA = 'O parâmetro `extra="forbid"` rejeita campos que não foram declarados.'
+
+
+def _pair(first: str, second: str, sources=("a.md", "a.md")) -> list[RetrievedChunk]:
+    return [
+        RetrievedChunk(Chunk(f"id{n}", text, src, f"S{n}", n, "recursive"), score=1.0)
+        for n, (text, src) in enumerate(zip((first, second), sources, strict=True), start=1)
+    ]
+
+
+def test_standalone_citation_line_belongs_to_the_previous_statement():
+    """Caso d11: o qwen2.5:3b escreve a frase e põe o [1] sozinho na linha seguinte."""
+    text = "- O middleware que comprime é o `GZipMiddleware`.\n\n[1]"
+    assert statements(text) == ["- O middleware que comprime é o `GZipMiddleware`. [1]"]
+    chunk = "O `GZipMiddleware` comprime as respostas da API com gzip."
+    assert not ground_answer(text, _chunks(1, text=chunk)).refused
+
+
+def test_wrong_citation_number_in_the_same_document_is_repaired():
+    """Casos d03 e d07: o fato está no trecho 2 do mesmo arquivo, citado como [1]."""
+    text = "Use `frozen=True` para tornar as instâncias imutáveis [1]."
+    result = ground_answer(text, _pair(EXTRA, FROZEN))
+    assert not result.refused and result.resolved == 1
+    assert [c.id for c in result.citations] == [2]
+    assert result.answer.endswith("[2]")
+
+
+def test_citation_is_never_repaired_across_documents():
+    """Caso u07: o qualificador existe em outro arquivo, mas isso não sustenta a frase."""
+    other = (
+        "A porta padrão do servidor é 8000 e o comando fastapi run usa um único processo padrão."
+    )
+    text = "O comando `fastapi run` usa por padrão um único processo [1]."
+    chunks = _pair(WORKERS_TEXT, other, sources=("implantacao.md", "primeiros-passos.md"))
+    result = ground_answer(text, chunks)
+    assert result.refused and result.resolved == 0
+
+
+def test_uncited_statement_supported_by_one_chunk_gets_its_citation():
+    text = "Use `frozen=True` para tornar as instâncias imutáveis depois de criadas."
+    result = ground_answer(text, _pair(EXTRA, FROZEN))
+    assert not result.refused and result.resolved == 1
+    assert [c.id for c in result.citations] == [2]
+
+
+def test_uncited_external_knowledge_is_not_attributed():
+    text = "HTML é uma linguagem de marcação usada para estruturar páginas web."
+    result = ground_answer(text, _chunks(4))
+    assert result.refused and result.resolved == 0
+
+
+def test_uncited_statement_needs_one_chunk_not_the_union_of_the_context():
+    """Metade dos termos num trecho e metade em outro não sustenta a frase."""
+    text = "O parâmetro extra torna as instâncias imutáveis e rejeita campos."
+    result = ground_answer(text, _pair(EXTRA, FROZEN))
+    assert result.refused
+
+
+def test_negation_missing_from_the_chunk_counts_as_invented():
+    claim = "O parâmetro `frozen=True` não torna as instâncias imutáveis [1]"
+    assert missing_critical_terms(claim, [FROZEN]) == ["não"]
+    assert (
+        missing_critical_terms(
+            "Não use `frozen=True` em modelos mutáveis", ["Não use frozen=True."]
+        )
+        == []
+    )
+
+
+def test_attributed_statement_does_not_dilute_a_rejected_cited_one():
+    """Citada e reprovada + sem citação e atribuída: a resposta continua recusada."""
+    text = (
+        "Use o Django REST Framework com serializers [1]. "
+        "Use `frozen=True` para tornar as instâncias imutáveis depois de criadas."
+    )
+    result = ground_answer(text, _pair(FROZEN, EXTRA))
+    assert result.refused and result.coverage == 1.0  # a 2ª frase ganhou citação
+    assert result.unsupported == ["Use o Django REST Framework com serializers [1]."]

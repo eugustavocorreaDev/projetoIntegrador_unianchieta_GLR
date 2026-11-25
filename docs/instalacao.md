@@ -195,6 +195,7 @@ Todas têm valor padrão: nada precisa ser configurado para rodar. Para mudar al
 | `MIN_VECTOR_SCORE` | `0.0` | Limite de cosseno para chamar o LLM (0 desativa) |
 | `MIN_CITATION_COVERAGE` | `0.5` | Fração mínima das afirmações da resposta com citação |
 | `MIN_SUPPORT_RATIO` | `0.3` | Fração mínima dos termos de cada afirmação presentes no trecho citado |
+| `MIN_ATTRIBUTION_RATIO` | `0.6` | Fração mínima dos termos cobertos por um único trecho para corrigir uma citação errada ou atribuir uma a frase sem citação |
 | `ENABLE_INGEST_ENDPOINT` | `true` | Habilita o `POST /ingest` |
 | `LOG_LEVEL` / `LOG_DIR` | `INFO` / `logs` | Nível e pasta dos logs JSON |
 | `API_URL` | `http://localhost:8000` | Endereço da API usado pela interface |

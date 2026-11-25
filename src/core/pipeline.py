@@ -164,10 +164,12 @@ class RAGPipeline:
                 chunks,
                 min_coverage=self.settings.min_citation_coverage,
                 min_support=self.settings.min_support_ratio,
+                min_attribution=self.settings.min_attribution_ratio,
             )
             grounding_info = {
                 "coverage": None if grounded.coverage is None else round(grounded.coverage, 3),
                 "unsupported": [truncate(s, 160) for s in grounded.unsupported],
+                "resolved": grounded.resolved,
             }
             answer, refused = grounded.answer, grounded.refused
             reason, citations = grounded.refusal_reason, grounded.citations
