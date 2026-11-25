@@ -53,7 +53,7 @@
   "expected_snippets": [
    "status.HTTP_204_NO_CONTENT"
   ],
-  "raw_answer": "- Para uma exclusão bem-sucedida que não devolve conteúdo, deve-se usar a constante `status.HTTP_204_NO_CONTENT` do módulo `status`. [1]",
+  "raw_answer": "[1] A constante do módulo `status` que deve ser usada em uma exclusão que não devolve conteúdo é `status.HTTP_204_NO_CONTENT`.",
   "chunks": [
    {
     "id": "e367076f-12b4-5f7a-9544-b675d7e93d2f",
@@ -97,7 +97,7 @@
   "expected_snippets": [
    "frozen=True torna as instâncias imutáveis"
   ],
-  "raw_answer": "Para tornar as instâncias de um modelo Pydantic imutáveis, você deve adicionar a configuração `frozen=True` ao `model_config` do seu modelo. [1][3]",
+  "raw_answer": "Para tornar as instâncias de um modelo Pydantic imutáveis, você deve adicionar a configuração `frozen=True` ao `model_config` do seu modelo. [2]",
   "chunks": [
    {
     "id": "579b5796-7679-5355-b9bc-fd1f6d0cce67",
@@ -185,7 +185,7 @@
   "expected_snippets": [
    "Field(alias=\"dataNascimento\")"
   ],
-  "raw_answer": "Para aceitar JSON com chaves em camelCase mantendo o atributo Python em snake_case, use o argumento `alias` da função `Field` do Pydantic. Isso pode ser feito conforme mostrado no trecho [1]:\n\n```python\nField(alias=\"dataNascimento\")\n```\n\nIsso permite que o Pydantic aceite chaves em camelCase e mantenha o nome do atributo Python em snake_case.",
+  "raw_answer": "- Para aceitar JSON com chaves em camelCase mantendo o atributo Python em snake_case, use o argumento `alias` de `Field` na definição de campos Pydantic:\n\n```python\n[1]\nfrom pydantic import BaseModel, Field\n\nclass Produto(BaseModel):\n    nome: str = Field(alias=\"dataNascimento\")\n    preco: float = Field(alias=\"preco\")\n```\n\n- Para aceitar também o nome do atributo na entrada, ative `populate_by_name=True` no `ConfigDict`:\n\n```python\n[1]\nfrom pydantic import BaseModel, Field\n\nclass Produto(BaseModel):\n    nome: str = Field(alias=\"dataNascimento\")\n    preco: float = Field(alias=\"preco\")\n\nproduto = Produto(nome=\"Caneta\", preco=\"2.5\")\nproduto.model_dump()  # {\"dataNascimento\": \"Caneta\", \"preco\": \"2.5\"}\n```\n\n- Para exportar as chaves com os aliases, use `model_dump(by_alias=True)`:\n\n```python\n[1]\nfrom pydantic import BaseModel, Field\n\nclass Produto(BaseModel):\n    nome: str = Field(alias=\"dataNascimento\")\n    preco: float = Field(alias=\"preco\")\n\nproduto = Produto(nome=\"Caneta\", preco=\"2.5\")\nproduto.model_dump(by_alias=True)  # {\"dataNascimento\": \"Caneta\", \"preco\": \"2.5\"}\n```",
   "chunks": [
    {
     "id": "6f221b34-51b1-5e20-b378-80bb3c887cc7",
@@ -229,7 +229,7 @@
   "expected_snippets": [
    "argumentos passados ao criar a classe"
   ],
-  "raw_answer": "- No pydantic-settings, o argumento passado ao criar a classe tem mais prioridade do que as variáveis de ambiente na definição de configurações. [1]",
+  "raw_answer": "- No pydantic-settings, o argumento passado ao criar a classe tem mais prioridade do que as variáveis de ambiente [1].",
   "chunks": [
    {
     "id": "93c6fbe6-ed3b-5495-88e9-8299b9a4894f",
@@ -273,7 +273,7 @@
   "expected_snippets": [
    "pytest -x | Para na primeira falha"
   ],
-  "raw_answer": "[3] A opção `pytest -x` faz com que o pytest para na primeira falha.",
+  "raw_answer": "- Para na primeira falha: [3]",
   "chunks": [
    {
     "id": "7df5fa45-a98f-5d81-98a1-a7d4a718bd14",
@@ -493,7 +493,7 @@
   "expected_snippets": [
    "A classe APIKeyHeader, de fastapi.security"
   ],
-  "raw_answer": "- Para exigir uma chave de API enviada em um cabeçalho, você pode usar a classe `APIKeyHeader` do módulo `fastapi.security`. [1]\n\n```python\nfrom fastapi.security import APIKeyHeader\n\napi_key_header = APIKeyHeader(name=\"X-API-Key\")\n\nasync def verificar_chave(chave: Annotated[str, Depends(api_key_header)]):\n    # Compare com a chave guardada em uma variável de ambiente\n    if chave != settings.api_key:\n        raise HTTPException(status_code=401, detail=\"Chave inválida\")\n```",
+  "raw_answer": "- Para exigir uma chave de API enviada num cabeçalho, use a classe `APIKeyHeader` do módulo `fastapi.security`. [1]\n\n```python\nfrom fastapi.security import APIKeyHeader\n\napi_key_header = APIKeyHeader(name=\"X-API-Key\")\n\nasync def verificar_chave(chave: Annotated[str, Depends(api_key_header)]):\n    # Compare com a chave guardada em uma variável de ambiente\n    if chave != settings.api_key:\n        raise HTTPException(status_code=401, detail=\"Chave inválida\")\n```",
   "chunks": [
    {
     "id": "6fb8f184-219e-5688-bdd8-a583f26f069a",
@@ -524,6 +524,798 @@
     "source": "erros-e-middleware.md",
     "section": "Tratamento de erros, middleware e CORS > Outros middlewares prontos",
     "text": "O FastAPI reexporta middlewares do Starlette para necessidades comuns:\n\n- `GZipMiddleware` comprime as respostas para clientes que aceitam gzip. O argumento `minimum_size` evita comprimir respostas pequenas.\n- `TrustedHostMiddleware` recusa requisições cujo cabeçalho `Host` não esteja na lista `allowed_hosts`, o que protege contra ataques de cabeçalho Host.\n- `HTTPSRedirectMiddleware` redireciona toda requisição HTTP para o endereço HTTPS equivalente.\n\n```python\nfrom fastapi.middleware.gzip import GZipMiddleware\n\napp.add_middleware(GZipMiddleware, minimum_size=1000)\n```"
+   }
+  ]
+ },
+ {
+  "id": "d13",
+  "question": "Qual parâmetro do APIRouter aplica uma lista de dependências a todas as rotas do roteador?",
+  "answerable": true,
+  "expected_answer": "O parâmetro `dependencies` do `APIRouter`.",
+  "expected_source": "aplicacoes-maiores.md",
+  "expected_section": "Aplicações maiores com APIRouter > Dependências por roteador",
+  "expected_snippets": [
+   "O parâmetro `dependencies` do `APIRouter` aplica uma lista de dependências a todas as rotas do roteador"
+  ],
+  "raw_answer": "- O parâmetro `dependencies` do `APIRouter` aplica uma lista de dependências a todas as rotas do roteador, conforme [1].",
+  "chunks": [
+   {
+    "id": "32f20be6-12cc-5651-91e0-d530b38884e8",
+    "source": "aplicacoes-maiores.md",
+    "section": "Aplicações maiores com APIRouter > Dependências por roteador",
+    "text": "O parâmetro `dependencies` do `APIRouter` aplica uma lista de dependências a todas as rotas do roteador, por exemplo para exigir um token em todo o módulo de administração. As dependências do roteador são executadas antes das dependências declaradas em cada rota."
+   },
+   {
+    "id": "cf154617-496b-50e5-99fc-74c0202ce701",
+    "source": "aplicacoes-maiores.md",
+    "section": "Aplicações maiores com APIRouter > Respostas documentadas por roteador",
+    "text": "O parâmetro `responses` recebe um dicionário com códigos de status e descrições adicionais, como `{404: {\"description\": \"Não encontrado\"}}`. Essas respostas aparecem na documentação OpenAPI de todas as rotas do roteador, sem alterar o comportamento delas."
+   },
+   {
+    "id": "daa63540-c382-59e7-b3db-dfdcb4bbd935",
+    "source": "dependencias.md",
+    "section": "Dependências > Dependências globais e em decoradores",
+    "text": "Quando o valor retornado pela dependência não é necessário, mas ela precisa ser executada, por exemplo para verificar um cabeçalho, declare-a na lista `dependencies` do decorador: `@app.get(\"/items/\", dependencies=[Depends(verify_token)])`.\n\nPara aplicar uma dependência a todas as rotas da aplicação, passe a lista na criação: `app = FastAPI(dependencies=[Depends(verify_token)])`. O mesmo vale para um `APIRouter`, aplicando a dependência só às rotas daquele roteador."
+   },
+   {
+    "id": "f776b392-4222-5aea-be2c-e1450d4068e4",
+    "source": "aplicacoes-maiores.md",
+    "section": "Aplicações maiores com APIRouter > Criando um roteador",
+    "text": "Um `APIRouter` funciona como uma pequena aplicação: ele aceita os mesmos decoradores `get`, `post`, `put`, `patch` e `delete`.\n\n```python\nfrom fastapi import APIRouter\n\nrouter = APIRouter(prefix=\"/items\", tags=[\"items\"])\n\n# O caminho final desta rota será /items/\n@router.get(\"/\")\nasync def list_items():\n    return [{\"name\": \"Caneta\"}, {\"name\": \"Caderno\"}]\n\n@router.get(\"/{item_id}\")\nasync def read_item(item_id: int):\n    return {\"item_id\": item_id}\n```\n\nO argumento `prefix` é adicionado ao início de todos os caminhos do roteador e não pode terminar com barra. O argumento `tags` agrupa as rotas na documentação interativa, o que facilita a navegação quando há muitos endpoints."
+   },
+   {
+    "id": "fc2ec6c0-f3cf-5d55-9c0e-6de782a9a61a",
+    "source": "aplicacoes-maiores.md",
+    "section": "Aplicações maiores com APIRouter > Boas práticas",
+    "text": "- Mantenha um roteador por domínio do negócio, como itens, usuários e pedidos.\n- Deixe a criação do objeto `FastAPI` e a inclusão dos roteadores apenas no `main.py`.\n- Coloque dependências reutilizadas em um módulo próprio, para evitar importações circulares entre roteadores."
+   }
+  ]
+ },
+ {
+  "id": "d14",
+  "question": "O que acontece se eu chamar time.sleep dentro de uma rota async def?",
+  "answerable": true,
+  "expected_answer": "Bloqueia o laço de eventos e nenhuma outra requisição é atendida.",
+  "expected_source": "async-e-concorrencia.md",
+  "expected_section": "Concorrência: async def ou def > O erro mais comum",
+  "expected_snippets": [
+   "dentro de uma rota `async def` bloqueia o laço de eventos"
+  ],
+  "raw_answer": "O que acontece se eu chamar time.sleep dentro de uma rota async def? [1][2] Chamar a função time.sleep dentro de uma rota async def bloqueia o laço de eventos e trava todas as requisições, pois a função time.sleep é síncrona e bloqueia a execução da rota. Isso pode ser corrigido usando a versão assíncrona da biblioteca ou declarando a rota com `def` comum.",
+  "chunks": [
+   {
+    "id": "b47e8464-7e9a-58c5-a4a1-5f48af221204",
+    "source": "async-e-concorrencia.md",
+    "section": "Concorrência: async def ou def > A regra prática",
+    "text": "1. Se a biblioteca que você usa oferece funções assíncronas, que devem ser chamadas com `await`, declare a rota com `async def`.\n2. Se a biblioteca é síncrona, como a maioria dos drivers de banco de dados tradicionais, declare a rota com `def` comum.\n3. Se a rota não faz nenhuma espera de entrada e saída, as duas formas funcionam; `async def` evita o pequeno custo de usar uma thread.\n\n```python\nimport time\nimport httpx\n\n@app.get(\"/lento-errado\")\nasync def lento_errado():\n    # Erro: time.sleep bloqueia o laço de eventos e trava todas as requisições\n    time.sleep(5)\n    return {\"ok\": True}\n\n@app.get(\"/externo\")\nasync def externo():\n    async with httpx.AsyncClient() as cliente:\n        resposta = await cliente.get(\"https://example.com\")\n    return {\"status\": resposta.status_code}\n```"
+   },
+   {
+    "id": "fd508546-3292-593a-9b25-0f9698dff3d9",
+    "source": "async-e-concorrencia.md",
+    "section": "Concorrência: async def ou def > O erro mais comum",
+    "text": "Chamar uma função bloqueante, como `time.sleep`, uma leitura síncrona de arquivo grande ou um driver de banco síncrono, dentro de uma rota `async def` bloqueia o laço de eventos. Durante esse tempo, nenhuma outra requisição é atendida pelo processo. A correção é usar a versão assíncrona da biblioteca ou declarar a rota com `def` comum."
+   },
+   {
+    "id": "bcf6d774-7223-5ed0-a6d2-9791f594db42",
+    "source": "async-e-concorrencia.md",
+    "section": "Concorrência: async def ou def > await só dentro de async def",
+    "text": "A palavra `await` só pode ser usada dentro de funções declaradas com `async def`. Usá-la em uma função comum é um erro de sintaxe."
+   },
+   {
+    "id": "b1893d03-f579-5410-918d-0fdfc4f7e3e1",
+    "source": "erros-e-middleware.md",
+    "section": "Tratamento de erros, middleware e CORS > Middleware",
+    "text": "Um middleware é uma função executada em toda requisição, antes de ela chegar à rota, e em toda resposta, antes de ela voltar ao cliente:\n\n```python\nimport time\n\n@app.middleware(\"http\")\nasync def add_process_time_header(request, call_next):\n    start = time.perf_counter()\n    response = await call_next(request)\n    # Mede quanto tempo a rota levou para responder\n    response.headers[\"X-Process-Time\"] = str(time.perf_counter() - start)\n    return response\n```\n\nA função `call_next` repassa a requisição para a rota correspondente e devolve a resposta gerada."
+   },
+   {
+    "id": "54682f05-65ad-5259-bbf0-997d06168661",
+    "source": "async-e-concorrencia.md",
+    "section": "Concorrência: async def ou def",
+    "text": "O FastAPI aceita operações de caminho e dependências declaradas tanto com `async def` quanto com `def` comum. A escolha afeta como o servidor executa o código e, se for feita errada, pode travar o atendimento de todas as requisições."
+   }
+  ]
+ },
+ {
+  "id": "d15",
+  "question": "O cabeçalho User-Agent diferencia maiúsculas de minúsculas?",
+  "answerable": true,
+  "expected_answer": "Não, os cabeçalhos HTTP não diferenciam maiúsculas de minúsculas.",
+  "expected_source": "cabecalhos-cookies-formularios.md",
+  "expected_section": "Cabeçalhos, cookies e formulários > Cabeçalhos com Header",
+  "expected_snippets": [
+   "Os cabeçalhos HTTP não diferenciam maiúsculas de minúsculas"
+  ],
+  "raw_answer": "O cabeçalho User-Agent não diferencia maiúsculas de minúsculas. Isso pode ser visto no trecho [1], onde é explicado que os cabeçalhos HTTP não diferenciam maiúsculas de minúsculas.",
+  "chunks": [
+   {
+    "id": "8bf93194-8052-52a5-9798-44c9ff3a9b20",
+    "source": "cabecalhos-cookies-formularios.md",
+    "section": "Cabeçalhos, cookies e formulários > Cabeçalhos com Header",
+    "text": "```python\nfrom typing import Annotated\nfrom fastapi import FastAPI, Header\n\napp = FastAPI()\n\n@app.get(\"/agente\")\nasync def agente(user_agent: Annotated[str | None, Header()] = None):\n    return {\"User-Agent\": user_agent}\n```\n\nComo a maioria dos cabeçalhos usa hífen, como `User-Agent`, e o hífen não é válido em nomes de variáveis Python, o `Header` converte automaticamente os sublinhados do nome do parâmetro em hífens. Para desligar essa conversão, use `Header(convert_underscores=False)`.\n\nOs cabeçalhos HTTP não diferenciam maiúsculas de minúsculas, então o parâmetro `user_agent` recebe o valor de `User-Agent`, `user-agent` ou `USER-AGENT`. Quando o mesmo cabeçalho pode aparecer várias vezes, declare o tipo como `list[str]` para receber todos os valores."
+   },
+   {
+    "id": "5865fbc7-31d8-53f8-aa5f-056281546a7b",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Modelo de resposta",
+    "text": "O argumento `response_model` do decorador define o formato da resposta. O FastAPI converte o retorno da função para esse modelo e remove qualquer campo que não esteja nele, o que evita vazar dados sensíveis:\n\n```python\nclass UserIn(BaseModel):\n    username: str\n    password: str\n\nclass UserOut(BaseModel):\n    username: str\n\n@app.post(\"/users/\", response_model=UserOut, status_code=201)\nasync def create_user(user: UserIn):\n    # A senha recebida nunca aparece na resposta\n    return user\n```\n\nNesse exemplo, a senha é descartada da resposta mesmo que a função devolva o objeto completo. O argumento `status_code=201` muda o código de status da resposta de sucesso, que por padrão é 200."
+   },
+   {
+    "id": "a4aa8198-c8a0-5e3e-8db9-4c4323b1546a",
+    "source": "parametros.md",
+    "section": "Parâmetros de caminho e de consulta > Parâmetros de consulta",
+    "text": "Os argumentos da função que não aparecem no caminho são interpretados como parâmetros de consulta:\n\n```python\n@app.get(\"/items/\")\nasync def list_items(skip: int = 0, limit: int = 10):\n    # GET /items/?skip=20&limit=5\n    return fake_db[skip : skip + limit]\n```\n\nUm parâmetro de consulta com valor padrão é opcional. Para torná-lo obrigatório, basta não definir valor padrão. Usar `None` como padrão indica um parâmetro opcional sem valor definido.\n\nParâmetros do tipo `bool` aceitam os valores `1`, `true`, `on` e `yes` como verdadeiro, sem diferenciar maiúsculas e minúsculas."
+   },
+   {
+    "id": "da8dc5d6-fc27-5149-bc67-270a455876df",
+    "source": "docker-compose.md",
+    "section": "Docker Compose: vários serviços > Um arquivo compose típico",
+    "text": "```yaml\nservices:\n  api:\n    build: .\n    ports:\n      - \"8000:80\"\n    environment:\n      BANCO_URL: postgresql://app:senha@db:5432/app\n    depends_on:\n      db:\n        condition: service_healthy\n\n  db:\n    image: postgres:16\n    environment:\n      POSTGRES_USER: app\n      POSTGRES_PASSWORD: senha\n    volumes:\n      - dados_db:/var/lib/postgresql/data\n    healthcheck:\n      test: [\"CMD\", \"pg_isready\", \"-U\", \"app\"]\n      interval: 5s\n      retries: 10\n\nvolumes:\n  dados_db:\n```\n\nCada entrada em `services` vira um container. A chave `build` constrói a imagem a partir de um Dockerfile, e a chave `image` usa uma imagem pronta de um registro."
+   },
+   {
+    "id": "f7108e23-4887-5a37-bf94-854f7e524194",
+    "source": "cabecalhos-cookies-formularios.md",
+    "section": "Cabeçalhos, cookies e formulários > Formulários com Form",
+    "text": "Formulários HTML enviam os campos codificados como `application/x-www-form-urlencoded`, e não como JSON. Para lê-los, use `Form`:\n\n```python\nfrom fastapi import Form\n\n@app.post(\"/login/\")\nasync def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):\n    # Os campos chegam do formulário, não de um corpo JSON\n    return {\"username\": username}\n```\n\nPara trabalhar com formulários é necessário instalar o pacote `python-multipart`, que já vem incluído em `fastapi[standard]`.\n\nNão é possível declarar, na mesma operação de caminho, campos de formulário e um corpo JSON. A limitação vem do próprio protocolo HTTP: o corpo da requisição tem uma única codificação, ou formulário ou JSON."
+   }
+  ]
+ },
+ {
+  "id": "d16",
+  "question": "Como evito reler o arquivo .env a cada requisição?",
+  "answerable": true,
+  "expected_answer": "Criando as configurações uma única vez, com functools.lru_cache.",
+  "expected_source": "configuracoes.md",
+  "expected_section": "Configurações com pydantic-settings > Usando as configurações no FastAPI",
+  "expected_snippets": [
+   "criar as configurações uma única vez, com `functools.lru_cache`"
+  ],
+  "raw_answer": "Como evitar reler o arquivo `.env` a cada requisição, você pode usar o `env_file` no Docker Compose. [1]",
+  "chunks": [
+   {
+    "id": "4eab9290-b2d9-5a93-90a2-b28ee239651d",
+    "source": "docker-compose.md",
+    "section": "Docker Compose: vários serviços > Variáveis de ambiente",
+    "text": "As variáveis podem ser definidas em `environment` ou carregadas de um arquivo com `env_file`. O Compose também lê automaticamente um arquivo `.env` na pasta do projeto para substituir expressões como `${PORTA:-8000}` dentro do próprio arquivo compose, em que o valor após `:-` é o padrão usado quando a variável não existe."
+   },
+   {
+    "id": "9bca08d8-8916-5a93-8fc8-30c52cb2dd43",
+    "source": "docker-imagens.md",
+    "section": "Docker: construindo imagens > O arquivo .dockerignore",
+    "text": "O arquivo `.dockerignore` lista o que não deve ser enviado no contexto de construção, como `.git`, ambientes virtuais, caches e arquivos `.env`. Ele deixa a construção mais rápida e evita copiar segredos para dentro da imagem."
+   },
+   {
+    "id": "60f808f4-41e2-5f0e-963f-4ab2c30f73a0",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Como o FastAPI decide a origem de cada parâmetro",
+    "text": "É possível misturar parâmetros de caminho, de consulta e de corpo na mesma função. A regra é:\n\n- se o nome aparece no caminho, é um parâmetro de caminho;\n- se o tipo é simples, como `int`, `str` ou `bool`, é um parâmetro de consulta;\n- se o tipo é um modelo Pydantic, é lido do corpo da requisição.\n\nQuando a função recebe um único modelo, o JSON esperado é o próprio conteúdo do modelo. Para exigir que ele venha dentro de uma chave com o nome do parâmetro, use `Body(embed=True)`."
+   },
+   {
+    "id": "d93dbeed-49fd-502a-bf65-5ad15b98c719",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Validação dentro do modelo",
+    "text": "Use `Field` do Pydantic para validar e documentar cada campo, por exemplo `price: float = Field(gt=0, description=\"Preço em reais\")`. As mesmas validações disponíveis em `Query` e `Path`, como `gt`, `max_length` e `pattern`, funcionam em `Field`."
+   },
+   {
+    "id": "da89868b-a2f9-5ea1-9959-15342586d503",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta",
+    "text": "O corpo da requisição é o dado que o cliente envia para a API, normalmente em JSON, em métodos como POST, PUT e PATCH. No FastAPI, o corpo é descrito com modelos Pydantic."
+   }
+  ]
+ },
+ {
+  "id": "d17",
+  "question": "Como faço o response_model omitir os campos que não foram definidos explicitamente?",
+  "answerable": true,
+  "expected_answer": "Com response_model_exclude_unset=True.",
+  "expected_source": "corpo-da-requisicao.md",
+  "expected_section": "Corpo da requisição e modelos de resposta > Modelo de resposta",
+  "expected_snippets": [
+   "use `response_model_exclude_unset=True`"
+  ],
+  "raw_answer": "- Para omitir da resposta os campos que não foram definidos explicitamente, use `response_model_exclude_unset=True` [1].",
+  "chunks": [
+   {
+    "id": "042baa64-46f4-54c7-ab55-cbe43a1a222a",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Modelo de resposta",
+    "text": "Para omitir da resposta os campos que não foram definidos explicitamente, use `response_model_exclude_unset=True`."
+   },
+   {
+    "id": "5865fbc7-31d8-53f8-aa5f-056281546a7b",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Modelo de resposta",
+    "text": "O argumento `response_model` do decorador define o formato da resposta. O FastAPI converte o retorno da função para esse modelo e remove qualquer campo que não esteja nele, o que evita vazar dados sensíveis:\n\n```python\nclass UserIn(BaseModel):\n    username: str\n    password: str\n\nclass UserOut(BaseModel):\n    username: str\n\n@app.post(\"/users/\", response_model=UserOut, status_code=201)\nasync def create_user(user: UserIn):\n    # A senha recebida nunca aparece na resposta\n    return user\n```\n\nNesse exemplo, a senha é descartada da resposta mesmo que a função devolva o objeto completo. O argumento `status_code=201` muda o código de status da resposta de sucesso, que por padrão é 200."
+   },
+   {
+    "id": "7d702652-3e9e-567e-b26f-0fc3eb475c41",
+    "source": "respostas-personalizadas.md",
+    "section": "Respostas personalizadas e códigos de status > Retornando uma resposta diretamente",
+    "text": "Uma operação de caminho também pode retornar uma instância de `Response` ou de uma subclasse. Nesse caso, o FastAPI envia a resposta como está: ele não aplica o `response_model` e não faz nenhuma conversão de dados. Por isso, ao retornar uma resposta diretamente, você é responsável por garantir que o conteúdo já esteja no formato correto."
+   },
+   {
+    "id": "50705fdc-1a64-502f-a88b-372cc8485a46",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Atualizações parciais com PATCH",
+    "text": "Em uma atualização parcial, o cliente envia só os campos que quer mudar. Declare um modelo com todos os campos opcionais e use `model_dump(exclude_unset=True)` para obter apenas os campos enviados:\n\n```python\nclass ItemUpdate(BaseModel):\n    name: str | None = None\n    price: float | None = None\n\n@app.patch(\"/items/{item_id}\")\nasync def update_item(item_id: str, changes: ItemUpdate):\n    stored = Item(**items[item_id])\n    # Só os campos enviados pelo cliente substituem os valores guardados\n    updated = stored.model_copy(update=changes.model_dump(exclude_unset=True))\n    items[item_id] = updated.model_dump()\n    return updated\n```\n\nSem o `exclude_unset=True`, os campos que o cliente não enviou chegariam como `None` e apagariam os valores já guardados."
+   },
+   {
+    "id": "3eadf517-f7f4-5cd3-b9ec-efb420ee29a9",
+    "source": "respostas-personalizadas.md",
+    "section": "Respostas personalizadas e códigos de status > Cabeçalhos e cookies na resposta",
+    "text": "Para acrescentar cabeçalhos ou cookies sem abrir mão da conversão automática, declare um parâmetro do tipo `Response` na função e altere-o:\n\n```python\nfrom fastapi import Response\n\n@app.get(\"/preferencias\")\nasync def preferencias(response: Response):\n    response.headers[\"X-Versao-API\"] = \"2\"\n    response.set_cookie(key=\"tema\", value=\"claro\")\n    return {\"ok\": True}\n```\n\nO FastAPI usa esse objeto temporário para copiar os cabeçalhos, os cookies e o código de status para a resposta final, enquanto o valor retornado continua sendo convertido normalmente."
+   }
+  ]
+ },
+ {
+  "id": "d18",
+  "question": "Para que serve o bloco finally numa dependência com yield?",
+  "answerable": true,
+  "expected_answer": "Garante que o recurso seja liberado mesmo quando ocorre um erro.",
+  "expected_source": "dependencias.md",
+  "expected_section": "Dependências > Dependências com yield",
+  "expected_snippets": [
+   "O bloco `finally` garante que o recurso seja liberado mesmo quando ocorre um erro"
+  ],
+  "raw_answer": "- Para que serve o bloco finally numa dependência com yield? [1] O bloco `finally` garante que o recurso seja liberado mesmo quando ocorre um erro, mesmo que a rota levante uma exceção.",
+  "chunks": [
+   {
+    "id": "42fc9b57-d206-56a1-a8c1-4af68ba48fe2",
+    "source": "dependencias.md",
+    "section": "Dependências > Dependências com yield",
+    "text": "Uma dependência pode usar `yield` em vez de `return` para executar código de limpeza depois que a rota termina, como fechar uma sessão de banco de dados:\n\n```python\nasync def get_db():\n    db = SessionLocal()\n    try:\n        yield db\n    finally:\n        # Executado ao final, mesmo que a rota levante uma exceção\n        db.close()\n```\n\nO valor entregue pelo `yield` é injetado na rota. O bloco `finally` garante que o recurso seja liberado mesmo quando ocorre um erro."
+   },
+   {
+    "id": "d7dccbe8-6c80-5616-b3cb-972c90ed4745",
+    "source": "dependencias.md",
+    "section": "Dependências > Exceções em dependências com yield",
+    "text": "Se a rota levantar uma exceção enquanto uma dependência com `yield` está ativa, a exceção é relançada no ponto do `yield`. Por isso, o padrão é envolver o `yield` em `try` e `finally`: o bloco `finally` libera o recurso em qualquer caso. Se a dependência capturar a exceção com `except`, ela deve relançá-la com `raise`, para que o FastAPI continue tratando o erro e a resposta de erro chegue ao cliente."
+   },
+   {
+    "id": "1d107b14-0878-5f33-8221-e69b679fc1d2",
+    "source": "pytest-fixtures.md",
+    "section": "pytest: fixtures > Limpeza com yield",
+    "text": "Para executar código de encerramento, a fixture usa `yield` no lugar de `return`. Tudo o que vem depois do `yield` roda quando o teste termina, mesmo que ele tenha falhado:\n\n```python\n@pytest.fixture\ndef conexao():\n    con = abrir_conexao()\n    yield con\n    # Encerramento: executado depois do teste\n    con.close()\n```"
+   },
+   {
+    "id": "74e5e2fd-5163-5c73-86b9-877b37a71f13",
+    "source": "testes.md",
+    "section": "Testes > Sobrescrevendo dependências",
+    "text": "Para trocar uma dependência real por uma versão de teste, por exemplo substituir o banco de produção por um banco em memória, use o dicionário `app.dependency_overrides`:\n\n```python\ndef override_get_db():\n    # Banco de dados temporário só para os testes\n    yield TestingSessionLocal()\n\napp.dependency_overrides[get_db] = override_get_db\n```\n\nA chave do dicionário é a dependência original e o valor é a função que a substitui. Depois dos testes, limpe as substituições com `app.dependency_overrides = {}` para não afetar outros testes."
+   },
+   {
+    "id": "e2e647db-d36f-509e-a127-8351aa6dea7e",
+    "source": "dependencias.md",
+    "section": "Dependências > Classes como dependências",
+    "text": "Qualquer objeto que pode ser chamado serve como dependência, inclusive uma classe. Nesse caso, o FastAPI chama o construtor da classe e entrega a instância criada, o que ajuda o editor a oferecer autocompletar nos atributos."
+   }
+  ]
+ },
+ {
+  "id": "d19",
+  "question": "O que significa o sufixo :ro numa montagem de pasta do Compose?",
+  "answerable": true,
+  "expected_answer": "Monta a pasta só para leitura.",
+  "expected_source": "docker-compose.md",
+  "expected_section": "Docker Compose: vários serviços > Volumes",
+  "expected_snippets": [
+   "O sufixo `:ro` monta a pasta só para leitura"
+  ],
+  "raw_answer": "O sufixo `:ro` numa montagem de pasta do Compose monta a pasta só para leitura. [1]",
+  "chunks": [
+   {
+    "id": "d234279f-a94a-5a0e-9a31-90d1ed19c123",
+    "source": "docker-compose.md",
+    "section": "Docker Compose: vários serviços > Volumes",
+    "text": "- **Volume nomeado**, como `dados_db:/var/lib/postgresql/data`: o Docker gerencia o armazenamento, e os dados sobrevivem quando o container é recriado.\n- **Montagem de pasta**, como `./data:/app/data:ro`: liga uma pasta do computador hospedeiro ao container. O sufixo `:ro` monta a pasta só para leitura."
+   },
+   {
+    "id": "4eab9290-b2d9-5a93-90a2-b28ee239651d",
+    "source": "docker-compose.md",
+    "section": "Docker Compose: vários serviços > Variáveis de ambiente",
+    "text": "As variáveis podem ser definidas em `environment` ou carregadas de um arquivo com `env_file`. O Compose também lê automaticamente um arquivo `.env` na pasta do projeto para substituir expressões como `${PORTA:-8000}` dentro do próprio arquivo compose, em que o valor após `:-` é o padrão usado quando a variável não existe."
+   },
+   {
+    "id": "16a8c4c5-182c-5e90-ba0a-89e90922a97a",
+    "source": "aplicacoes-maiores.md",
+    "section": "Aplicações maiores com APIRouter > Estrutura de pastas sugerida",
+    "text": "Uma organização comum separa rotas, modelos e dependências em pacotes Python:\n\n```text\napp/\n├── __init__.py\n├── main.py            # cria o FastAPI e inclui os roteadores\n├── dependencies.py    # dependências compartilhadas\n└── routers/\n    ├── __init__.py\n    ├── items.py\n    └── users.py\n```\n\nCada pasta com um arquivo `__init__.py` vira um pacote, o que permite importações como `from app.routers import items`. A aplicação é executada a partir da pasta acima de `app`, por exemplo com `fastapi run app/main.py`."
+   },
+   {
+    "id": "125321bd-39c0-5caa-81e1-05429e4ea8e7",
+    "source": "docker-compose.md",
+    "section": "Docker Compose: vários serviços > Política de reinício",
+    "text": "A chave `restart` define o que fazer quando um container para: `no` (padrão) não reinicia, `always` sempre reinicia, `on-failure` reinicia só em caso de erro e `unless-stopped` reinicia sempre, exceto quando o container foi parado manualmente."
+   },
+   {
+    "id": "0db04a80-94b4-5e4e-bd12-21043660d1c9",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos > A primeira aplicação",
+    "text": "Crie um arquivo `main.py` com o conteúdo abaixo:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n# Uma \"operação de caminho\": método GET no caminho \"/\"\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Olá, mundo\"}\n```\n\nA variável `app` é a instância principal da aplicação. O decorador `@app.get(\"/\")` informa que a função logo abaixo responde a requisições do tipo GET no caminho `/`. A função pode ser declarada com `async def` ou com `def` comum, e o retorno pode ser um dicionário, uma lista ou um modelo Pydantic, que são convertidos para JSON automaticamente."
+   }
+  ]
+ },
+ {
+  "id": "d20",
+  "question": "Qual instrução do Dockerfile define o usuário que executa o container?",
+  "answerable": true,
+  "expected_answer": "USER.",
+  "expected_source": "docker-imagens.md",
+  "expected_section": "Docker: construindo imagens > Instruções principais do Dockerfile",
+  "expected_snippets": [
+   "Define o usuário que executa os comandos seguintes e o container"
+  ],
+  "raw_answer": "- A instrução `USER` do Dockerfile define o usuário que executa os comandos seguintes e o container [2].",
+  "chunks": [
+   {
+    "id": "ad297b3e-7b38-573d-a71d-7dd0983a5b49",
+    "source": "docker-imagens.md",
+    "section": "Docker: construindo imagens > Instruções principais do Dockerfile",
+    "text": "A instrução `EXPOSE` apenas documenta a porta: ela não publica a porta no computador hospedeiro. Para acessar o container, a porta precisa ser publicada ao executá-lo, com `docker run -p 8000:80`, em que o primeiro número é a porta do hospedeiro e o segundo, a do container."
+   },
+   {
+    "id": "7999966c-f4d9-5223-9a92-959694f932ed",
+    "source": "docker-imagens.md",
+    "section": "Docker: construindo imagens > Instruções principais do Dockerfile",
+    "text": "| Instrução | Função |\n| --- | --- |\n| `FROM` | Define a imagem base, como `python:3.11-slim` |\n| `WORKDIR` | Define o diretório de trabalho das instruções seguintes |\n| `COPY` | Copia arquivos do contexto de construção para a imagem |\n| `RUN` | Executa um comando durante a construção, como instalar pacotes |\n| `ENV` | Define variáveis de ambiente da imagem |\n| `EXPOSE` | Documenta a porta em que a aplicação escuta |\n| `USER` | Define o usuário que executa os comandos seguintes e o container |\n| `CMD` | Define o comando padrão ao iniciar o container |"
+   },
+   {
+    "id": "e971e56d-9541-5850-9eb8-6c446d3a8bcf",
+    "source": "docker-imagens.md",
+    "section": "Docker: construindo imagens > Verificação de saúde",
+    "text": "A instrução `HEALTHCHECK` define um comando que o Docker executa periodicamente para saber se a aplicação está respondendo. O container passa a ter o estado `healthy` ou `unhealthy`, que outras ferramentas, como o Docker Compose, podem usar para decidir a ordem de inicialização."
+   },
+   {
+    "id": "401774c7-bb89-5b1c-bc8c-c5e07a72028e",
+    "source": "docker-imagens.md",
+    "section": "Docker: construindo imagens",
+    "text": "Uma imagem Docker é um pacote imutável com o sistema de arquivos, as dependências e o comando necessários para executar uma aplicação. Ela é descrita em um arquivo `Dockerfile` e construída com `docker build`. Um container é uma instância em execução de uma imagem."
+   },
+   {
+    "id": "4171454d-b192-5d08-ba97-9d867f26b89d",
+    "source": "docker-imagens.md",
+    "section": "Docker: construindo imagens > Construindo e executando",
+    "text": "```bash\n# Constrói a imagem a partir do Dockerfile da pasta atual\ndocker build -t minha-api:1.0 .\n\n# Executa em segundo plano, publicando a porta 8000\ndocker run -d --name api -p 8000:80 minha-api:1.0\n```\n\nO ponto final em `docker build` é o contexto de construção: a pasta cujos arquivos ficam disponíveis para as instruções `COPY`."
+   }
+  ]
+ },
+ {
+  "id": "d21",
+  "question": "Qual resposta o FastAPI devolve por padrão quando a validação dos dados falha?",
+  "answerable": true,
+  "expected_answer": "Uma resposta 422 com a lista de problemas encontrados.",
+  "expected_source": "erros-e-middleware.md",
+  "expected_section": "Tratamento de erros, middleware e CORS > Manipuladores de exceção personalizados",
+  "expected_snippets": [
+   "vira uma resposta 422 com a lista de problemas encontrados"
+  ],
+  "raw_answer": "Não encontrei essa informação na documentação indexada. [1][5]",
+  "chunks": [
+   {
+    "id": "f4cf1312-e350-58ce-aa60-a7de0d3f4cb1",
+    "source": "respostas-personalizadas.md",
+    "section": "Respostas personalizadas e códigos de status",
+    "text": "Por padrão, o FastAPI converte o retorno de uma operação de caminho para JSON e o envia dentro de um `JSONResponse`. Em vários casos é preciso controlar o tipo de resposta, os cabeçalhos ou o código de status."
+   },
+   {
+    "id": "df2f5d0b-7d0c-5b46-b802-fc4a611223e1",
+    "source": "respostas-personalizadas.md",
+    "section": "Respostas personalizadas e códigos de status > Escolhendo a classe de resposta",
+    "text": "O argumento `response_class` do decorador define a classe usada para montar a resposta e também o tipo de conteúdo documentado no OpenAPI. As classes ficam em `fastapi.responses`:\n\n| Classe | Uso |\n| --- | --- |\n| `JSONResponse` | Padrão; serializa o conteúdo como JSON |\n| `HTMLResponse` | Devolve uma página HTML |\n| `PlainTextResponse` | Devolve texto puro |\n| `RedirectResponse` | Redireciona o cliente para outra URL, por padrão com o status 307 |\n| `StreamingResponse` | Envia o conteúdo aos poucos, a partir de um iterador |\n| `FileResponse` | Envia um arquivo do disco de forma assíncrona |\n\n```python\nfrom fastapi.responses import HTMLResponse\n\n@app.get(\"/painel\", response_class=HTMLResponse)\nasync def painel():\n    return \"<h1>Painel</h1>\"\n```"
+   },
+   {
+    "id": "7d702652-3e9e-567e-b26f-0fc3eb475c41",
+    "source": "respostas-personalizadas.md",
+    "section": "Respostas personalizadas e códigos de status > Retornando uma resposta diretamente",
+    "text": "Uma operação de caminho também pode retornar uma instância de `Response` ou de uma subclasse. Nesse caso, o FastAPI envia a resposta como está: ele não aplica o `response_model` e não faz nenhuma conversão de dados. Por isso, ao retornar uma resposta diretamente, você é responsável por garantir que o conteúdo já esteja no formato correto."
+   },
+   {
+    "id": "5865fbc7-31d8-53f8-aa5f-056281546a7b",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Modelo de resposta",
+    "text": "O argumento `response_model` do decorador define o formato da resposta. O FastAPI converte o retorno da função para esse modelo e remove qualquer campo que não esteja nele, o que evita vazar dados sensíveis:\n\n```python\nclass UserIn(BaseModel):\n    username: str\n    password: str\n\nclass UserOut(BaseModel):\n    username: str\n\n@app.post(\"/users/\", response_model=UserOut, status_code=201)\nasync def create_user(user: UserIn):\n    # A senha recebida nunca aparece na resposta\n    return user\n```\n\nNesse exemplo, a senha é descartada da resposta mesmo que a função devolva o objeto completo. O argumento `status_code=201` muda o código de status da resposta de sucesso, que por padrão é 200."
+   },
+   {
+    "id": "da89868b-a2f9-5ea1-9959-15342586d503",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta",
+    "text": "O corpo da requisição é o dado que o cliente envia para a API, normalmente em JSON, em métodos como POST, PUT e PATCH. No FastAPI, o corpo é descrito com modelos Pydantic."
+   }
+  ]
+ },
+ {
+  "id": "d22",
+  "question": "Que rota posso usar para os orquestradores saberem se a aplicação está pronta?",
+  "answerable": true,
+  "expected_answer": "Uma rota simples como GET /health devolvendo {\"status\": \"ok\"}.",
+  "expected_source": "implantacao.md",
+  "expected_section": "Implantação > Rota de verificação de saúde",
+  "expected_snippets": [
+   "`GET /health` devolvendo"
+  ],
+  "raw_answer": "- Para que orquestradores como o Docker Compose e o Kubernetes possam verificar se a aplicação está pronta, você pode usar uma rota de verificação de saúde. [1]\n\n- Uma rota simples, como `GET /health` devolvendo `{\"status\": \"ok\"}`, pode ser usada pela instrução `HEALTHCHECK` do Dockerfile ou pelas sondas do Kubernetes. [1]\n\n- Essa rota de verificação de saúde serve para indicar ao orquestrador que a aplicação está pronta e está funcionando corretamente. [1]",
+  "chunks": [
+   {
+    "id": "302e3922-6c49-5aa1-ab1b-236a718f4c14",
+    "source": "implantacao.md",
+    "section": "Implantação > Rota de verificação de saúde",
+    "text": "Orquestradores como o Docker Compose e o Kubernetes precisam saber se a aplicação está pronta. Uma rota simples, como `GET /health` devolvendo `{\"status\": \"ok\"}`, pode ser usada pela instrução `HEALTHCHECK` do Dockerfile ou pelas sondas do Kubernetes. Uma verificação mais completa também confere se os serviços de que a aplicação depende, como o banco de dados, estão respondendo."
+   },
+   {
+    "id": "622b4f4d-c974-5dd0-ab79-41de7e464994",
+    "source": "parametros.md",
+    "section": "Parâmetros de caminho e de consulta > Parâmetros de caminho > A ordem das rotas importa",
+    "text": "As operações de caminho são avaliadas na ordem em que foram declaradas. Se existir uma rota fixa `/users/me` e uma rota com parâmetro `/users/{user_id}`, declare `/users/me` primeiro. Caso contrário, a rota com parâmetro captura a requisição e trata \"me\" como se fosse um `user_id`."
+   },
+   {
+    "id": "42fc9b57-d206-56a1-a8c1-4af68ba48fe2",
+    "source": "dependencias.md",
+    "section": "Dependências > Dependências com yield",
+    "text": "Uma dependência pode usar `yield` em vez de `return` para executar código de limpeza depois que a rota termina, como fechar uma sessão de banco de dados:\n\n```python\nasync def get_db():\n    db = SessionLocal()\n    try:\n        yield db\n    finally:\n        # Executado ao final, mesmo que a rota levante uma exceção\n        db.close()\n```\n\nO valor entregue pelo `yield` é injetado na rota. O bloco `finally` garante que o recurso seja liberado mesmo quando ocorre um erro."
+   },
+   {
+    "id": "b47e8464-7e9a-58c5-a4a1-5f48af221204",
+    "source": "async-e-concorrencia.md",
+    "section": "Concorrência: async def ou def > A regra prática",
+    "text": "1. Se a biblioteca que você usa oferece funções assíncronas, que devem ser chamadas com `await`, declare a rota com `async def`.\n2. Se a biblioteca é síncrona, como a maioria dos drivers de banco de dados tradicionais, declare a rota com `def` comum.\n3. Se a rota não faz nenhuma espera de entrada e saída, as duas formas funcionam; `async def` evita o pequeno custo de usar uma thread.\n\n```python\nimport time\nimport httpx\n\n@app.get(\"/lento-errado\")\nasync def lento_errado():\n    # Erro: time.sleep bloqueia o laço de eventos e trava todas as requisições\n    time.sleep(5)\n    return {\"ok\": True}\n\n@app.get(\"/externo\")\nasync def externo():\n    async with httpx.AsyncClient() as cliente:\n        resposta = await cliente.get(\"https://example.com\")\n    return {\"status\": resposta.status_code}\n```"
+   },
+   {
+    "id": "f776b392-4222-5aea-be2c-e1450d4068e4",
+    "source": "aplicacoes-maiores.md",
+    "section": "Aplicações maiores com APIRouter > Criando um roteador",
+    "text": "Um `APIRouter` funciona como uma pequena aplicação: ele aceita os mesmos decoradores `get`, `post`, `put`, `patch` e `delete`.\n\n```python\nfrom fastapi import APIRouter\n\nrouter = APIRouter(prefix=\"/items\", tags=[\"items\"])\n\n# O caminho final desta rota será /items/\n@router.get(\"/\")\nasync def list_items():\n    return [{\"name\": \"Caneta\"}, {\"name\": \"Caderno\"}]\n\n@router.get(\"/{item_id}\")\nasync def read_item(item_id: int):\n    return {\"item_id\": item_id}\n```\n\nO argumento `prefix` é adicionado ao início de todos os caminhos do roteador e não pode terminar com barra. O argumento `tags` agrupa as rotas na documentação interativa, o que facilita a navegação quando há muitos endpoints."
+   }
+  ]
+ },
+ {
+  "id": "d23",
+  "question": "Quais valores um parâmetro do tipo bool aceita como verdadeiro?",
+  "answerable": true,
+  "expected_answer": "1, true, on e yes, sem diferenciar maiúsculas e minúsculas.",
+  "expected_source": "parametros.md",
+  "expected_section": "Parâmetros de caminho e de consulta > Parâmetros de consulta",
+  "expected_snippets": [
+   "aceitam os valores `1`, `true`, `on` e `yes` como verdadeiro"
+  ],
+  "raw_answer": "Os valores do parâmetro do tipo `bool` aceitam os valores `1`, `true`, `on` e `yes` como verdadeiro, sem diferenciar maiúsculas e minúsculas. Isso pode ser visto no trecho [1].",
+  "chunks": [
+   {
+    "id": "a4aa8198-c8a0-5e3e-8db9-4c4323b1546a",
+    "source": "parametros.md",
+    "section": "Parâmetros de caminho e de consulta > Parâmetros de consulta",
+    "text": "Os argumentos da função que não aparecem no caminho são interpretados como parâmetros de consulta:\n\n```python\n@app.get(\"/items/\")\nasync def list_items(skip: int = 0, limit: int = 10):\n    # GET /items/?skip=20&limit=5\n    return fake_db[skip : skip + limit]\n```\n\nUm parâmetro de consulta com valor padrão é opcional. Para torná-lo obrigatório, basta não definir valor padrão. Usar `None` como padrão indica um parâmetro opcional sem valor definido.\n\nParâmetros do tipo `bool` aceitam os valores `1`, `true`, `on` e `yes` como verdadeiro, sem diferenciar maiúsculas e minúsculas."
+   },
+   {
+    "id": "f7aeb1c9-0360-5d1d-ad0c-4967f4cd41d4",
+    "source": "parametros.md",
+    "section": "Parâmetros de caminho e de consulta > Parâmetros de caminho > Valores predefinidos com Enum",
+    "text": "Para limitar os valores aceitos em um parâmetro de caminho, use uma classe que herda de `str` e de `Enum`. A documentação interativa passa a mostrar a lista de valores válidos, e qualquer outro valor é rejeitado com erro de validação."
+   },
+   {
+    "id": "60f808f4-41e2-5f0e-963f-4ab2c30f73a0",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Como o FastAPI decide a origem de cada parâmetro",
+    "text": "É possível misturar parâmetros de caminho, de consulta e de corpo na mesma função. A regra é:\n\n- se o nome aparece no caminho, é um parâmetro de caminho;\n- se o tipo é simples, como `int`, `str` ou `bool`, é um parâmetro de consulta;\n- se o tipo é um modelo Pydantic, é lido do corpo da requisição.\n\nQuando a função recebe um único modelo, o JSON esperado é o próprio conteúdo do modelo. Para exigir que ele venha dentro de uma chave com o nome do parâmetro, use `Body(embed=True)`."
+   },
+   {
+    "id": "9061f322-00c3-5bfe-8cf7-3b6b11f7452c",
+    "source": "configuracoes.md",
+    "section": "Configurações com pydantic-settings > Declarando as configurações",
+    "text": "Os valores das variáveis de ambiente são sempre texto, mas o Pydantic os converte para o tipo declarado: `APP_DEBUG=true` vira o booleano `True` e `APP_MAX_ITENS=10` vira o inteiro 10. Se uma variável obrigatória estiver ausente ou inválida, a aplicação falha ao iniciar com uma `ValidationError`, o que evita descobrir o erro só em produção."
+   },
+   {
+    "id": "e6f6da3b-b82c-5a2c-a925-28450e412868",
+    "source": "parametros.md",
+    "section": "Parâmetros de caminho e de consulta > Validações adicionais",
+    "text": "Para validar o conteúdo de um parâmetro de consulta, combine `Annotated` com `Query`:\n\n```python\nfrom typing import Annotated\nfrom fastapi import Query\n\n@app.get(\"/search/\")\nasync def search(q: Annotated[str | None, Query(min_length=3, max_length=50)] = None):\n    return {\"q\": q}\n```\n\nAlém de `min_length` e `max_length`, é possível exigir um formato com `pattern`, que recebe uma expressão regular. Para receber uma lista de valores, como em `?tag=a&tag=b`, declare o tipo como `list[str]` e use `Query()` explicitamente.\n\nPara parâmetros de caminho numéricos, use `Path` com as validações `gt` (maior que), `ge` (maior ou igual), `lt` (menor que) e `le` (menor ou igual). Por exemplo, `Path(ge=1)` rejeita identificadores menores que 1."
+   }
+  ]
+ },
+ {
+  "id": "d24",
+  "question": "Em qual endereço a aplicação serve o esquema OpenAPI?",
+  "answerable": true,
+  "expected_answer": "Em /openapi.json.",
+  "expected_source": "primeiros-passos.md",
+  "expected_section": "Primeiros passos > Documentação interativa",
+  "expected_snippets": [
+   "servido em `/openapi.json`"
+  ],
+  "raw_answer": "A aplicação serve o esquema OpenAPI no endereço `http://127.0.0.1:8000/openapi.json` [1].",
+  "chunks": [
+   {
+    "id": "519eb524-d198-5e32-b3d3-d0602f068cb3",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos > Documentação interativa",
+    "text": "Com o servidor rodando, acesse `http://127.0.0.1:8000/docs` para abrir a documentação interativa gerada com o Swagger UI, onde é possível testar cada endpoint pelo navegador. Uma documentação alternativa, gerada com o ReDoc, fica em `http://127.0.0.1:8000/redoc`.\n\nAs duas páginas são construídas a partir do esquema OpenAPI da aplicação, servido em `/openapi.json`. Esse esquema também pode ser usado para gerar clientes automaticamente em outras linguagens."
+   },
+   {
+    "id": "d8f100a7-fd87-5063-82cf-d3f11916db4c",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Exemplos na documentação",
+    "text": "Para mostrar um exemplo de corpo na documentação interativa, use o argumento `examples` de `Field`, como `name: str = Field(examples=[\"Caneta azul\"])`. O exemplo aparece no esquema OpenAPI e já vem preenchido quando alguém testa a rota pelo navegador."
+   },
+   {
+    "id": "6fb8f184-219e-5688-bdd8-a583f26f069a",
+    "source": "seguranca.md",
+    "section": "Segurança e autenticação > Chave de API em cabeçalho",
+    "text": "Para integrações entre sistemas, um esquema simples é exigir uma chave de API em um cabeçalho. A classe `APIKeyHeader`, de `fastapi.security`, lê o cabeçalho e o documenta no OpenAPI:\n\n```python\nfrom fastapi.security import APIKeyHeader\n\napi_key_header = APIKeyHeader(name=\"X-API-Key\")\n\nasync def verificar_chave(chave: Annotated[str, Depends(api_key_header)]):\n    # Compare com a chave guardada em uma variável de ambiente\n    if chave != settings.api_key:\n        raise HTTPException(status_code=401, detail=\"Chave inválida\")\n```\n\nSe o cabeçalho não for enviado, a própria dependência rejeita a requisição antes de a rota ser executada."
+   },
+   {
+    "id": "4e18037c-1e21-5430-8e23-c0b1a8caed98",
+    "source": "erros-e-middleware.md",
+    "section": "Tratamento de erros, middleware e CORS > Outros middlewares prontos",
+    "text": "O FastAPI reexporta middlewares do Starlette para necessidades comuns:\n\n- `GZipMiddleware` comprime as respostas para clientes que aceitam gzip. O argumento `minimum_size` evita comprimir respostas pequenas.\n- `TrustedHostMiddleware` recusa requisições cujo cabeçalho `Host` não esteja na lista `allowed_hosts`, o que protege contra ataques de cabeçalho Host.\n- `HTTPSRedirectMiddleware` redireciona toda requisição HTTP para o endereço HTTPS equivalente.\n\n```python\nfrom fastapi.middleware.gzip import GZipMiddleware\n\napp.add_middleware(GZipMiddleware, minimum_size=1000)\n```"
+   },
+   {
+    "id": "0db04a80-94b4-5e4e-bd12-21043660d1c9",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos > A primeira aplicação",
+    "text": "Crie um arquivo `main.py` com o conteúdo abaixo:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n# Uma \"operação de caminho\": método GET no caminho \"/\"\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Olá, mundo\"}\n```\n\nA variável `app` é a instância principal da aplicação. O decorador `@app.get(\"/\")` informa que a função logo abaixo responde a requisições do tipo GET no caminho `/`. A função pode ser declarada com `async def` ou com `def` comum, e o retorno pode ser um dicionário, uma lista ou um modelo Pydantic, que são convertidos para JSON automaticamente."
+   }
+  ]
+ },
+ {
+  "id": "d25",
+  "question": "Como ficou o método dict() na versão 2 do Pydantic?",
+  "answerable": true,
+  "expected_answer": "Virou model_dump().",
+  "expected_source": "pydantic-modelos.md",
+  "expected_section": "Pydantic: modelos de dados > Migração da versão 1 para a versão 2",
+  "expected_snippets": [
+   "`dict()` virou `model_dump()`"
+  ],
+  "raw_answer": "- O método `dict()` foi renomeado para `model_dump()` na versão 2 do Pydantic, conforme mencionado em [1].",
+  "chunks": [
+   {
+    "id": "88ad203a-0b0b-5751-a48e-6330278d9315",
+    "source": "pydantic-modelos.md",
+    "section": "Pydantic: modelos de dados > Migração da versão 1 para a versão 2",
+    "text": "Vários métodos foram renomeados na versão 2 do Pydantic: `dict()` virou `model_dump()`, `json()` virou `model_dump_json()`, `parse_obj()` virou `model_validate()`, o decorador `validator` virou `field_validator` e `root_validator` virou `model_validator`."
+   },
+   {
+    "id": "579b5796-7679-5355-b9bc-fd1f6d0cce67",
+    "source": "pydantic-modelos.md",
+    "section": "Pydantic: modelos de dados",
+    "text": "O Pydantic é a biblioteca de validação de dados usada pelo FastAPI. Um modelo Pydantic é uma classe que herda de `BaseModel` e declara seus campos com anotações de tipo. Este guia usa a versão 2 do Pydantic."
+   },
+   {
+    "id": "b6b243d1-f791-5f0a-b1e8-b5a869997bd5",
+    "source": "pydantic-validacao.md",
+    "section": "Pydantic: validação personalizada > Tratando ValidationError",
+    "text": "```python\nfrom pydantic import ValidationError\n\ntry:\n    Periodo(inicio=10, fim=2)\nexcept ValidationError as erro:\n    for problema in erro.errors():\n        print(problema[\"loc\"], problema[\"msg\"])\n```\n\nO método `errors()` devolve uma lista de dicionários. Cada dicionário traz a localização do problema em `loc`, a mensagem em `msg` e o tipo do erro em `type`. No FastAPI, essa mesma estrutura aparece no campo `detail` das respostas com status 422."
+   },
+   {
+    "id": "8fb35d51-0298-59df-b559-44bf74672604",
+    "source": "configuracoes.md",
+    "section": "Configurações com pydantic-settings",
+    "text": "Aplicações reais leem endereços de bancos de dados, chaves secretas e parâmetros de ambiente a partir de variáveis de ambiente. O pacote `pydantic-settings` estende o Pydantic para carregar e validar essas configurações. Desde a versão 2 do Pydantic, ele é instalado separadamente, com `pip install pydantic-settings`."
+   },
+   {
+    "id": "6293f3ed-2838-5df0-9f14-28d170562e56",
+    "source": "pydantic-modelos.md",
+    "section": "Pydantic: modelos de dados > Configuração do modelo",
+    "text": "A configuração de um modelo é feita com o atributo `model_config` e a classe `ConfigDict`:\n\n- `extra=\"forbid\"` rejeita campos que não foram declarados; o padrão, `extra=\"ignore\"`, apenas os descarta.\n- `from_attributes=True` permite criar o modelo a partir de atributos de um objeto, como uma linha retornada por um ORM. Na versão 1 do Pydantic essa opção se chamava `orm_mode`.\n- `frozen=True` torna as instâncias imutáveis depois de criadas.\n- `str_strip_whitespace=True` remove espaços no início e no fim de todos os campos de texto."
+   }
+  ]
+ },
+ {
+  "id": "d26",
+  "question": "O que o método errors() devolve quando a validação do Pydantic falha?",
+  "answerable": true,
+  "expected_answer": "Uma lista de dicionários, cada um com loc, msg e type.",
+  "expected_source": "pydantic-validacao.md",
+  "expected_section": "Pydantic: validação personalizada > Tratando ValidationError",
+  "expected_snippets": [
+   "O método `errors()` devolve uma lista de dicionários"
+  ],
+  "raw_answer": "O método `errors()` do Pydantic devolve uma lista de dicionários quando a validação falha. Cada dicionário contém a localização do problema em `loc`, a mensagem em `msg` e o tipo do erro em `type`. [1]",
+  "chunks": [
+   {
+    "id": "b6b243d1-f791-5f0a-b1e8-b5a869997bd5",
+    "source": "pydantic-validacao.md",
+    "section": "Pydantic: validação personalizada > Tratando ValidationError",
+    "text": "```python\nfrom pydantic import ValidationError\n\ntry:\n    Periodo(inicio=10, fim=2)\nexcept ValidationError as erro:\n    for problema in erro.errors():\n        print(problema[\"loc\"], problema[\"msg\"])\n```\n\nO método `errors()` devolve uma lista de dicionários. Cada dicionário traz a localização do problema em `loc`, a mensagem em `msg` e o tipo do erro em `type`. No FastAPI, essa mesma estrutura aparece no campo `detail` das respostas com status 422."
+   },
+   {
+    "id": "949916a2-5a58-5674-acba-931ecdec5c10",
+    "source": "pydantic-validacao.md",
+    "section": "Pydantic: validação personalizada",
+    "text": "As anotações de tipo resolvem a maior parte das validações, mas regras de negócio costumam exigir verificações próprias. O Pydantic oferece restrições declarativas com `Field` e validadores escritos em Python."
+   },
+   {
+    "id": "dd6ed05c-a9cd-5149-9a20-3d10373679e6",
+    "source": "pydantic-validacao.md",
+    "section": "Pydantic: validação personalizada > Validadores de modelo",
+    "text": "Quando a regra envolve mais de um campo, use `model_validator`. No modo `after`, o método recebe a instância já validada e deve retorná-la:\n\n```python\nfrom pydantic import BaseModel, model_validator\n\nclass Periodo(BaseModel):\n    inicio: int\n    fim: int\n\n    @model_validator(mode=\"after\")\n    def fim_depois_do_inicio(self):\n        if self.fim < self.inicio:\n            raise ValueError(\"fim deve ser maior ou igual ao início\")\n        return self\n```"
+   },
+   {
+    "id": "9061f322-00c3-5bfe-8cf7-3b6b11f7452c",
+    "source": "configuracoes.md",
+    "section": "Configurações com pydantic-settings > Declarando as configurações",
+    "text": "Os valores das variáveis de ambiente são sempre texto, mas o Pydantic os converte para o tipo declarado: `APP_DEBUG=true` vira o booleano `True` e `APP_MAX_ITENS=10` vira o inteiro 10. Se uma variável obrigatória estiver ausente ou inválida, a aplicação falha ao iniciar com uma `ValidationError`, o que evita descobrir o erro só em produção."
+   },
+   {
+    "id": "90eb028a-dffe-5972-94be-dd86ef12d5a0",
+    "source": "pydantic-modelos.md",
+    "section": "Pydantic: modelos de dados > Declarando um modelo",
+    "text": "```python\nfrom pydantic import BaseModel\n\nclass Produto(BaseModel):\n    nome: str\n    preco: float\n    em_estoque: bool = True\n    tags: list[str] = []\n```\n\nAo criar uma instância, o Pydantic valida e converte os dados de entrada. No modo padrão, chamado de modo flexível, o texto `\"19.90\"` é convertido para o número `19.9` no campo `preco`. Se um valor não puder ser convertido, a criação falha com uma `ValidationError` que descreve cada campo inválido."
+   }
+  ]
+ },
+ {
+  "id": "d27",
+  "question": "Como uma fixture executa código de encerramento depois do teste?",
+  "answerable": true,
+  "expected_answer": "Usando yield no lugar de return.",
+  "expected_source": "pytest-fixtures.md",
+  "expected_section": "pytest: fixtures > Limpeza com yield",
+  "expected_snippets": [
+   "a fixture usa `yield` no lugar de `return`"
+  ],
+  "raw_answer": "- Para uma fixture executar código de encerramento depois do teste, ela deve usar `yield` no lugar de `return`. Isso permite que o código de encerramento seja executado após o teste, mesmo que ele tenha falhado. [1]",
+  "chunks": [
+   {
+    "id": "1d107b14-0878-5f33-8221-e69b679fc1d2",
+    "source": "pytest-fixtures.md",
+    "section": "pytest: fixtures > Limpeza com yield",
+    "text": "Para executar código de encerramento, a fixture usa `yield` no lugar de `return`. Tudo o que vem depois do `yield` roda quando o teste termina, mesmo que ele tenha falhado:\n\n```python\n@pytest.fixture\ndef conexao():\n    con = abrir_conexao()\n    yield con\n    # Encerramento: executado depois do teste\n    con.close()\n```"
+   },
+   {
+    "id": "312dbe9d-54d5-54e9-b806-321049c650f4",
+    "source": "pytest-fixtures.md",
+    "section": "pytest: fixtures",
+    "text": "Fixtures são funções que preparam o que um teste precisa, como dados, conexões ou objetos configurados, e opcionalmente limpam tudo depois. Um teste recebe uma fixture simplesmente declarando um parâmetro com o nome dela."
+   },
+   {
+    "id": "1527a064-e4ab-595c-85ef-bc7a939e58c8",
+    "source": "pytest-fixtures.md",
+    "section": "pytest: fixtures > Escopo",
+    "text": "O argumento `scope` define por quanto tempo a fixture é reaproveitada:\n\n| Escopo | A fixture é criada |\n| --- | --- |\n| `function` (padrão) | uma vez por teste |\n| `class` | uma vez por classe de testes |\n| `module` | uma vez por arquivo de testes |\n| `package` | uma vez por pacote |\n| `session` | uma única vez em toda a execução |\n\nEscopos maiores economizam tempo em preparações caras, como subir um banco de dados de teste, mas exigem cuidado: um teste que altera o objeto compartilhado pode afetar os testes seguintes."
+   },
+   {
+    "id": "689dd439-27dc-52e7-b9c8-5f2628bba061",
+    "source": "testes.md",
+    "section": "Testes > Eventos de inicialização",
+    "text": "O código de inicialização e de encerramento definido no `lifespan` da aplicação só é executado nos testes quando o cliente é usado como gerenciador de contexto, com `with TestClient(app) as client:`."
+   },
+   {
+    "id": "e561c7e1-b06e-5d3d-8b40-8b936bad94ef",
+    "source": "pytest-fixtures.md",
+    "section": "pytest: fixtures > Fixtures automáticas",
+    "text": "Com `@pytest.fixture(autouse=True)`, a fixture é aplicada a todos os testes do seu alcance sem precisar ser declarada como parâmetro, o que é útil para restaurar um estado global antes de cada teste."
+   }
+  ]
+ },
+ {
+  "id": "d28",
+  "question": "Como marco um teste que deve falhar por causa de um defeito conhecido?",
+  "answerable": true,
+  "expected_answer": "Com @pytest.mark.xfail.",
+  "expected_source": "pytest-fundamentos.md",
+  "expected_section": "pytest: fundamentos > Marcadores para pular testes",
+  "expected_snippets": [
+   "`@pytest.mark.xfail` indica que se espera que o teste falhe"
+  ],
+  "raw_answer": "@pytest.mark.xfail [5]",
+  "chunks": [
+   {
+    "id": "fabd571c-171e-52f4-bf13-226c9842c05a",
+    "source": "pytest-fundamentos.md",
+    "section": "pytest: fundamentos > Marcadores para pular testes",
+    "text": "- `@pytest.mark.skip(reason=\"...\")` pula o teste sempre.\n- `@pytest.mark.skipif(condicao, reason=\"...\")` pula o teste quando a condição é verdadeira, por exemplo em um sistema operacional específico.\n- `@pytest.mark.xfail` indica que se espera que o teste falhe, como em um defeito conhecido ainda não corrigido.\n\nMarcadores personalizados, como `@pytest.mark.lento`, devem ser registrados na opção `markers` da configuração do pytest, no `pyproject.toml` ou no `pytest.ini`. Com a opção `--strict-markers`, um marcador não registrado faz a execução falhar, o que evita erros de digitação."
+   },
+   {
+    "id": "312dbe9d-54d5-54e9-b806-321049c650f4",
+    "source": "pytest-fixtures.md",
+    "section": "pytest: fixtures",
+    "text": "Fixtures são funções que preparam o que um teste precisa, como dados, conexões ou objetos configurados, e opcionalmente limpam tudo depois. Um teste recebe uma fixture simplesmente declarando um parâmetro com o nome dela."
+   },
+   {
+    "id": "7df5fa45-a98f-5d81-98a1-a7d4a718bd14",
+    "source": "pytest-fundamentos.md",
+    "section": "pytest: fundamentos > Opções úteis da linha de comando",
+    "text": "| Opção | Efeito |\n| --- | --- |\n| `pytest -v` | Mostra o nome de cada teste executado |\n| `pytest -q` | Saída resumida |\n| `pytest -x` | Para na primeira falha |\n| `pytest -k \"login and not lento\"` | Roda só os testes cujo nome corresponde à expressão |\n| `pytest --lf` | Roda de novo só os testes que falharam na última execução |\n| `pytest tests/test_api.py::test_health` | Roda um único teste |"
+   },
+   {
+    "id": "7fb6f2a0-cc7b-5f1f-a54b-c89374f03332",
+    "source": "pytest-fixtures.md",
+    "section": "pytest: fixtures > Fixtures embutidas mais usadas",
+    "text": "- `tmp_path`: um diretório temporário exclusivo para o teste, como objeto `pathlib.Path`.\n- `monkeypatch`: troca atributos, variáveis de ambiente e itens de dicionários durante o teste, com `setattr`, `setenv` e `delenv`. Tudo é desfeito automaticamente quando o teste termina.\n- `capsys`: captura o que foi impresso; o método `readouterr()` devolve a saída padrão e a saída de erro.\n- `caplog`: captura os registros feitos com o módulo `logging`."
+   },
+   {
+    "id": "1d107b14-0878-5f33-8221-e69b679fc1d2",
+    "source": "pytest-fixtures.md",
+    "section": "pytest: fixtures > Limpeza com yield",
+    "text": "Para executar código de encerramento, a fixture usa `yield` no lugar de `return`. Tudo o que vem depois do `yield` roda quando o teste termina, mesmo que ele tenha falhado:\n\n```python\n@pytest.fixture\ndef conexao():\n    con = abrir_conexao()\n    yield con\n    # Encerramento: executado depois do teste\n    con.close()\n```"
+   }
+  ]
+ },
+ {
+  "id": "d29",
+  "question": "Qual status e qual cabeçalho devo devolver quando as credenciais são inválidas?",
+  "answerable": true,
+  "expected_answer": "Status 401 e o cabeçalho WWW-Authenticate com o valor Bearer.",
+  "expected_source": "seguranca.md",
+  "expected_section": "Segurança e autenticação > Erros de autenticação",
+  "expected_snippets": [
+   "usando o status 401 e o cabeçalho `WWW-Authenticate` com o valor `Bearer`"
+  ],
+  "raw_answer": "- Quando as credenciais são inválidas, devemos devolver um `HTTPException` com o status 401 e o cabeçalho `WWW-Authenticate` com o valor `Bearer`, conforme [1].\n\n```python\nfrom fastapi import FastAPI, HTTPException\n\napp = FastAPI()\n\n@app.post(\"/autenticacao\", status_code=status.HTTP_401_UNAUTHORIZED)\nasync def autenticacao():\n    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=\"Credenciais inválidas\")\n```",
+  "chunks": [
+   {
+    "id": "2c4c29e2-1795-5530-aab9-a349684d7609",
+    "source": "seguranca.md",
+    "section": "Segurança e autenticação > Erros de autenticação",
+    "text": "Quando as credenciais são inválidas, responda com `HTTPException` usando o status 401 e o cabeçalho `WWW-Authenticate` com o valor `Bearer`, como define a especificação do esquema."
+   },
+   {
+    "id": "e367076f-12b4-5f7a-9544-b675d7e93d2f",
+    "source": "respostas-personalizadas.md",
+    "section": "Respostas personalizadas e códigos de status > Códigos de status com o módulo status",
+    "text": "Em vez de escrever números soltos, use as constantes do módulo `status`, que deixam o código mais legível e evitam erros de digitação:\n\n```python\nfrom fastapi import FastAPI, status\n\napp = FastAPI()\n\n@app.post(\"/items/\", status_code=status.HTTP_201_CREATED)\nasync def create_item(name: str):\n    return {\"name\": name}\n```\n\nA constante `status.HTTP_201_CREATED` vale 201 e indica que um recurso foi criado. Para uma operação que não devolve conteúdo, como uma exclusão bem-sucedida, use `status.HTTP_204_NO_CONTENT` e não retorne corpo."
+   },
+   {
+    "id": "f4cf1312-e350-58ce-aa60-a7de0d3f4cb1",
+    "source": "respostas-personalizadas.md",
+    "section": "Respostas personalizadas e códigos de status",
+    "text": "Por padrão, o FastAPI converte o retorno de uma operação de caminho para JSON e o envia dentro de um `JSONResponse`. Em vários casos é preciso controlar o tipo de resposta, os cabeçalhos ou o código de status."
+   },
+   {
+    "id": "3eadf517-f7f4-5cd3-b9ec-efb420ee29a9",
+    "source": "respostas-personalizadas.md",
+    "section": "Respostas personalizadas e códigos de status > Cabeçalhos e cookies na resposta",
+    "text": "Para acrescentar cabeçalhos ou cookies sem abrir mão da conversão automática, declare um parâmetro do tipo `Response` na função e altere-o:\n\n```python\nfrom fastapi import Response\n\n@app.get(\"/preferencias\")\nasync def preferencias(response: Response):\n    response.headers[\"X-Versao-API\"] = \"2\"\n    response.set_cookie(key=\"tema\", value=\"claro\")\n    return {\"ok\": True}\n```\n\nO FastAPI usa esse objeto temporário para copiar os cabeçalhos, os cookies e o código de status para a resposta final, enquanto o valor retornado continua sendo convertido normalmente."
+   },
+   {
+    "id": "27b74305-18d2-554b-a1f5-2ae7ab75ec76",
+    "source": "erros-e-middleware.md",
+    "section": "Tratamento de erros, middleware e CORS > Levantando erros HTTP",
+    "text": "Para devolver um erro ao cliente, levante uma `HTTPException` com o código de status e uma mensagem:\n\n```python\nfrom fastapi import HTTPException\n\n@app.get(\"/items/{item_id}\")\nasync def read_item(item_id: str):\n    if item_id not in items:\n        raise HTTPException(status_code=404, detail=\"Item não encontrado\")\n    return items[item_id]\n```\n\nA exceção interrompe a execução e a resposta é um JSON no formato `{\"detail\": \"Item não encontrado\"}`. O argumento `detail` aceita qualquer valor que possa ser convertido em JSON, como um dicionário ou uma lista. Também é possível enviar cabeçalhos adicionais com o argumento `headers`."
+   }
+  ]
+ },
+ {
+  "id": "d30",
+  "question": "Posso declarar BackgroundTasks dentro de uma dependência?",
+  "answerable": true,
+  "expected_answer": "Sim; o FastAPI usa o mesmo objeto em toda a requisição.",
+  "expected_source": "tarefas-em-segundo-plano.md",
+  "expected_section": "Tarefas em segundo plano > Em dependências",
+  "expected_snippets": [
+   "O FastAPI usa o mesmo objeto em toda a requisição"
+  ],
+  "raw_answer": "Não encontrei essa informação na documentação indexada.",
+  "chunks": [
+   {
+    "id": "39b58db1-fe39-5c58-ac3b-c1333863ef25",
+    "source": "tarefas-em-segundo-plano.md",
+    "section": "Tarefas em segundo plano > Em dependências",
+    "text": "Um parâmetro `BackgroundTasks` também pode ser declarado dentro de uma dependência. O FastAPI usa o mesmo objeto em toda a requisição, então as tarefas adicionadas na dependência e na rota são executadas juntas depois da resposta."
+   },
+   {
+    "id": "b37078db-6b28-544e-9288-4e6af732f748",
+    "source": "dependencias.md",
+    "section": "Dependências",
+    "text": "O sistema de injeção de dependências do FastAPI permite declarar o que uma operação de caminho precisa para funcionar, como uma conexão com o banco de dados, o usuário autenticado ou parâmetros comuns a várias rotas. O FastAPI resolve essas dependências antes de chamar a função."
+   },
+   {
+    "id": "88976c79-9977-5144-8e3b-1d02868003f6",
+    "source": "tarefas-em-segundo-plano.md",
+    "section": "Tarefas em segundo plano > Usando BackgroundTasks",
+    "text": "Declare um parâmetro do tipo `BackgroundTasks` na função da rota e adicione tarefas com o método `add_task`:\n\n```python\nfrom fastapi import BackgroundTasks\n\ndef write_notification(email: str, message: str = \"\"):\n    with open(\"log.txt\", mode=\"a\") as log:\n        log.write(f\"notificação para {email}: {message}\\n\")\n\n@app.post(\"/send-notification/{email}\")\nasync def send_notification(email: str, background_tasks: BackgroundTasks):\n    background_tasks.add_task(write_notification, email, message=\"bem-vindo\")\n    return {\"message\": \"Notificação enviada em segundo plano\"}\n```\n\nO primeiro argumento de `add_task` é a função a executar. Os argumentos seguintes, posicionais ou nomeados, são repassados para ela. A função pode ser declarada com `def` comum ou com `async def`."
+   },
+   {
+    "id": "daa63540-c382-59e7-b3db-dfdcb4bbd935",
+    "source": "dependencias.md",
+    "section": "Dependências > Dependências globais e em decoradores",
+    "text": "Quando o valor retornado pela dependência não é necessário, mas ela precisa ser executada, por exemplo para verificar um cabeçalho, declare-a na lista `dependencies` do decorador: `@app.get(\"/items/\", dependencies=[Depends(verify_token)])`.\n\nPara aplicar uma dependência a todas as rotas da aplicação, passe a lista na criação: `app = FastAPI(dependencies=[Depends(verify_token)])`. O mesmo vale para um `APIRouter`, aplicando a dependência só às rotas daquele roteador."
+   },
+   {
+    "id": "e46f1841-e563-5fbc-8644-a686fdb65745",
+    "source": "dependencias.md",
+    "section": "Dependências > Subdependências",
+    "text": "Uma dependência pode depender de outra, formando uma árvore. O FastAPI resolve a árvore inteira na ordem correta. Se a mesma dependência aparece mais de uma vez na mesma requisição, ela é executada só uma vez e o resultado fica em cache durante aquela requisição. Para forçar uma nova execução a cada uso, declare `Depends(dependencia, use_cache=False)`."
    }
   ]
  },
@@ -758,6 +1550,240 @@
     "source": "configuracoes.md",
     "section": "Configurações com pydantic-settings",
     "text": "Aplicações reais leem endereços de bancos de dados, chaves secretas e parâmetros de ambiente a partir de variáveis de ambiente. O pacote `pydantic-settings` estende o Pydantic para carregar e validar essas configurações. Desde a versão 2 do Pydantic, ele é instalado separadamente, com `pip install pydantic-settings`."
+   }
+  ]
+ },
+ {
+  "id": "v07",
+  "question": "Qual é o timeout padrão de uma requisição no FastAPI?",
+  "answerable": false,
+  "note": "Armadilha: valor padrão não documentado.",
+  "raw_answer": "Não encontrei essa informação na documentação indexada.",
+  "chunks": [
+   {
+    "id": "da89868b-a2f9-5ea1-9959-15342586d503",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta",
+    "text": "O corpo da requisição é o dado que o cliente envia para a API, normalmente em JSON, em métodos como POST, PUT e PATCH. No FastAPI, o corpo é descrito com modelos Pydantic."
+   },
+   {
+    "id": "875d3aa7-62e2-5769-8a54-5a09bd1b2195",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos > Instalação",
+    "text": "A forma recomendada de instalar é com os extras padrão, que incluem o servidor Uvicorn e a ferramenta de linha de comando `fastapi`:\n\n```bash\n# Crie e ative um ambiente virtual antes de instalar\npip install \"fastapi[standard]\"\n```\n\nInstalar dentro de um ambiente virtual evita conflitos de versões entre projetos diferentes na mesma máquina."
+   },
+   {
+    "id": "60f808f4-41e2-5f0e-963f-4ab2c30f73a0",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Como o FastAPI decide a origem de cada parâmetro",
+    "text": "É possível misturar parâmetros de caminho, de consulta e de corpo na mesma função. A regra é:\n\n- se o nome aparece no caminho, é um parâmetro de caminho;\n- se o tipo é simples, como `int`, `str` ou `bool`, é um parâmetro de consulta;\n- se o tipo é um modelo Pydantic, é lido do corpo da requisição.\n\nQuando a função recebe um único modelo, o JSON esperado é o próprio conteúdo do modelo. Para exigir que ele venha dentro de uma chave com o nome do parâmetro, use `Body(embed=True)`."
+   },
+   {
+    "id": "60f4b95d-12f4-50c0-9950-284b8175f3e1",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos > Executando o servidor",
+    "text": "Durante o desenvolvimento, use o comando abaixo. Ele recarrega o servidor sempre que um arquivo é salvo:\n\n```bash\nfastapi dev main.py\n```\n\nEm produção, use `fastapi run main.py`, que não ativa o recarregamento automático e escuta em todas as interfaces de rede. Por padrão, o servidor atende na porta 8000."
+   },
+   {
+    "id": "5865fbc7-31d8-53f8-aa5f-056281546a7b",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Modelo de resposta",
+    "text": "O argumento `response_model` do decorador define o formato da resposta. O FastAPI converte o retorno da função para esse modelo e remove qualquer campo que não esteja nele, o que evita vazar dados sensíveis:\n\n```python\nclass UserIn(BaseModel):\n    username: str\n    password: str\n\nclass UserOut(BaseModel):\n    username: str\n\n@app.post(\"/users/\", response_model=UserOut, status_code=201)\nasync def create_user(user: UserIn):\n    # A senha recebida nunca aparece na resposta\n    return user\n```\n\nNesse exemplo, a senha é descartada da resposta mesmo que a função devolva o objeto completo. O argumento `status_code=201` muda o código de status da resposta de sucesso, que por padrão é 200."
+   }
+  ]
+ },
+ {
+  "id": "v08",
+  "question": "Qual é o tamanho máximo do corpo de uma requisição por padrão?",
+  "answerable": false,
+  "note": "Armadilha: valor padrão não documentado.",
+  "raw_answer": "Não encontrei essa informação na documentação indexada.",
+  "chunks": [
+   {
+    "id": "da89868b-a2f9-5ea1-9959-15342586d503",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta",
+    "text": "O corpo da requisição é o dado que o cliente envia para a API, normalmente em JSON, em métodos como POST, PUT e PATCH. No FastAPI, o corpo é descrito com modelos Pydantic."
+   },
+   {
+    "id": "60f808f4-41e2-5f0e-963f-4ab2c30f73a0",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Como o FastAPI decide a origem de cada parâmetro",
+    "text": "É possível misturar parâmetros de caminho, de consulta e de corpo na mesma função. A regra é:\n\n- se o nome aparece no caminho, é um parâmetro de caminho;\n- se o tipo é simples, como `int`, `str` ou `bool`, é um parâmetro de consulta;\n- se o tipo é um modelo Pydantic, é lido do corpo da requisição.\n\nQuando a função recebe um único modelo, o JSON esperado é o próprio conteúdo do modelo. Para exigir que ele venha dentro de uma chave com o nome do parâmetro, use `Body(embed=True)`."
+   },
+   {
+    "id": "042baa64-46f4-54c7-ab55-cbe43a1a222a",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Modelo de resposta",
+    "text": "Para omitir da resposta os campos que não foram definidos explicitamente, use `response_model_exclude_unset=True`."
+   },
+   {
+    "id": "d8f100a7-fd87-5063-82cf-d3f11916db4c",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Exemplos na documentação",
+    "text": "Para mostrar um exemplo de corpo na documentação interativa, use o argumento `examples` de `Field`, como `name: str = Field(examples=[\"Caneta azul\"])`. O exemplo aparece no esquema OpenAPI e já vem preenchido quando alguém testa a rota pelo navegador."
+   },
+   {
+    "id": "d93dbeed-49fd-502a-bf65-5ad15b98c719",
+    "source": "corpo-da-requisicao.md",
+    "section": "Corpo da requisição e modelos de resposta > Validação dentro do modelo",
+    "text": "Use `Field` do Pydantic para validar e documentar cada campo, por exemplo `price: float = Field(gt=0, description=\"Preço em reais\")`. As mesmas validações disponíveis em `Query` e `Path`, como `gt`, `max_length` e `pattern`, funcionam em `Field`."
+   }
+  ]
+ },
+ {
+  "id": "v09",
+  "question": "Como configuro rate limiting na API?",
+  "answerable": false,
+  "note": "Assunto ausente.",
+  "raw_answer": "Não encontrei essa informação na documentação indexada.",
+  "chunks": [
+   {
+    "id": "1288b361-de58-58b3-9341-90f3c3684489",
+    "source": "configuracoes.md",
+    "section": "Configurações com pydantic-settings > Declarando as configurações",
+    "text": "```python\nfrom pydantic_settings import BaseSettings, SettingsConfigDict\n\nclass Settings(BaseSettings):\n    model_config = SettingsConfigDict(env_file=\".env\", env_prefix=\"APP_\")\n\n    nome_app: str = \"Minha API\"\n    banco_url: str\n    debug: bool = False\n    max_itens: int = 50\n```\n\nCada campo é lido de uma variável de ambiente com o mesmo nome, acrescido do prefixo definido em `env_prefix`. Neste exemplo, o campo `banco_url` vem da variável `APP_BANCO_URL`. Por padrão, os nomes das variáveis não diferenciam maiúsculas de minúsculas."
+   },
+   {
+    "id": "6fb8f184-219e-5688-bdd8-a583f26f069a",
+    "source": "seguranca.md",
+    "section": "Segurança e autenticação > Chave de API em cabeçalho",
+    "text": "Para integrações entre sistemas, um esquema simples é exigir uma chave de API em um cabeçalho. A classe `APIKeyHeader`, de `fastapi.security`, lê o cabeçalho e o documenta no OpenAPI:\n\n```python\nfrom fastapi.security import APIKeyHeader\n\napi_key_header = APIKeyHeader(name=\"X-API-Key\")\n\nasync def verificar_chave(chave: Annotated[str, Depends(api_key_header)]):\n    # Compare com a chave guardada em uma variável de ambiente\n    if chave != settings.api_key:\n        raise HTTPException(status_code=401, detail=\"Chave inválida\")\n```\n\nSe o cabeçalho não for enviado, a própria dependência rejeita a requisição antes de a rota ser executada."
+   },
+   {
+    "id": "3eadf517-f7f4-5cd3-b9ec-efb420ee29a9",
+    "source": "respostas-personalizadas.md",
+    "section": "Respostas personalizadas e códigos de status > Cabeçalhos e cookies na resposta",
+    "text": "Para acrescentar cabeçalhos ou cookies sem abrir mão da conversão automática, declare um parâmetro do tipo `Response` na função e altere-o:\n\n```python\nfrom fastapi import Response\n\n@app.get(\"/preferencias\")\nasync def preferencias(response: Response):\n    response.headers[\"X-Versao-API\"] = \"2\"\n    response.set_cookie(key=\"tema\", value=\"claro\")\n    return {\"ok\": True}\n```\n\nO FastAPI usa esse objeto temporário para copiar os cabeçalhos, os cookies e o código de status para a resposta final, enquanto o valor retornado continua sendo convertido normalmente."
+   },
+   {
+    "id": "da8dc5d6-fc27-5149-bc67-270a455876df",
+    "source": "docker-compose.md",
+    "section": "Docker Compose: vários serviços > Um arquivo compose típico",
+    "text": "```yaml\nservices:\n  api:\n    build: .\n    ports:\n      - \"8000:80\"\n    environment:\n      BANCO_URL: postgresql://app:senha@db:5432/app\n    depends_on:\n      db:\n        condition: service_healthy\n\n  db:\n    image: postgres:16\n    environment:\n      POSTGRES_USER: app\n      POSTGRES_PASSWORD: senha\n    volumes:\n      - dados_db:/var/lib/postgresql/data\n    healthcheck:\n      test: [\"CMD\", \"pg_isready\", \"-U\", \"app\"]\n      interval: 5s\n      retries: 10\n\nvolumes:\n  dados_db:\n```\n\nCada entrada em `services` vira um container. A chave `build` constrói a imagem a partir de um Dockerfile, e a chave `image` usa uma imagem pronta de um registro."
+   },
+   {
+    "id": "e7e0c91c-b6ef-5a43-a157-874b64ca850b",
+    "source": "seguranca.md",
+    "section": "Segurança e autenticação > Use sempre HTTPS",
+    "text": "Tokens, senhas e chaves de API viajam nos cabeçalhos e no corpo das requisições. Em produção, a API deve ser acessada somente por HTTPS, para que essas credenciais não trafeguem em texto aberto pela rede."
+   }
+  ]
+ },
+ {
+  "id": "v10",
+  "question": "Como exponho um endpoint GraphQL com o FastAPI?",
+  "answerable": false,
+  "note": "Assunto ausente.",
+  "raw_answer": "Não encontrei essa informação na documentação indexada.",
+  "chunks": [
+   {
+    "id": "0db04a80-94b4-5e4e-bd12-21043660d1c9",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos > A primeira aplicação",
+    "text": "Crie um arquivo `main.py` com o conteúdo abaixo:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n# Uma \"operação de caminho\": método GET no caminho \"/\"\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Olá, mundo\"}\n```\n\nA variável `app` é a instância principal da aplicação. O decorador `@app.get(\"/\")` informa que a função logo abaixo responde a requisições do tipo GET no caminho `/`. A função pode ser declarada com `async def` ou com `def` comum, e o retorno pode ser um dicionário, uma lista ou um modelo Pydantic, que são convertidos para JSON automaticamente."
+   },
+   {
+    "id": "519eb524-d198-5e32-b3d3-d0602f068cb3",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos > Documentação interativa",
+    "text": "Com o servidor rodando, acesse `http://127.0.0.1:8000/docs` para abrir a documentação interativa gerada com o Swagger UI, onde é possível testar cada endpoint pelo navegador. Uma documentação alternativa, gerada com o ReDoc, fica em `http://127.0.0.1:8000/redoc`.\n\nAs duas páginas são construídas a partir do esquema OpenAPI da aplicação, servido em `/openapi.json`. Esse esquema também pode ser usado para gerar clientes automaticamente em outras linguagens."
+   },
+   {
+    "id": "875d3aa7-62e2-5769-8a54-5a09bd1b2195",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos > Instalação",
+    "text": "A forma recomendada de instalar é com os extras padrão, que incluem o servidor Uvicorn e a ferramenta de linha de comando `fastapi`:\n\n```bash\n# Crie e ative um ambiente virtual antes de instalar\npip install \"fastapi[standard]\"\n```\n\nInstalar dentro de um ambiente virtual evita conflitos de versões entre projetos diferentes na mesma máquina."
+   },
+   {
+    "id": "3afef30d-5b9a-550a-bf28-2685015b4568",
+    "source": "implantacao.md",
+    "section": "Implantação > Processos e workers",
+    "text": "O comando `fastapi run` aceita a opção `--workers` para iniciar vários processos e usar mais núcleos da CPU, por exemplo `fastapi run --workers 4 main.py`.\n\nEm um cluster com Kubernetes, o recomendado é rodar um único processo por container e deixar a replicação a cargo do próprio cluster, que cria mais containers conforme a demanda."
+   },
+   {
+    "id": "b37078db-6b28-544e-9288-4e6af732f748",
+    "source": "dependencias.md",
+    "section": "Dependências",
+    "text": "O sistema de injeção de dependências do FastAPI permite declarar o que uma operação de caminho precisa para funcionar, como uma conexão com o banco de dados, o usuário autenticado ou parâmetros comuns a várias rotas. O FastAPI resolve essas dependências antes de chamar a função."
+   }
+  ]
+ },
+ {
+  "id": "v11",
+  "question": "Quantos workers o Uvicorn usa por padrão?",
+  "answerable": false,
+  "note": "Armadilha: a opção --workers é documentada, o valor padrão do Uvicorn não.",
+  "raw_answer": "Não encontrei essa informação na documentação indexada. [1]",
+  "chunks": [
+   {
+    "id": "3afef30d-5b9a-550a-bf28-2685015b4568",
+    "source": "implantacao.md",
+    "section": "Implantação > Processos e workers",
+    "text": "O comando `fastapi run` aceita a opção `--workers` para iniciar vários processos e usar mais núcleos da CPU, por exemplo `fastapi run --workers 4 main.py`.\n\nEm um cluster com Kubernetes, o recomendado é rodar um único processo por container e deixar a replicação a cargo do próprio cluster, que cria mais containers conforme a demanda."
+   },
+   {
+    "id": "875d3aa7-62e2-5769-8a54-5a09bd1b2195",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos > Instalação",
+    "text": "A forma recomendada de instalar é com os extras padrão, que incluem o servidor Uvicorn e a ferramenta de linha de comando `fastapi`:\n\n```bash\n# Crie e ative um ambiente virtual antes de instalar\npip install \"fastapi[standard]\"\n```\n\nInstalar dentro de um ambiente virtual evita conflitos de versões entre projetos diferentes na mesma máquina."
+   },
+   {
+    "id": "a4aa8198-c8a0-5e3e-8db9-4c4323b1546a",
+    "source": "parametros.md",
+    "section": "Parâmetros de caminho e de consulta > Parâmetros de consulta",
+    "text": "Os argumentos da função que não aparecem no caminho são interpretados como parâmetros de consulta:\n\n```python\n@app.get(\"/items/\")\nasync def list_items(skip: int = 0, limit: int = 10):\n    # GET /items/?skip=20&limit=5\n    return fake_db[skip : skip + limit]\n```\n\nUm parâmetro de consulta com valor padrão é opcional. Para torná-lo obrigatório, basta não definir valor padrão. Usar `None` como padrão indica um parâmetro opcional sem valor definido.\n\nParâmetros do tipo `bool` aceitam os valores `1`, `true`, `on` e `yes` como verdadeiro, sem diferenciar maiúsculas e minúsculas."
+   },
+   {
+    "id": "1d107b14-0878-5f33-8221-e69b679fc1d2",
+    "source": "pytest-fixtures.md",
+    "section": "pytest: fixtures > Limpeza com yield",
+    "text": "Para executar código de encerramento, a fixture usa `yield` no lugar de `return`. Tudo o que vem depois do `yield` roda quando o teste termina, mesmo que ele tenha falhado:\n\n```python\n@pytest.fixture\ndef conexao():\n    con = abrir_conexao()\n    yield con\n    # Encerramento: executado depois do teste\n    con.close()\n```"
+   },
+   {
+    "id": "3eadf517-f7f4-5cd3-b9ec-efb420ee29a9",
+    "source": "respostas-personalizadas.md",
+    "section": "Respostas personalizadas e códigos de status > Cabeçalhos e cookies na resposta",
+    "text": "Para acrescentar cabeçalhos ou cookies sem abrir mão da conversão automática, declare um parâmetro do tipo `Response` na função e altere-o:\n\n```python\nfrom fastapi import Response\n\n@app.get(\"/preferencias\")\nasync def preferencias(response: Response):\n    response.headers[\"X-Versao-API\"] = \"2\"\n    response.set_cookie(key=\"tema\", value=\"claro\")\n    return {\"ok\": True}\n```\n\nO FastAPI usa esse objeto temporário para copiar os cabeçalhos, os cookies e o código de status para a resposta final, enquanto o valor retornado continua sendo convertido normalmente."
+   }
+  ]
+ },
+ {
+  "id": "v12",
+  "question": "Como habilito WebSockets na aplicação?",
+  "answerable": false,
+  "note": "Assunto ausente.",
+  "raw_answer": "Não encontrei essa informação na documentação indexada. [1][4]",
+  "chunks": [
+   {
+    "id": "302e3922-6c49-5aa1-ab1b-236a718f4c14",
+    "source": "implantacao.md",
+    "section": "Implantação > Rota de verificação de saúde",
+    "text": "Orquestradores como o Docker Compose e o Kubernetes precisam saber se a aplicação está pronta. Uma rota simples, como `GET /health` devolvendo `{\"status\": \"ok\"}`, pode ser usada pela instrução `HEALTHCHECK` do Dockerfile ou pelas sondas do Kubernetes. Uma verificação mais completa também confere se os serviços de que a aplicação depende, como o banco de dados, estão respondendo."
+   },
+   {
+    "id": "6e7021d2-721c-5d50-82d6-c21fe38131d4",
+    "source": "implantacao.md",
+    "section": "Implantação > Proxy reverso e HTTPS",
+    "text": "Em produção, o HTTPS normalmente fica a cargo de um proxy de terminação TLS, como Traefik ou Caddy, que recebe as conexões seguras e repassa as requisições para a aplicação. Quando a aplicação roda atrás desse proxy, adicione a opção `--proxy-headers` ao comando `fastapi run`, para que ela confie nos cabeçalhos encaminhados pelo proxy."
+   },
+   {
+    "id": "405f8f96-8cad-500d-8ebd-b4c90114df54",
+    "source": "aplicacoes-maiores.md",
+    "section": "Aplicações maiores com APIRouter",
+    "text": "Quando a aplicação cresce, manter todas as rotas em um único arquivo `main.py` fica difícil de ler e de testar. O FastAPI oferece a classe `APIRouter` para dividir as operações de caminho em módulos, mantendo a mesma documentação automática e o mesmo sistema de dependências."
+   },
+   {
+    "id": "0db04a80-94b4-5e4e-bd12-21043660d1c9",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos > A primeira aplicação",
+    "text": "Crie um arquivo `main.py` com o conteúdo abaixo:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n# Uma \"operação de caminho\": método GET no caminho \"/\"\n@app.get(\"/\")\nasync def root():\n    return {\"message\": \"Olá, mundo\"}\n```\n\nA variável `app` é a instância principal da aplicação. O decorador `@app.get(\"/\")` informa que a função logo abaixo responde a requisições do tipo GET no caminho `/`. A função pode ser declarada com `async def` ou com `def` comum, e o retorno pode ser um dicionário, uma lista ou um modelo Pydantic, que são convertidos para JSON automaticamente."
+   },
+   {
+    "id": "ebd0d5e9-cca3-524f-ace8-33361c7d8124",
+    "source": "primeiros-passos.md",
+    "section": "Primeiros passos",
+    "text": "Este guia mostra como criar a primeira aplicação com FastAPI, um framework web para construir APIs com Python baseado em anotações de tipo. As anotações são usadas para validar dados, converter tipos e gerar a documentação automaticamente."
    }
   ]
  }

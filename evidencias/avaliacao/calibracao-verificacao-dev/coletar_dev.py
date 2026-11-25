@@ -8,8 +8,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]  # raiz do repositório
 os.chdir(ROOT)
-os.environ.update(QDRANT_MODE="local", QDRANT_PATH=".qdrant_local", LLM_MODE="ollama",
-                  EMBED_MODE="ollama", LOG_DIR="")
+for k, v in dict(QDRANT_MODE="server", LLM_MODE="ollama",
+                  EMBED_MODE="ollama", LOG_DIR="").items():
+    os.environ.setdefault(k, v)
 sys.path[:0] = [str(ROOT / "src"), str(ROOT)]
 from core.config import Settings  # noqa: E402
 from core.pipeline import build_pipeline  # noqa: E402
