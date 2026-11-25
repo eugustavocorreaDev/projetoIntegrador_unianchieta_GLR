@@ -26,7 +26,7 @@ Os testes **não precisam de Ollama, Qdrant em rede nem internet**. Eles usam du
 | `test_loader.py` | Front matter, título, limpeza de HTML e diretivas, `#` dentro de código não vira título, seções e blocos |
 | `test_chunking.py` | Tamanho e sobreposição do `fixed`, cobertura do texto, chunks do `recursive` dentro de uma única seção, IDs determinísticos, pontuação preservada |
 | `test_retrieval.py` | Tokenização, BM25, RRF, os 4 modos × 2 estratégias, queda para `hybrid` quando o reranker falha, coleção ausente, wrapper do FlashRank |
-| `test_grounding.py` | Prompt, extração de citações, remoção de citações inválidas, resposta sem citação vira recusa, variações de recusa, recusa com citação continua recusa, conhecimento externo com citação falsa é bloqueado, cobertura mínima de citações, sustentação lexical, citação depois do ponto, respostas em tópicos e com código |
+| `test_grounding.py` | Prompt, extração de citações, remoção de citações inválidas, resposta sem citação vira recusa, variações de recusa, recusa com citação continua recusa, conhecimento externo com citação falsa é bloqueado, cobertura mínima de citações, sustentação lexical, termos críticos (número, identificador e qualificador inventados), citação depois do ponto, respostas em tópicos e com código |
 | `test_ollama_clients.py` | Prefixos e lotes de embeddings, opções determinísticas do LLM, erros 404, 500, conexão e tempo limite |
 | `test_pipeline_integration.py` | Ingestão das duas estratégias, reindexação sem duplicar, resposta com citação real, filtro de relevância sem chamar o LLM, falhas do LLM |
 | `test_api.py` | Endpoints, validação (422), 409, 503, 403 do `/ingest`, ausência de segredos no `/config`, OpenAPI |

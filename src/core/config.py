@@ -72,6 +72,9 @@ class Settings(BaseSettings):
     # Verificação das respostas (generation/grounding.py)
     min_citation_coverage: float = 0.5  # fração mínima de afirmações com citação
     min_support_ratio: float = 0.3  # fração mínima dos termos de cada afirmação no trecho citado
+    # Mais rígido que o anterior: vale para trocar a citação errada e para dar citação a uma
+    # frase que veio sem ela, onde nenhum trecho foi indicado pelo modelo
+    min_attribution_ratio: float = 0.6
 
     # API
     # O POST /ingest recria as coleções; desative em qualquer ambiente compartilhado.

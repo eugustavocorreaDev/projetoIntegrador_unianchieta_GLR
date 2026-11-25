@@ -1,38 +1,89 @@
 {
-  "cobertura>=0.50 (atual)": {
-    "respostas_fundamentadas": "9/12",
-    "fonte_errada": 0,
-    "recusas_corretas": "6/6",
-    "falsas_aceitas_adversariais": "1/4"
+  "sem reparo nem atribuição": {
+    "respostas_fundamentadas": "22/30",
+    "respondidas_sem_trecho_ouro_citado": 2,
+    "falsas_recusas": [
+      "d05",
+      "d07",
+      "d21",
+      "d23",
+      "d24",
+      "d30"
+    ],
+    "citacoes_reparadas_ou_atribuidas": 0,
+    "recusas_corretas": "12/12",
+    "forjadas_aceitas": "2/15",
+    "forjadas_aceitas_texto": [
+      "Todos os modelos Pydantic são imutáveis [2].",
+      "O parâmetro `frozen=True` não torna as instâncias imutáveis [2]."
+    ]
   },
-  "cobertura>=0.25 ": {
-    "respostas_fundamentadas": "9/12",
-    "fonte_errada": 0,
-    "recusas_corretas": "6/6",
-    "falsas_aceitas_adversariais": "1/4"
+  "atribuição >= 0,50": {
+    "respostas_fundamentadas": "24/30",
+    "respondidas_sem_trecho_ouro_citado": 2,
+    "falsas_recusas": [
+      "d21",
+      "d23",
+      "d24",
+      "d30"
+    ],
+    "citacoes_reparadas_ou_atribuidas": 10,
+    "recusas_corretas": "12/12",
+    "forjadas_aceitas": "2/15",
+    "forjadas_aceitas_texto": [
+      "Todos os modelos Pydantic são imutáveis [2].",
+      "O parâmetro `frozen=True` não torna as instâncias imutáveis [2]."
+    ]
   },
-  "cobertura>=0.00 ": {
-    "respostas_fundamentadas": "10/12",
-    "fonte_errada": 0,
-    "recusas_corretas": "6/6",
-    "falsas_aceitas_adversariais": "1/4"
+  "atribuição >= 0,60 (adotada)": {
+    "respostas_fundamentadas": "24/30",
+    "respondidas_sem_trecho_ouro_citado": 2,
+    "falsas_recusas": [
+      "d21",
+      "d23",
+      "d24",
+      "d30"
+    ],
+    "citacoes_reparadas_ou_atribuidas": 10,
+    "recusas_corretas": "12/12",
+    "forjadas_aceitas": "2/15",
+    "forjadas_aceitas_texto": [
+      "Todos os modelos Pydantic são imutáveis [2].",
+      "O parâmetro `frozen=True` não torna as instâncias imutáveis [2]."
+    ]
   },
-  "cobertura>=0.50 + confere frases sem citação": {
-    "respostas_fundamentadas": "9/12",
-    "fonte_errada": 0,
-    "recusas_corretas": "6/6",
-    "falsas_aceitas_adversariais": "3/4"
+  "atribuição >= 0,70": {
+    "respostas_fundamentadas": "24/30",
+    "respondidas_sem_trecho_ouro_citado": 2,
+    "falsas_recusas": [
+      "d21",
+      "d23",
+      "d24",
+      "d30"
+    ],
+    "citacoes_reparadas_ou_atribuidas": 10,
+    "recusas_corretas": "12/12",
+    "forjadas_aceitas": "2/15",
+    "forjadas_aceitas_texto": [
+      "Todos os modelos Pydantic são imutáveis [2].",
+      "O parâmetro `frozen=True` não torna as instâncias imutáveis [2]."
+    ]
   },
-  "cobertura>=0.25 + confere frases sem citação": {
-    "respostas_fundamentadas": "10/12",
-    "fonte_errada": 0,
-    "recusas_corretas": "6/6",
-    "falsas_aceitas_adversariais": "3/4"
-  },
-  "cobertura>=0.00 + confere frases sem citação": {
-    "respostas_fundamentadas": "11/12",
-    "fonte_errada": 0,
-    "recusas_corretas": "6/6",
-    "falsas_aceitas_adversariais": "3/4"
+  "atribuição >= 0,80": {
+    "respostas_fundamentadas": "24/30",
+    "respondidas_sem_trecho_ouro_citado": 2,
+    "falsas_recusas": [
+      "d21",
+      "d23",
+      "d24",
+      "d30"
+    ],
+    "citacoes_reparadas_ou_atribuidas": 9,
+    "recusas_corretas": "12/12",
+    "forjadas_aceitas": "2/15",
+    "forjadas_aceitas_texto": [
+      "Todos os modelos Pydantic são imutáveis [2].",
+      "O parâmetro `frozen=True` não torna as instâncias imutáveis [2]."
+    ]
   }
 }

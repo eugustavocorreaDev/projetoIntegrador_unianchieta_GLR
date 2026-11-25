@@ -27,7 +27,7 @@
 ## Limitações conhecidas (o que o sistema não faz)
 
 - Não responde sobre nada fora da documentação indexada; recusa de propósito.
-- A verificação de citações exige cobertura mínima e sustentação **lexical**: cada afirmação citada precisa compartilhar termos com o trecho que cita. Ela barra afirmações sem relação com os trechos, mas uma paráfrase errada que reutiliza os mesmos termos passa. A taxa é estimada na análise manual de erros.
+- A verificação de citações exige cobertura mínima e sustentação **lexical**: cada afirmação citada precisa compartilhar termos com o trecho que cita. Ela também exige que números, identificadores de código e qualificadores de escopo ("padrão", "sempre", "apenas") da afirmação existam no trecho citado, o que barra valores inventados com as palavras do trecho. Ela barra afirmações sem relação com os trechos e valores inventados, mas uma paráfrase errada que reutiliza os mesmos termos e qualificadores passa. A taxa é estimada na análise manual de erros.
 - A recusa estrita gera falsos negativos (resposta correta sem citação é descartada), medidos por `false_refusal_rate`.
 - `MIN_VECTOR_SCORE` vem desligado e depende de calibração por corpus e modelo de embeddings.
 - O BM25 roda em memória: adequado até dezenas de milhares de chunks, não para corpora muito maiores.

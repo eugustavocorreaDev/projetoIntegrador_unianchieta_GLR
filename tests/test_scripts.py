@@ -86,3 +86,50 @@ def test_installer_is_wired_to_docs_and_checker():
     assert 'run_local.ps1") -Testar' in installer
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     assert "scripts\\instalar.ps1" in readme
+
+
+# --- Teste de carga --------------------------------------------------------------
+
+
+def test_load_test_percentile_and_summary():
+    from scripts import load_test as lt
+
+    assert lt.percentile([], 95) == 0.0
+    assert lt.percentile([5, 1, 3, 2, 4], 50) == 3
+    assert lt.percentile(list(range(1, 101)), 95) == 95
+    samples = [{"ok": True, "ms": 10.0, "refused": True}, {"ok": True, "ms": 30.0}] + [
+        {"ok": False, "ms": 999.0, "status": 500}
+    ]
+    summary = lt.summarize(samples, wall_s=2.0)
+    assert summary["errors"] == 1 and summary["refused"] == 1
+    assert summary["throughput_rps"] == 1.0 and summary["max_ms"] == 30.0  # erro fora da latência
+
+
+def test_load_test_step_counts_errors_and_respects_concurrency():
+    import asyncio
+
+    import httpx
+
+    from scripts import load_test as lt
+
+    state = {"in_flight": 0, "peak": 0, "calls": 0}
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        state["calls"] += 1
+        call = state["calls"]  # lido antes do await: outras requisições mexem no contador
+        state["in_flight"] += 1
+        state["peak"] = max(state["peak"], state["in_flight"])
+        await asyncio.sleep(0.01)
+        state["in_flight"] -= 1
+        status = 500 if call % 4 == 0 else 200
+        return httpx.Response(status, json={"refused": False})
+
+    async def go():
+        transport = httpx.MockTransport(handler)
+        async with httpx.AsyncClient(transport=transport, base_url="http://api") as client:
+            return await lt.run_step(client, "/ask", ["q1", "q2"], concurrency=3, total=20)
+
+    result = asyncio.run(go())
+    assert result["requests"] == 20 and result["errors"] == 5
+    assert result["error_statuses"] == ["500"] and state["peak"] <= 3
+    assert len(lt.load_questions()) >= 30  # usa o conjunto de desenvolvimento

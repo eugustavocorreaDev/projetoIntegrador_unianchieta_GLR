@@ -64,7 +64,9 @@ Copie o bloco abaixo para cada caso.
 - **Causa provável:** a verificação é lexical. A frase alucinada reaproveita palavras do trecho citado ("único", "processo"), então passa na sustentação mínima de 30%
 - **Correção tentada (15/11/2026):** uma regra no prompt dizendo que valor padrão só pode ser afirmado se o trecho o disser explicitamente. Medida antes e depois com a mesma pergunta: o modelo de 3B **manteve a alucinação**, e a regra foi retirada
 - **Correção proposta:** verificação semântica (um LLM maior como juiz, ou NLI entre a frase e o trecho) ou um modelo de geração maior. Ambas custam latência em CPU e ficam como trabalho futuro
-- **Resultado depois da correção:** não corrigido; a taxa de recusas corretas oficial é 92,9% (13/14) por causa deste caso
+- **Correção aplicada (termos críticos):** a causa é a **média** da sustentação. Medido: a frase do u07 tem sustentação 0,67 e a do baseline ("usa por padrão 1 worker"), 0,50, acima do limite de 0,30, e os termos sem suporte eram justamente "padrão" e "1". `generation/grounding.py` passou a exigir que números, identificadores de código e qualificadores de escopo ("padrão", "sempre", "apenas"...) da afirmação existam no trecho citado (`missing_critical_terms`), sem LLM e sem latência extra. Um termo ausente recusa a resposta inteira. Testes: `test_invented_value_reusing_chunk_words_is_refused`, `test_one_invented_claim_refuses_the_whole_answer`
+- **Resultado depois da correção:** barra o u07 nas duas configurações (teste unitário com o trecho real). No conjunto de desenvolvimento, as respostas forjadas aceitas caem de 5/8 para 1/8, ao custo de 1 resposta certa com citação errada (d07); ver `evidencias/avaliacao/calibracao-verificacao-dev/README.md`. **Pendente:** repetir a avaliação oficial com o Ollama real. Como a regra foi desenhada a partir deste caso, o resultado no conjunto de teste não é uma estimativa limpa para ele
+- **Resultado oficial de 15/11 (antes da correção):** não corrigido; a taxa de recusas corretas oficial é 92,9% (13/14) por causa deste caso
 
 ---
 
@@ -79,8 +81,10 @@ Copie o bloco abaixo para cada caso.
 - **Categoria:** recusa indevida (verificação rígida demais para um modelo de 3B)
 - **Causa provável:** o modelo de 3B não segue a instrução "cite toda afirmação"
 - **Correção avaliada:** seis variações da regra, calibradas **só no conjunto de desenvolvimento**, com 4 respostas forjadas de controle. Afrouxar a cobertura ganha no máximo 1 de 12 perguntas; conferir as frases sem citação contra todo o contexto passa a aceitar 3 de 4 respostas forjadas
-- **Decisão:** manter a regra atual. A troca entre cobertura de respostas (62% respondidas) e segurança (93,5% fundamentadas entre as respondidas) é deliberada
-- **Resultado depois da correção:** sem mudança, por decisão baseada em dados
+- **Decisão de 15/11:** manter a regra atual. A troca entre cobertura de respostas (62% respondidas) e segurança (93,5% fundamentadas entre as respondidas) é deliberada
+- **Nova análise (24/11/2026), dev ampliado para 30 + 12 e respostas reais:** a baixa cobertura tem três causas distintas, e nenhuma pede afrouxar o limite. (1) `[n]` sozinho na linha ficava fora da frase (bug do parser, d11); (2) citação com o número errado de trecho, com o fato num trecho do mesmo documento (d03, d05, d07); (3) frases de continuação sem `[n]`, sustentadas por um único trecho
+- **Correção aplicada:** o parser anexa o `[n]` isolado à frase anterior; `_resolve` troca o `[n]` errado só por um trecho do **mesmo documento** que sustente a frase sozinho (razão ≥ `MIN_ATTRIBUTION_RATIO` = 0,6, sem termo crítico faltando) e dá citação à frase sem ela sob o mesmo critério, nunca pelo pool de todo o contexto, que foi o que aceitou forjadas. A frase atribuída não conta na regra da maioria, para não diluir uma citada e reprovada. Testes: `test_standalone_citation_line_belongs_to_the_previous_statement`, `test_wrong_citation_number_in_the_same_document_is_repaired`, `test_citation_is_never_repaired_across_documents`, `test_uncited_statement_*`, `test_attributed_statement_does_not_dilute_a_rejected_cited_one`
+- **Resultado depois da correção (dev, mesmas 42 respostas reais):** fundamentadas 22/30 → 24/30; entre as respondidas 91,7% → 92,3%; recusas corretas 12/12 → 12/12. Com 30 perguntas a diferença não é significativa. As falsas recusas que sobram (d21, d30) são recusas do próprio modelo; d24 é uma recusa coerente (endereço que não está no trecho). Detalhes em `evidencias/avaliacao/calibracao-verificacao-dev/README.md`
 
 ---
 
