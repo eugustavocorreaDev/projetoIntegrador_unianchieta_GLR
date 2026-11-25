@@ -1,0 +1,42 @@
+{
+  "url": "http://localhost:8000",
+  "endpoint": "ask",
+  "steps": [
+    {
+      "requests": 6,
+      "errors": 0,
+      "error_rate": 0.0,
+      "refused": 0,
+      "throughput_rps": 0.051,
+      "p50_ms": 22271.3,
+      "p95_ms": 31354.2,
+      "p99_ms": 31354.2,
+      "max_ms": 31354.2,
+      "concurrency": 1
+    },
+    {
+      "requests": 6,
+      "errors": 0,
+      "error_rate": 0.0,
+      "refused": 0,
+      "throughput_rps": 0.104,
+      "p50_ms": 13798.4,
+      "p95_ms": 33148.5,
+      "p99_ms": 33148.5,
+      "max_ms": 33148.5,
+      "concurrency": 2
+    },
+    {
+      "requests": 6,
+      "errors": 0,
+      "error_rate": 0.0,
+      "refused": 0,
+      "throughput_rps": 0.117,
+      "p50_ms": 15842.9,
+      "p95_ms": 41172.5,
+      "p99_ms": 41172.5,
+      "max_ms": 41172.5,
+      "concurrency": 4
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "url": "http://localhost:8000",
+  "endpoint": "search",
+  "steps": [
+    {
+      "requests": 100,
+      "errors": 0,
+      "error_rate": 0.0,
+      "refused": 0,
+      "throughput_rps": 12.135,
+      "p50_ms": 78.1,
+      "p95_ms": 124.1,
+      "p99_ms": 192.8,
+      "max_ms": 195.8,
+      "concurrency": 1
+    },
+    {
+      "requests": 100,
+      "errors": 0,
+      "error_rate": 0.0,
+      "refused": 0,
+      "throughput_rps": 11.961,
+      "p50_ms": 320.8,
+      "p95_ms": 497.8,
+      "p99_ms": 536.6,
+      "max_ms": 536.8,
+      "concurrency": 4
+    },
+    {
+      "requests": 100,
+      "errors": 0,
+      "error_rate": 0.0,
+      "refused": 0,
+      "throughput_rps": 12.512,
+      "p50_ms": 642.4,
+      "p95_ms": 706.9,
+      "p99_ms": 713.4,
+      "max_ms": 726.3,
+      "concurrency": 8
+    },
+    {
+      "requests": 100,
+      "errors": 0,
+      "error_rate": 0.0,
+      "refused": 0,
+      "throughput_rps": 11.608,
+      "p50_ms": 1309.9,
+      "p95_ms": 1602.6,
+      "p99_ms": 1614.9,
+      "max_ms": 1627.5,
+      "concurrency": 16
+    },
+    {
+      "requests": 100,
+      "errors": 0,
+      "error_rate": 0.0,
+      "refused": 0,
+      "throughput_rps": 10.766,
+      "p50_ms": 2877.9,
+      "p95_ms": 3175.2,
+      "p99_ms": 3200.6,
+      "max_ms": 3224.7,
+      "concurrency": 32
+    }
+  ]
+}
