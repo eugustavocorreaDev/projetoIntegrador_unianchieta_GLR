@@ -19,7 +19,7 @@
 
 **Baseline:** chunking `fixed` + busca `vector`, tanto na recuperação quanto na geração (`--gen-strategy fixed --gen-mode vector`). **Comparações:** 2 estratégias de chunking × 4 modos de recuperação.
 
-**Conjuntos:** `perguntas_teste.json` (50 com resposta e 14 sem; só para o resultado) e `perguntas_dev.json` (12 com resposta e 6 sem; só para calibrar). Um teste automatizado garante que os dois não compartilham perguntas nem trechos esperados.
+**Conjuntos:** `perguntas_teste.json` (50 com resposta e 14 sem; só para o resultado) e `perguntas_dev.json` (30 com resposta e 12 sem; só para calibrar). Um teste automatizado garante que os dois não compartilham perguntas nem trechos esperados.
 
 ## Como reproduzir (um comando)
 

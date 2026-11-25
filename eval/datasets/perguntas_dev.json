@@ -1,6 +1,6 @@
 {
   "name": "perguntas_dev",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "corpus": "data/raw_docs (20 documentos)",
   "description": "Conjunto de DESENVOLVIMENTO: usado apenas para calibrar parâmetros, como MIN_VECTOR_SCORE. Não compartilha perguntas nem trechos esperados com o conjunto de teste (perguntas_teste.json), e há um teste automatizado que garante isso. Nunca reporte números deste arquivo como resultado final.",
   "questions": [
@@ -113,6 +113,168 @@
       "expected_snippets": ["A classe APIKeyHeader, de fastapi.security"]
     },
     {
+      "id": "d13",
+      "question": "Qual parâmetro do APIRouter aplica uma lista de dependências a todas as rotas do roteador?",
+      "answerable": true,
+      "expected_answer": "O parâmetro `dependencies` do `APIRouter`.",
+      "expected_source": "aplicacoes-maiores.md",
+      "expected_section": "Aplicações maiores com APIRouter > Dependências por roteador",
+      "expected_snippets": ["O parâmetro `dependencies` do `APIRouter` aplica uma lista de dependências a todas as rotas do roteador"]
+    },
+    {
+      "id": "d14",
+      "question": "O que acontece se eu chamar time.sleep dentro de uma rota async def?",
+      "answerable": true,
+      "expected_answer": "Bloqueia o laço de eventos e nenhuma outra requisição é atendida.",
+      "expected_source": "async-e-concorrencia.md",
+      "expected_section": "Concorrência: async def ou def > O erro mais comum",
+      "expected_snippets": ["dentro de uma rota `async def` bloqueia o laço de eventos"]
+    },
+    {
+      "id": "d15",
+      "question": "O cabeçalho User-Agent diferencia maiúsculas de minúsculas?",
+      "answerable": true,
+      "expected_answer": "Não, os cabeçalhos HTTP não diferenciam maiúsculas de minúsculas.",
+      "expected_source": "cabecalhos-cookies-formularios.md",
+      "expected_section": "Cabeçalhos, cookies e formulários > Cabeçalhos com Header",
+      "expected_snippets": ["Os cabeçalhos HTTP não diferenciam maiúsculas de minúsculas"]
+    },
+    {
+      "id": "d16",
+      "question": "Como evito reler o arquivo .env a cada requisição?",
+      "answerable": true,
+      "expected_answer": "Criando as configurações uma única vez, com functools.lru_cache.",
+      "expected_source": "configuracoes.md",
+      "expected_section": "Configurações com pydantic-settings > Usando as configurações no FastAPI",
+      "expected_snippets": ["criar as configurações uma única vez, com `functools.lru_cache`"]
+    },
+    {
+      "id": "d17",
+      "question": "Como faço o response_model omitir os campos que não foram definidos explicitamente?",
+      "answerable": true,
+      "expected_answer": "Com response_model_exclude_unset=True.",
+      "expected_source": "corpo-da-requisicao.md",
+      "expected_section": "Corpo da requisição e modelos de resposta > Modelo de resposta",
+      "expected_snippets": ["use `response_model_exclude_unset=True`"]
+    },
+    {
+      "id": "d18",
+      "question": "Para que serve o bloco finally numa dependência com yield?",
+      "answerable": true,
+      "expected_answer": "Garante que o recurso seja liberado mesmo quando ocorre um erro.",
+      "expected_source": "dependencias.md",
+      "expected_section": "Dependências > Dependências com yield",
+      "expected_snippets": ["O bloco `finally` garante que o recurso seja liberado mesmo quando ocorre um erro"]
+    },
+    {
+      "id": "d19",
+      "question": "O que significa o sufixo :ro numa montagem de pasta do Compose?",
+      "answerable": true,
+      "expected_answer": "Monta a pasta só para leitura.",
+      "expected_source": "docker-compose.md",
+      "expected_section": "Docker Compose: vários serviços > Volumes",
+      "expected_snippets": ["O sufixo `:ro` monta a pasta só para leitura"]
+    },
+    {
+      "id": "d20",
+      "question": "Qual instrução do Dockerfile define o usuário que executa o container?",
+      "answerable": true,
+      "expected_answer": "USER.",
+      "expected_source": "docker-imagens.md",
+      "expected_section": "Docker: construindo imagens > Instruções principais do Dockerfile",
+      "expected_snippets": ["Define o usuário que executa os comandos seguintes e o container"]
+    },
+    {
+      "id": "d21",
+      "question": "Qual resposta o FastAPI devolve por padrão quando a validação dos dados falha?",
+      "answerable": true,
+      "expected_answer": "Uma resposta 422 com a lista de problemas encontrados.",
+      "expected_source": "erros-e-middleware.md",
+      "expected_section": "Tratamento de erros, middleware e CORS > Manipuladores de exceção personalizados",
+      "expected_snippets": ["vira uma resposta 422 com a lista de problemas encontrados"]
+    },
+    {
+      "id": "d22",
+      "question": "Que rota posso usar para os orquestradores saberem se a aplicação está pronta?",
+      "answerable": true,
+      "expected_answer": "Uma rota simples como GET /health devolvendo {\"status\": \"ok\"}.",
+      "expected_source": "implantacao.md",
+      "expected_section": "Implantação > Rota de verificação de saúde",
+      "expected_snippets": ["`GET /health` devolvendo"]
+    },
+    {
+      "id": "d23",
+      "question": "Quais valores um parâmetro do tipo bool aceita como verdadeiro?",
+      "answerable": true,
+      "expected_answer": "1, true, on e yes, sem diferenciar maiúsculas e minúsculas.",
+      "expected_source": "parametros.md",
+      "expected_section": "Parâmetros de caminho e de consulta > Parâmetros de consulta",
+      "expected_snippets": ["aceitam os valores `1`, `true`, `on` e `yes` como verdadeiro"]
+    },
+    {
+      "id": "d24",
+      "question": "Em qual endereço a aplicação serve o esquema OpenAPI?",
+      "answerable": true,
+      "expected_answer": "Em /openapi.json.",
+      "expected_source": "primeiros-passos.md",
+      "expected_section": "Primeiros passos > Documentação interativa",
+      "expected_snippets": ["servido em `/openapi.json`"]
+    },
+    {
+      "id": "d25",
+      "question": "Como ficou o método dict() na versão 2 do Pydantic?",
+      "answerable": true,
+      "expected_answer": "Virou model_dump().",
+      "expected_source": "pydantic-modelos.md",
+      "expected_section": "Pydantic: modelos de dados > Migração da versão 1 para a versão 2",
+      "expected_snippets": ["`dict()` virou `model_dump()`"]
+    },
+    {
+      "id": "d26",
+      "question": "O que o método errors() devolve quando a validação do Pydantic falha?",
+      "answerable": true,
+      "expected_answer": "Uma lista de dicionários, cada um com loc, msg e type.",
+      "expected_source": "pydantic-validacao.md",
+      "expected_section": "Pydantic: validação personalizada > Tratando ValidationError",
+      "expected_snippets": ["O método `errors()` devolve uma lista de dicionários"]
+    },
+    {
+      "id": "d27",
+      "question": "Como uma fixture executa código de encerramento depois do teste?",
+      "answerable": true,
+      "expected_answer": "Usando yield no lugar de return.",
+      "expected_source": "pytest-fixtures.md",
+      "expected_section": "pytest: fixtures > Limpeza com yield",
+      "expected_snippets": ["a fixture usa `yield` no lugar de `return`"]
+    },
+    {
+      "id": "d28",
+      "question": "Como marco um teste que deve falhar por causa de um defeito conhecido?",
+      "answerable": true,
+      "expected_answer": "Com @pytest.mark.xfail.",
+      "expected_source": "pytest-fundamentos.md",
+      "expected_section": "pytest: fundamentos > Marcadores para pular testes",
+      "expected_snippets": ["`@pytest.mark.xfail` indica que se espera que o teste falhe"]
+    },
+    {
+      "id": "d29",
+      "question": "Qual status e qual cabeçalho devo devolver quando as credenciais são inválidas?",
+      "answerable": true,
+      "expected_answer": "Status 401 e o cabeçalho WWW-Authenticate com o valor Bearer.",
+      "expected_source": "seguranca.md",
+      "expected_section": "Segurança e autenticação > Erros de autenticação",
+      "expected_snippets": ["usando o status 401 e o cabeçalho `WWW-Authenticate` com o valor `Bearer`"]
+    },
+    {
+      "id": "d30",
+      "question": "Posso declarar BackgroundTasks dentro de uma dependência?",
+      "answerable": true,
+      "expected_answer": "Sim; o FastAPI usa o mesmo objeto em toda a requisição.",
+      "expected_source": "tarefas-em-segundo-plano.md",
+      "expected_section": "Tarefas em segundo plano > Em dependências",
+      "expected_snippets": ["O FastAPI usa o mesmo objeto em toda a requisição"]
+    },
+    {
       "id": "v01",
       "question": "Como configuro o Celery Beat para agendar tarefas periódicas?",
       "answerable": false,
@@ -145,6 +307,42 @@
     {
       "id": "v06",
       "question": "Qual é a versão mínima do Python exigida pelo Pydantic?",
+      "answerable": false,
+      "note": "Assunto ausente."
+    },
+    {
+      "id": "v07",
+      "question": "Qual é o timeout padrão de uma requisição no FastAPI?",
+      "answerable": false,
+      "note": "Armadilha: valor padrão não documentado."
+    },
+    {
+      "id": "v08",
+      "question": "Qual é o tamanho máximo do corpo de uma requisição por padrão?",
+      "answerable": false,
+      "note": "Armadilha: valor padrão não documentado."
+    },
+    {
+      "id": "v09",
+      "question": "Como configuro rate limiting na API?",
+      "answerable": false,
+      "note": "Assunto ausente."
+    },
+    {
+      "id": "v10",
+      "question": "Como exponho um endpoint GraphQL com o FastAPI?",
+      "answerable": false,
+      "note": "Assunto ausente."
+    },
+    {
+      "id": "v11",
+      "question": "Quantos workers o Uvicorn usa por padrão?",
+      "answerable": false,
+      "note": "Armadilha: a opção --workers é documentada, o valor padrão do Uvicorn não."
+    },
+    {
+      "id": "v12",
+      "question": "Como habilito WebSockets na aplicação?",
       "answerable": false,
       "note": "Assunto ausente."
     }

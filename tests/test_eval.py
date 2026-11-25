@@ -201,7 +201,7 @@ def test_evaluate_retrieval_and_generation_offline(questions):
     ]
     gate = calibrate_gate(pipeline, load_dataset(DEV_DATASET), ["fixed", "recursive"], "hybrid", 5)
     assert set(gate) == {"fixed", "recursive"}
-    assert gate["recursive"]["n_answerable"] == 12 and gate["recursive"]["n_unanswerable"] == 6
+    assert gate["recursive"]["n_answerable"] == 30 and gate["recursive"]["n_unanswerable"] == 12
     assert gate["recursive"]["best_threshold"] is not None
     # Com embeddings lexicais, a busca híbrida já deve achar a maioria dos trechos
     hybrid = next(s for s in summary if s["strategy"] == "recursive" and s["mode"] == "hybrid")
